@@ -11,7 +11,7 @@ xcode-select --install
 
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
-echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> /Users/(username)/.zprofile
+echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile
 
 eval "$(/opt/homebrew/bin/brew shellenv)"
 
@@ -22,6 +22,8 @@ mkdir Code
 cd Code
 
 git clone https://github.com/clytrdr/mac.git
+
+cd mac
 
 ansible-playbook -i inventory/localhost localhost.yml --ask-become-pass --ask-vault-pass
 
