@@ -39,7 +39,7 @@
     - name: Set global mail address
       git_config:
         name: user.email
-        value: "{{ git_email }}"
+        value: "{{ git_mail }}"
 
   tags:
     - git
