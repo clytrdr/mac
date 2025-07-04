@@ -41,11 +41,11 @@ find ~/Library -iname "*pycharm*" -exec rm -r "{}" \;
 Decrypt secret file
 
 ```commandline
-ansible-vault decrypt secret.yml
+ansible-vault decrypt roles/git/vars/main.yml
 ```
 
 Encrypt secret file
 
 ```commandline
-ansible-vault encrypt secret.yml
+ansible-vault encrypt roles/git/vars/main.yml
 ```
