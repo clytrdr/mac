@@ -1,0 +1,11 @@
+- hosts: localhost
+  connection: local
+  gather_facts: no
+  become: no
+  vars_files:
+    - vars/secret.yml
+    - vars/brew.yml
+  roles:
+    - zsh
+    - homebrew
+    - git

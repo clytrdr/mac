@@ -1,0 +1,45 @@
+- block:
+    - name: git install
+      homebrew:
+        name: git
+        state: present
+
+    - name: Download git related files
+      uri:
+        url: "{{ item.url }}"
+        dest: "{{ item.dest }}"
+      loop:
+        - { url: 'https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh',
+            dest: '~/.zsh/git-prompt.sh' }
+        - { url: 'https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash',
+            dest: '~/.zsh/git-completion.bash' }
+        - { url: 'https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.zsh',
+            dest: '~/.zsh/_git' }
+
+    - name: Add global_ignore
+      template:
+        src: templates/gitignore_global.j2
+        dest: "~/.gitignore_global"
+
+    - name: Set global ignore
+      git_config:
+        name: core.excludesFile
+        value: "~/.gitignore_global"
+
+    - name: Change default branch name
+      git_config:
+        name: init.defaultBranch
+        value: main
+
+    - name: Set global user name
+      git_config:
+        name: user.name
+        value: "{{ git_user }}"
+
+    - name: Set global mail address
+      git_config:
+        name: user.email
+        value: "{{ git_email }}"
+
+  tags:
+    - git

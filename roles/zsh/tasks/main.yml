@@ -1,0 +1,18 @@
+- block:
+    - name: Create .zsh dir
+      file:
+        path: "~/.zsh"
+        state: directory
+
+    - name: Change .zshrc
+      template:
+        src: templates/zshrc.j2
+        dest: "~/.zshrc"
+
+    - name: Create .zfunc dir
+      file:
+        path: "~/.zfunc"
+        state: directory
+
+  tags:
+    - zsh

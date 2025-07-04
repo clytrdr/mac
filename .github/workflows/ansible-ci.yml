@@ -1,0 +1,51 @@
+name: Ansible CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test-playbook:
+    runs-on: macos-latest
+
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install Ansible and ansible-lint
+        run: pip3 install ansible ansible-lint
+
+      - name: Run ansible-lint
+        run: ansible-lint .
+
+      - name: Run Ansible Playbook Checks
+        env:
+          VAULT_PASSWORD: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}
+        run: |
+          if [ -z "$VAULT_PASSWORD" ]; then
+            echo "::error::ANSIBLE_VAULT_PASSWORD secret is not set or empty."
+            exit 1
+          fi
+
+          echo -n "$VAULT_PASSWORD" > .vault_pass
+          chmod 600 .vault_pass
+
+          # Set a trap to remove the vault password file upon exit, regardless of success or failure.
+          # This ensures cleanup is guaranteed even if an error occurs.
+          trap 'rm -f .vault_pass' EXIT
+
+          # Run various checks.
+          echo "--- Running syntax-check ---"
+          ansible-playbook localhost.yml -i inventory/localhost --syntax-check --vault-password-file .vault_pass
+
+          echo "--- Running dry-run ---"
+          ansible-playbook localhost.yml -i inventory/localhost --check --vault-password-file .vault_pass
