@@ -24,3 +24,4 @@ homebrew_packages:
   - name: ruff
   - name: docker-buildx
   - name: wget
+  - name: gemini-cli
