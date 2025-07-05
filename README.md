@@ -4,7 +4,7 @@
 
 This repository contains my personal Ansible playbooks for setting up a new macOS machine.
 
-## Usage
+## Setup
 
 ```commandline
 xcode-select --install
@@ -28,24 +28,4 @@ cd mac
 ansible-playbook -i inventory/localhost localhost.yml --ask-become-pass --ask-vault-pass
 
 conda init --all
-```
-
-## Note
-
-Delete Pycharm data
-
-```commandline
-find ~/Library -iname "*pycharm*" -exec rm -r "{}" \;
-```
-
-Decrypt secret file
-
-```commandline
-ansible-vault decrypt roles/git/vars/main.yml
-```
-
-Encrypt secret file
-
-```commandline
-ansible-vault encrypt roles/git/vars/main.yml
 ```

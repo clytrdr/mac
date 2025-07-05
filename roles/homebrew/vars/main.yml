@@ -9,6 +9,7 @@ homebrew_cask_packages:
   - name: miniconda
     become: yes
   - name: adguard
+  - name: obsidian
   - name: pycharm
 homebrew_packages:
   - name: ansible
