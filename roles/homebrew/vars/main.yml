@@ -10,7 +10,6 @@ homebrew_cask_packages:
     become: yes
   - name: adguard
   - name: obsidian
-  - name: cursor
   - name: pycharm
 homebrew_packages:
   - name: ansible
