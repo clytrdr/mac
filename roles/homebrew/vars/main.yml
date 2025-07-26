@@ -20,6 +20,7 @@ homebrew_packages:
   - name: terraform
   - name: gh
   - name: git-flow
+  - name: git-lfs
   - name: pre-commit
   - name: tox
   - name: ruff
