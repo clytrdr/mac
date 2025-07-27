@@ -25,7 +25,6 @@ homebrew_packages:
   - name: pre-commit
   - name: tox
   - name: ruff
-  - name: pip-tools
   - name: docker-buildx
   - name: wget
   - name: gemini-cli
