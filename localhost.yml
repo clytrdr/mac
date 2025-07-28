@@ -1,10 +1,16 @@
-- hosts: localhost
+- name: Setup local development environment
+  hosts: localhost
   connection: local
-  gather_facts: no
-  become: no
-  vars_files:
-    - vars/secret.yml
-    - vars/brew.yml
+  gather_facts: false
+  become: false
+  vars_prompt:
+    - name: git_user
+      prompt: "Please enter your Git user name"
+      private: false
+
+    - name: git_mail
+      prompt: "Please enter your Git email address"
+      private: false
   roles:
     - zsh
     - homebrew

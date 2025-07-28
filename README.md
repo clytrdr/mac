@@ -25,7 +25,7 @@ git clone https://github.com/clytrdr/mac.git
 
 cd mac
 
-ansible-playbook -i inventory/localhost localhost.yml --ask-become-pass --ask-vault-pass
+ansible-playbook -i inventory/localhost localhost.yml --ask-become-pass
 
 conda init --all
 ```

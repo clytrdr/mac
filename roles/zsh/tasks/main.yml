@@ -1,18 +1,21 @@
-- block:
-    - name: Create .zsh dir
-      file:
-        path: "~/.zsh"
-        state: directory
-
-    - name: Change .zshrc
-      template:
-        src: templates/zshrc.j2
-        dest: "~/.zshrc"
-
-    - name: Create .zfunc dir
-      file:
-        path: "~/.zfunc"
-        state: directory
-
+- name: Configure Zsh
   tags:
     - zsh
+  block:
+    - name: Create .zsh dir
+      ansible.builtin.file:
+        path: "~/.zsh"
+        state: directory
+        mode: '0755'
+
+    - name: Change .zshrc
+      ansible.builtin.template:
+        src: templates/zshrc.j2
+        dest: "~/.zshrc"
+        mode: '0644'
+
+    - name: Create .zfunc dir
+      ansible.builtin.file:
+        path: "~/.zfunc"
+        state: directory
+        mode: '0755'

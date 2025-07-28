@@ -4,10 +4,10 @@ homebrew_cask_packages:
   - name: google-cloud-sdk
   - name: google-chrome
   - name: clipy
-    become: yes
+    become: true
   - name: docker
   - name: miniconda
-    become: yes
+    become: true
   - name: adguard
   - name: obsidian
   - name: chatgpt
