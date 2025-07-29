@@ -11,7 +11,6 @@ homebrew_packages:
   - name: git-flow
   - name: git-lfs
   - name: pre-commit
-  - name: tox
   - name: ruff
   - name: docker-buildx
   - name: wget
