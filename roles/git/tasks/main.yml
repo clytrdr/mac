@@ -7,23 +7,10 @@
         name: git
         state: present
 
-    - name: Download Git related files
-      ansible.builtin.uri:
-        url: "{{ item.url }}"
-        dest: "{{ item.dest | expanduser }}"
-        mode: '0644'
-      loop:
-        - { url: 'https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh',
-            dest: '~/.zsh/git-prompt.sh' }
-        - { url: 'https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash',
-            dest: '~/.zsh/git-completion.bash' }
-        - { url: 'https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.zsh',
-            dest: '~/.zsh/_git' }
-
     - name: Add Global Gitignore
       ansible.builtin.template:
         src: templates/gitignore_global.j2
-        dest: "{{ '~/.gitignore_global' | expanduser }}"
+        dest: "{{ ansible_env.HOME }}/.gitignore_global"
         mode: '0644'
 
     - name: Set Git configurations
@@ -32,7 +19,7 @@
         value: "{{ item.value }}"
         scope: global
       loop:
-        - { name: 'core.excludesFile', value: "{{ '~/.gitignore_global' | expanduser }}" }
+        - { name: 'core.excludesFile', value: "{{ ansible_env.HOME }}/.gitignore_global" }
         - { name: 'init.defaultBranch', value: 'main' }
         - { name: 'user.name', value: "{{ git_user }}" }
         - { name: 'user.email', value: "{{ git_mail }}" }

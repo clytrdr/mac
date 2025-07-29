@@ -2,6 +2,13 @@
 # This ensures that binaries installed by Homebrew are found first.
 export PATH="/opt/homebrew/bin:$PATH"
 
+# --- Add Homebrew's Zsh Completion to fpath ---
+# This must be done before `compinit` is called.
+# It allows Zsh to find completion scripts installed by Homebrew (like for git).
+if [ -d /opt/homebrew/share/zsh/site-functions ]; then
+  fpath=(/opt/homebrew/share/zsh/site-functions $fpath)
+fi
+
 # --- Plugin Manager (zinit) ---
 # If you haven't installed zinit, run this command first:
 # sh -c "$(curl -fsSL https://git.io/zinit-install)"
@@ -29,12 +36,11 @@ else
 fi;
 
 # --- Git Prompt Setup ---
-# The git-prompt.sh and git-completion.bash scripts are often included with
-# the git installation from Homebrew. Sourcing them from there is a good practice.
-# e.g., source /opt/homebrew/etc/profile.d/git-prompt.sh
-source ~/.zsh/git-prompt.sh
-fpath=(~/.zsh $fpath)
-zstyle ':completion:*:*:git:*' script ~/.zsh/git-completion.bash
+# Source the git-prompt script provided by Homebrew's git installation.
+# This is more robust than downloading it manually.
+if [ -f /opt/homebrew/etc/profile.d/git-prompt.sh ]; then
+  source /opt/homebrew/etc/profile.d/git-prompt.sh
+fi
 
 # Configure the information shown in the git prompt
 GIT_PS1_SHOWDIRTYSTATE=true
