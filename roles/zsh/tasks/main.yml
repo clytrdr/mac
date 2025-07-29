@@ -2,26 +2,24 @@
   tags:
     - zsh
   block:
-    - name: Install zinit (Zsh plugin manager)
+    - name: Install zinit (Zsh plugin manager) if not present
       ansible.builtin.shell:
         cmd: 'sh -c "$(curl -fsSL https://git.io/zinit-install)"'
-        warn: false
-      args:
         creates: "{{ ansible_env.HOME }}/.zinit"
 
-    - name: Create .zsh dir
+    - name: Ensure .zsh directory exists
       ansible.builtin.file:
         path: "{{ ansible_env.HOME }}/.zsh"
         state: directory
         mode: '0755'
 
-    - name: Change .zshrc
+    - name: Deploy .zshrc configuration from template
       ansible.builtin.template:
         src: templates/zshrc.j2
         dest: "{{ ansible_env.HOME }}/.zshrc"
         mode: '0644'
 
-    - name: Create .zfunc dir
+    - name: Ensure .zfunc directory exists for custom functions
       ansible.builtin.file:
         path: "{{ ansible_env.HOME }}/.zfunc"
         state: directory
