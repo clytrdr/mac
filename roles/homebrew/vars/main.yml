@@ -1,17 +1,5 @@
 homebrew_taps:
   - hashicorp/tap
-homebrew_cask_packages:
-  - name: google-cloud-sdk
-  - name: google-chrome
-  - name: clipy
-    become: true
-  - name: docker
-  - name: miniconda
-    become: true
-  - name: adguard
-  - name: obsidian
-  - name: chatgpt
-  - name: pycharm
 homebrew_packages:
   - name: ansible
   - name: ansible-lint
@@ -28,3 +16,15 @@ homebrew_packages:
   - name: docker-buildx
   - name: wget
   - name: gemini-cli
+homebrew_cask_packages:
+  - name: google-cloud-sdk
+  - name: google-chrome
+  - name: clipy
+    become: true
+  - name: docker
+  - name: miniconda
+    become: true
+  - name: adguard
+  - name: obsidian
+  - name: chatgpt
+  - name: pycharm
