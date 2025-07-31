@@ -82,3 +82,35 @@ alias ...='cd ../..'
 
 # User-specific aliases (from your original config)
 alias gemi="gemini --yolo"
+
+# --- Custom Functions ---
+# A function to update all package managers at once.
+# It checks if each command (brew, conda, npm) exists before running the update.
+updateall() {
+  # Update Homebrew
+  if command -v brew &> /dev/null; then
+    echo "==> Updating Homebrew packages..."
+    brew upgrade
+  else
+    echo "INFO: Homebrew not found. Skipping."
+  fi
+
+  # Update Conda
+  if command -v conda &> /dev/null; then
+    echo "\n==> Updating all Conda packages..."
+    # The '-y' flag automatically confirms the update.
+    conda update --all -y
+  else
+    echo "\nINFO: Conda not found. Skipping."
+  fi
+
+  # Update global NPM packages
+  if command -v npm &> /dev/null; then
+    echo "\n==> Updating global npm packages..."
+    npm update -g
+  else
+    echo "\nINFO: npm not found. Skipping."
+  fi
+
+  echo "\n✅ All updates finished."
+}
