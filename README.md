@@ -1,6 +1,6 @@
 # My Ansible Setup for macOS
 
-[![Ansible CI](https://github.com/clytrdr/mac/actions/workflows/ansible-ci.yml/badge.svg)](https://github.com/clytrdr/mac/actions/workflows/ansible-ci.yml)
+[![Ansible CI](https://github.com/clytrdr/mac/actions/workflows/ci.yml/badge.svg)](https://github.com/clytrdr/mac/actions/workflows/ci.yml)
 
 This repository contains personal Ansible playbooks to automate the setup and configuration of a new macOS machine. It
 handles the installation of tools, applications, and shell configurations.
