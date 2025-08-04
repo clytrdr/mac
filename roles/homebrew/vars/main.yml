@@ -24,6 +24,4 @@ homebrew_cask_packages:
   - name: miniconda
     become: true
   - name: adguard
-  - name: obsidian
-  - name: chatgpt
   - name: pycharm
