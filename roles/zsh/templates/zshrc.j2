@@ -112,5 +112,13 @@ updateall() {
     echo "\nINFO: npm not found. Skipping."
   fi
 
+  # Update Google Cloud components
+  if command -v gcloud &> /dev/null; then
+    echo "\n==> Updating Google Cloud components..."
+    gcloud components update --quiet
+  else
+    echo "\nINFO: gcloud not found. Skipping."
+  fi
+
   echo "\n✅ All updates finished."
 }
