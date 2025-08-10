@@ -54,3 +54,4 @@ This playbook is configured in `localhost.yml` and automates the following:
 - **Zsh:** Configures the Zsh shell environment.
 - **Homebrew:** Installs packages and casks (GUI applications).
 - **Git:** Sets up global Git configuration with the user and email you provide.
+- **Node.js:** Configures Node.js version manager (`n`) to work without sudo permissions.

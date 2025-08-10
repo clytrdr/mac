@@ -2,6 +2,13 @@
 # This ensures that binaries installed by Homebrew are found first.
 export PATH="/opt/homebrew/bin:$PATH"
 
+# --- Node.js Configuration (n version manager) ---
+# Set N_PREFIX to use user directory instead of system directory
+# This prevents npm from requiring sudo for global package installations
+export N_PREFIX="$HOME/.n"
+# Add n's bin directory to PATH
+export PATH="$N_PREFIX/bin:$PATH"
+
 # --- Add Homebrew's Zsh Completion to fpath ---
 # This must be done before `compinit` is called.
 # It allows Zsh to find completion scripts installed by Homebrew (like for git).
