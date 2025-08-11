@@ -3,7 +3,7 @@
 [![Ansible CI](https://github.com/clytrdr/mac/actions/workflows/ci.yml/badge.svg)](https://github.com/clytrdr/mac/actions/workflows/ci.yml)
 
 This repository contains personal Ansible playbooks to automate the setup and configuration of a new macOS machine. It
-handles the installation of tools, applications, and shell configurations.
+handles the installation of development tools, applications, shell configurations, and AI tools like gemini-cli.
 
 ## 🚀 Getting Started
 
@@ -40,7 +40,7 @@ git clone https://github.com/clytrdr/mac.git
 
 cd mac
 
-ansible-playbook -i inventory/localhost localhost.yml --ask-become-pass
+ansible-playbook -i inventory/localhost localhost.yml --ask-become-pass --extra-vars "git_user=test git_mail=test@test.com"
 
 conda init --all
 ```
@@ -54,4 +54,4 @@ This playbook is configured in `localhost.yml` and automates the following:
 - **Zsh:** Configures the Zsh shell environment.
 - **Homebrew:** Installs packages and casks (GUI applications).
 - **Git:** Sets up global Git configuration with the user and email you provide.
-- **Node.js:** Configures Node.js version manager (`n`) to work without sudo permissions.
+- **Gemini CLI:** Installs and configures Google's Gemini AI CLI tool with MCP server support.
