@@ -1,0 +1,14 @@
+- name: Configure Gemini CLI
+  tags:
+    - gemini
+  block:
+    - name: Gemini CLI install
+      community.general.homebrew:
+        name: gemini-cli
+        state: latest
+
+    - name: Configure Gemini CLI
+      ansible.builtin.template:
+        src: templates/setting_json.j2
+        dest: "{{ ansible_env.HOME }}/.gemini/settings.json"
+        mode: '0644'

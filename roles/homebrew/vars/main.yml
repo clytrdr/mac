@@ -6,6 +6,7 @@ homebrew_packages:
   - name: speedtest-cli
   - name: battery
   - name: n
+  - name: uv
   - name: terraform
   - name: tflint
   - name: gh
@@ -15,7 +16,6 @@ homebrew_packages:
   - name: ruff
   - name: docker-buildx
   - name: wget
-  - name: gemini-cli
 homebrew_cask_packages:
   - name: google-cloud-sdk
   - name: google-chrome
