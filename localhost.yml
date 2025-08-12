@@ -12,7 +12,7 @@
       prompt: "Please enter your Git email address"
       private: false
   roles:
-    - zsh
-    - homebrew
     - git
+    - homebrew
+    - zsh
     - gemini

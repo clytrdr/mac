@@ -14,7 +14,8 @@ export N_PREFIX=$HOME/.n
 export PATH=$N_PREFIX/bin:$PATH
 
 # --- Plugin Manager (zinit) ---
-source ~/.zinit/bin/zinit.zsh
+ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
+source "${ZINIT_HOME}/zinit.zsh"
 
 # --- Load Recommended Plugins ---
 # Syntax highlighting for commands
@@ -38,10 +39,19 @@ else
 fi;
 
 # --- Git Prompt Setup ---
-# Source the git-prompt script provided by Homebrew's git installation.
-# This is more robust than downloading it manually.
-if [ -f /opt/homebrew/etc/profile.d/git-prompt.sh ]; then
-  source /opt/homebrew/etc/profile.d/git-prompt.sh
+# Ensure .zsh directory exists
+if [ ! -d ~/.zsh ]; then
+  mkdir -p ~/.zsh
+fi
+
+# Download git-prompt.sh if it doesn't exist
+if [ ! -f ~/.zsh/git-prompt.sh ]; then
+  curl -s -o ~/.zsh/git-prompt.sh https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh
+fi
+
+# Source the git-prompt script
+if [ -f ~/.zsh/git-prompt.sh ]; then
+  source ~/.zsh/git-prompt.sh
 fi
 
 # Configure the information shown in the git prompt
@@ -53,10 +63,10 @@ GIT_PS1_SHOWUPSTREAM=auto
 # --- Prompt Configuration ---
 # Enable command substitution in the prompt
 setopt PROMPT_SUBST
-# Display Git info on the right prompt (RPROMPT) for better readability with long paths
-RPROMPT='%F{red}$(__git_ps1 "(%s)")%f'
-# Set the main prompt (PS1): user@host: current_directory $
-PS1='%F{green}%n@%m%f: %F{cyan}%~%f \$ '
+# Clear the right prompt
+RPROMPT=''
+# Set the main prompt (PS1): user@host: current_directory $ git_status
+PS1='%F{green}%n@%m%f: %F{cyan}%~%f \$ %F{red}$(__git_ps1 "(%s)")%f '
 
 # --- History Configuration ---
 HISTFILE=~/.zsh_history      # History file path

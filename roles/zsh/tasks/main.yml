@@ -4,8 +4,11 @@
   block:
     - name: Install zinit (Zsh plugin manager) if not present
       ansible.builtin.shell:
-        cmd: 'sh -c "$(curl -fsSL https://git.io/zinit-install)"'
-        creates: "{{ ansible_env.HOME }}/.zinit"
+        cmd: |
+          ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
+          [ ! -d $ZINIT_HOME ] && mkdir -p "$(dirname $ZINIT_HOME)"
+          [ ! -d $ZINIT_HOME/.git ] && git clone https://github.com/zdharma-continuum/zinit.git "$ZINIT_HOME"
+        creates: "{{ ansible_env.HOME }}/.local/share/zinit/zinit.git"
 
     - name: Ensure .zsh directory exists
       ansible.builtin.file:
