@@ -3,14 +3,15 @@
   connection: local
   gather_facts: true
   become: false
-  vars_prompt:
-    - name: git_user
-      prompt: "Please enter your Git user name"
-      private: false
-
-    - name: git_mail
-      prompt: "Please enter your Git email address"
-      private: false
+  vars:
+    # Default values for when vault is not available or for syntax checking
+    git_user_name: "{{ git_user_name | default('Your Name') }}"
+    git_user_email: "{{ git_user_email | default('your.email@example.com') }}"
+  tasks:
+    - name: Load vault variables if available
+      include_vars: vars/secrets.yml
+      ignore_errors: true
+      no_log: true
   roles:
     - git
     - homebrew

@@ -38,9 +38,6 @@ jobs:
           python-version: '3.12'
 
       - name: Cache pip dependencies
-        # Speeds up later job runs by restoring downloaded packages from a cache.
-        # The cache is identified by the runner's OS and the hash of the requirements.txt file.
-        # This means the cache is only rebuilt when the dependencies in requirements.txt change.
         uses: actions/cache@v4
         with:
           path: ~/.cache/pip
@@ -51,10 +48,22 @@ jobs:
       - name: Install Ansible
         run: pip3 install -r requirements.txt
 
+      - name: Create vault password file from GitHub Secret
+        run: echo "${{ secrets.ANSIBLE_VAULT_PASSWORD }}" > .vault_pass
+        env:
+          ANSIBLE_VAULT_PASSWORD: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}
+
+      - name: Set vault password file permissions
+        run: chmod 600 .vault_pass
+
       - name: Run Ansible Playbook Checks
         run: |
           echo "--- Running syntax-check ---"
-          ansible-playbook localhost.yml -i inventory/localhost --syntax-check
+          ansible-playbook localhost.yml --syntax-check --vault-password-file .vault_pass
 
           echo "--- Running dry-run ---"
-          ansible-playbook localhost.yml -i inventory/localhost --check --extra-vars "git_user=test git_mail=test@test.com"
+          ansible-playbook localhost.yml --check --vault-password-file .vault_pass
+
+      - name: Clean up vault password file
+        if: always()
+        run: rm -f .vault_pass
