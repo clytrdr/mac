@@ -5,7 +5,6 @@ homebrew_packages:
   - name: ansible-lint
   - name: speedtest-cli
   - name: battery
-  - name: n
   - name: uv
   - name: terraform
   - name: tflint
