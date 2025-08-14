@@ -11,11 +11,11 @@
 1. [Disclaimer](#disclaimer)
 2. [Overview](#overview)
 3. [🚀 Getting Started](#-getting-started)
-   - 3.1 [Prerequisites](#prerequisites)
-   - 3.2 [Installation](#installation)
+    - 3.1 [Prerequisites](#prerequisites)
+    - 3.2 [Installation](#installation)
 4. [🔐 Managing Secrets (vars/secrets.yml)](#-managing-secrets-varssecrets.yml)
-   - 4.1 [Setting up secrets for the first time](#setting-up-secrets-for-the-first-time)
-   - 4.2 [Managing existing secrets](#managing-existing-secrets)
+    - 4.1 [Setting up secrets for the first time](#setting-up-secrets-for-the-first-time)
+    - 4.2 [Managing existing secrets](#managing-existing-secrets)
 5. [What does this playbook do?](#what-does-this-playbook-do)
 
 ## Overview
@@ -123,13 +123,9 @@ ansible-vault rekey vars/secrets.yml --vault-password-file .vault_pass
 - Keep your `.vault_pass` file secure and never commit it to git
 - The `vars/secrets.yml` file is encrypted and safe to commit
 
----
+## License
 
-### What does this playbook do?
+This project is licensed under the GNU General Public License v3.0 (GPLv3)—see the [LICENSE](LICENSE) file for
+details.
 
-This playbook is configured in `localhost.yml` and automates the following:
-
-- **Zsh:** Configures the Zsh shell environment.
-- **Homebrew:** Installs packages and casks (GUI applications).
-- **Git:** Sets up global Git configuration with the user and email you provide.
-- **Gemini CLI:** Installs and configures Google's Gemini AI CLI tool with MCP server support.
+Copyright (C) 2025 Ishikura Mikiya
