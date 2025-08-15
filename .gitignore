@@ -1,3 +1,4 @@
 *.retry
 .vault_pass
 .ansible_become_pass
+!vars/secrets.yml
