@@ -9,6 +9,13 @@
     "serena": {
       "command": "/opt/homebrew/bin/uvx",
       "args": ["--from", "git+https://github.com/oraios/serena", "serena", "start-mcp-server"]
+    },
+    "github": {
+      "command": "npx",
+      "args": ["@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "{{ gh_mcp_token }}"
+      }
     }
   }
 }

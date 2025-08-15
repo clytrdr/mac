@@ -3,11 +3,7 @@
   connection: local
   gather_facts: true
   become: false
-  vars:
-    # Default values for when vault is not available or for syntax checking
-    git_user_name: "{{ git_user_name | default('Your Name') }}"
-    git_user_email: "{{ git_user_email | default('your.email@example.com') }}"
-  tasks:
+  pre_tasks:
     - name: Load vault variables if available
       include_vars: vars/secrets.yml
       ignore_errors: true

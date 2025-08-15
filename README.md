@@ -58,9 +58,9 @@ git clone https://github.com/clytrdr/mac.git
 
 cd mac
 
-# Create vault password file (you'll need the vault password)
 echo "your_vault_password" > .vault_pass
-chmod 600 .vault_pass
+echo "your_mac_password" > .ansible_become_pass
+chmod 600 .ansible_become_pass .vault_pass
 
 ansible-playbook localhost.yml --ask-become-pass --vault-password-file .vault_pass
 
@@ -74,6 +74,7 @@ file `vars/secrets.yml` contains:
 
 - `git_user`: Your Git username
 - `git_mail`: Your Git email address
+- `gh_mcp_token`: Your GitHub Personal Access Token for the mcp organization
 
 ### Setting up secrets for the first time
 
