@@ -97,6 +97,14 @@ alias ...='cd ../..'
 # User-specific aliases (from your original config)
 alias gemi="gemini --yolo"
 
+# Git Flow aliases
+alias gfrf='git_flow_release_finish'
+
+git_flow_release_finish() {
+    local version=$1
+    git flow release finish -m "Release $version" "$version"
+}
+
 # --- Custom Functions ---
 # A function to update all package managers at once.
 # It checks if each command (brew, conda, npm) exists before running the update.

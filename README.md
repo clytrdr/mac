@@ -61,9 +61,13 @@ cd mac
 echo "your_vault_password" > .vault_pass
 echo "your_mac_password" > .ansible_become_pass
 chmod 600 .ansible_become_pass .vault_pass
+```
 
-ansible-playbook localhost.yml --ask-become-pass --vault-password-file .vault_pass
+```commandline
+ansible-playbook localhost.yml --become-password-file .ansible_become_pass --vault-password-file .vault_pass
+```
 
+```commandline
 conda init --all
 ```
 
