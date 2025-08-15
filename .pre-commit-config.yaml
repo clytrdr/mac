@@ -32,6 +32,7 @@ repos:
     hooks:
       - id: ansible-lint
         name: Lint Ansible playbooks
+        files: \.(yml|yaml|j2)$
         args:
-          - "--profile=safety"  # Use safety profile instead of production
-          - "-p" # Parseable output
+          - "--profile=safety"
+          - "-p"
