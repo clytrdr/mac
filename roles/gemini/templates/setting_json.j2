@@ -8,11 +8,21 @@
     },
     "serena": {
       "command": "/opt/homebrew/bin/uvx",
-      "args": ["--from", "git+https://github.com/oraios/serena", "serena", "start-mcp-server", "--enable-web-dashboard", "false"]
+      "args": [
+        "--from",
+        "git+https://github.com/oraios/serena",
+        "serena",
+        "start-mcp-server",
+        "--enable-web-dashboard", "false",
+        "--context", "agent",
+        "--project", "${PWD}"
+      ]
     },
     "github": {
       "command": "npx",
-      "args": ["@modelcontextprotocol/server-github"],
+      "args": [
+        "@modelcontextprotocol/server-github"
+      ],
       "env": {
         "GITHUB_PERSONAL_ACCESS_TOKEN": "{{ gh_mcp_token }}"
       }
