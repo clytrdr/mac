@@ -1,0 +1,27 @@
+- name: Configure Git and related tools
+  tags:
+    - git
+  block:
+    - name: Git install
+      community.general.homebrew:
+        name: git
+        state: latest
+
+    - name: Add Global Gitignore
+      ansible.builtin.template:
+        src: templates/gitignore_global.j2
+        dest: "{{ ansible_facts.env.HOME }}/.gitignore_global"
+        mode: '0644'
+
+    - name: Set Git configurations
+      community.general.git_config:
+        name: "{{ item.name }}"
+        value: "{{ item.value }}"
+        scope: global
+      loop:
+        - { name: 'core.excludesFile', value: "{{ ansible_facts.env.HOME }}/.gitignore_global" }
+        - { name: 'init.defaultBranch', value: 'main' }
+        - { name: 'user.name', value: "{{ git_user }}" }
+        - { name: 'user.email', value: "{{ git_mail }}" }
+        - { name: 'alias.pushall', value: '!git push --all && git push --tags' }
+      when: item.value is defined and item.value | string | length > 0

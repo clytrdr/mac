@@ -1,0 +1,16 @@
+- name: Setup local development environment
+  hosts: localhost
+  connection: local
+  gather_facts: true
+  become: false
+  pre_tasks:
+    - name: Load vault variables if available
+      include_vars: vars/secrets.yml
+      ignore_errors: true
+      no_log: true
+  roles:
+    - git
+    - homebrew
+    - zsh
+    - gemini
+    - node

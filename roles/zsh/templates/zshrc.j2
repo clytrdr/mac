@@ -1,0 +1,148 @@
+# --- Path for Homebrew ---
+# This ensures that binaries installed by Homebrew are found first.
+export PATH="/opt/homebrew/bin:$PATH"
+
+# --- Add Homebrew's Zsh Completion to fpath ---
+# This must be done before `compinit` is called.
+# It allows Zsh to find completion scripts installed by Homebrew (like for git).
+if [ -d /opt/homebrew/share/zsh/site-functions ]; then
+  fpath=(/opt/homebrew/share/zsh/site-functions $fpath)
+fi
+
+# --- Path for n ---
+export N_PREFIX=$HOME/.n
+export PATH=$N_PREFIX/bin:$PATH
+
+# --- Plugin Manager (zinit) ---
+ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
+source "${ZINIT_HOME}/zinit.zsh"
+
+# --- Load Recommended Plugins ---
+# Syntax highlighting for commands
+zinit light zsh-users/zsh-syntax-highlighting
+# Suggests commands as you type based on history
+zinit light zsh-users/zsh-autosuggestions
+# fzf (fuzzy finder) integration - makes history search (Ctrl+R) powerful
+# (It's recommended to install fzf itself via `brew install fzf`)
+zinit light-mode for \
+    junegunn/fzf-bin \
+    junegunn/fzf
+
+# --- Completion System Setup ---
+# Initialize the completion system
+autoload -Uz compinit
+# Speed up compinit by using a cache file
+if [ -n ~/.zcompdump(N.mh+24) ]; then
+  compinit;
+else
+  compinit -C;
+fi;
+
+# --- Git Prompt Setup ---
+# Ensure .zsh directory exists
+if [ ! -d ~/.zsh ]; then
+  mkdir -p ~/.zsh
+fi
+
+# Download git-prompt.sh if it doesn't exist
+if [ ! -f ~/.zsh/git-prompt.sh ]; then
+  curl -s -o ~/.zsh/git-prompt.sh https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh
+fi
+
+# Source the git-prompt script
+if [ -f ~/.zsh/git-prompt.sh ]; then
+  source ~/.zsh/git-prompt.sh
+fi
+
+# Configure the information shown in the git prompt
+GIT_PS1_SHOWDIRTYSTATE=true
+GIT_PS1_SHOWUNTRACKEDFILES=true
+GIT_PS1_SHOWSTASHSTATE=true
+GIT_PS1_SHOWUPSTREAM=auto
+
+# --- Prompt Configuration ---
+# Enable command substitution in the prompt
+setopt PROMPT_SUBST
+# Clear the right prompt
+RPROMPT=''
+# Set the main prompt (PS1): user@host: current_directory $ git_status
+PS1='%F{green}%n@%m%f: %F{cyan}%~%f \$ %F{red}$(__git_ps1 "(%s)")%f '
+
+# --- History Configuration ---
+HISTFILE=~/.zsh_history      # History file path
+HISTSIZE=10000               # Number of lines to keep in memory
+SAVEHIST=10000               # Number of lines to save in the history file
+setopt HIST_EXPIRE_DUPS_FIRST   # Expire duplicates first when trimming history
+setopt HIST_IGNORE_DUPS         # Don't record an event if it's a duplicate of the previous one
+setopt HIST_FIND_NO_DUPS        # When searching, find the newest entry without duplicates
+setopt HIST_IGNORE_SPACE        # Don't save commands that start with a space
+setopt SHARE_HISTORY            # Share history between all sessions
+
+# --- Useful Options (setopt) ---
+setopt AUTO_CD              # cd to a directory just by typing its name
+setopt EXTENDED_GLOB        # Enable extended globbing (e.g., ls ^*.txt)
+setopt NOTIFY               # Notify on completion of long-running jobs
+
+# --- Aliases ---
+# Common aliases for convenience
+alias ls='ls -G'            # Enable colors for ls on macOS
+alias l='ls -CF'
+alias la='ls -A'
+alias ll='ls -alF'
+alias g='git'
+alias gst='git status'
+alias ..='cd ..'
+alias ...='cd ../..'
+
+# User-specific aliases (from your original config)
+alias gemi="gemini --yolo"
+
+# Git Flow aliases
+alias gfrf='git_flow_release_finish'
+
+git_flow_release_finish() {
+    local version=$1
+    git flow release finish -m "Release_$version" "$version"
+}
+
+# --- Custom Functions ---
+# A function to update all package managers at once.
+# It checks if each command (brew, conda, npm) exists before running the update.
+updateall() {
+  # Update Homebrew
+  if command -v brew &> /dev/null; then
+    echo "==> Updating Homebrew..."
+    brew update
+    echo "==> Updating Homebrew packages..."
+    brew upgrade
+  else
+    echo "INFO: Homebrew not found. Skipping."
+  fi
+
+  # Update Conda
+  if command -v conda &> /dev/null; then
+    echo "\n==> Updating all Conda packages..."
+    # The '-y' flag automatically confirms the update.
+    conda update --all -y
+  else
+    echo "\nINFO: Conda not found. Skipping."
+  fi
+
+  # Update global NPM packages
+  if command -v npm &> /dev/null; then
+    echo "\n==> Updating global npm packages..."
+    npm update -g --no-fund
+  else
+    echo "\nINFO: npm not found. Skipping."
+  fi
+
+  # Update Google Cloud components
+  if command -v gcloud &> /dev/null; then
+    echo "\n==> Updating Google Cloud components..."
+    gcloud components update --quiet
+  else
+    echo "\nINFO: gcloud not found. Skipping."
+  fi
+
+  echo "\n✅ All updates finished."
+}

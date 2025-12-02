@@ -1,0 +1,29 @@
+- name: Configure Zsh
+  tags:
+    - zsh
+  block:
+    - name: Install zinit (Zsh plugin manager) if not present
+      ansible.builtin.shell:
+        cmd: |
+          ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
+          [ ! -d $ZINIT_HOME ] && mkdir -p "$(dirname $ZINIT_HOME)"
+          [ ! -d $ZINIT_HOME/.git ] && git clone https://github.com/zdharma-continuum/zinit.git "$ZINIT_HOME"
+        creates: "{{ ansible_facts.env.HOME }}/.local/share/zinit/zinit.git"
+
+    - name: Ensure .zsh directory exists
+      ansible.builtin.file:
+        path: "{{ ansible_facts.env.HOME }}/.zsh"
+        state: directory
+        mode: '0755'
+
+    - name: Deploy .zshrc configuration from template
+      ansible.builtin.template:
+        src: templates/zshrc.j2
+        dest: "{{ ansible_facts.env.HOME }}/.zshrc"
+        mode: '0644'
+
+    - name: Ensure .zfunc directory exists for custom functions
+      ansible.builtin.file:
+        path: "{{ ansible_facts.env.HOME }}/.zfunc"
+        state: directory
+        mode: '0755'

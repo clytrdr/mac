@@ -1,0 +1,26 @@
+homebrew_taps:
+  - hashicorp/tap
+homebrew_packages:
+  - name: ansible
+  - name: ansible-lint
+  - name: speedtest-cli
+  - name: uv
+  - name: terraform
+  - name: tflint
+  - name: gh
+  - name: git-flow
+  - name: git-lfs
+  - name: pre-commit
+  - name: ruff
+  - name: docker-buildx
+  - name: wget
+homebrew_cask_packages:
+  - name: google-cloud-sdk
+  - name: google-chrome
+  - name: clipy
+    become: true
+  - name: docker
+  - name: miniconda
+    become: true
+  - name: adguard
+  - name: pycharm

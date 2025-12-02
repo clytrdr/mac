@@ -1,0 +1,55 @@
+- name: Manage Homebrew setup
+  tags:
+    - homebrew
+  block:
+    - name: Update Homebrew itself and all taps
+      community.general.homebrew:
+        update_homebrew: true
+
+    - name: Homebrew tap
+      community.general.homebrew_tap:
+        name: '{{ item }}'
+        state: present
+      loop: '{{ homebrew_taps }}'
+
+    - name: Homebrew packages install/upgrade
+      community.general.homebrew:
+        name: '{{ item.name }}'
+        state: '{{ item.state | default("latest") }}'
+      loop: '{{ homebrew_packages }}'
+
+    - name: Homebrew cask packages install/upgrade
+      become: '{{ item.become | default(false) }}'
+      become_user: "{{ lookup('env', 'USER') }}"
+      community.general.homebrew_cask:
+        name: "{{ item.name }}"
+        state: latest
+      loop: '{{ homebrew_cask_packages }}'
+      environment:
+        HOMEBREW_CASK_OPTS: "--appdir=/Applications"
+
+    - name: Check if gcloud is authenticated
+      # Run 'gcloud auth list' to check for an active account.
+      ansible.builtin.command: gcloud auth list --filter=status:ACTIVE --format="value(account)"
+      register: gcloud_auth_status
+      changed_when: false
+      failed_when: false # Do not stop the playbook even if the command fails (e.g., if not authenticated).
+
+    - name: Prompt user to authenticate with gcloud if needed
+      # This task runs only if no active account was found in the previous task.
+      when: gcloud_auth_status.stdout == ""
+      block:
+        - name: Display gcloud login instructions
+          # Display a message and pause, prompting the user to run the authentication command manually.
+          ansible.builtin.pause:
+            prompt: |
+              -----------------------------------------------------------------
+              gcloud authentication is required.
+
+              Please open a new terminal, run the following command,
+              and complete the authentication in your browser.
+
+              gcloud auth application-default login
+
+              Once authentication is complete, return to this terminal and press Enter.
+              -----------------------------------------------------------------

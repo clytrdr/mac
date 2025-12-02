@@ -1,0 +1,43 @@
+# ==============================================================================
+# pre-commit Configuration
+#
+# This file configures pre-commit hooks to automatically check and format code
+# before each commit.
+#
+# To update hooks to their latest versions: pre-commit autoupdate
+# To run all hooks on all files manually: pre-commit run --all-files
+# ==============================================================================
+
+# Exclude files from all hooks using a regex.
+# Useful for binary files, data files, or auto-generated files.
+# Example for multiple patterns: '(\.pkl|\.csv|\.ipynb)$'
+# exclude: '\.pkl$'
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      # --- Git & Sanity Checks ---
+      - id: check-added-large-files
+        name: Check for large files
+        args: ["--maxkb=2048"] # Warn on files larger than 2MB
+      - id: check-merge-conflict
+        name: Check for merge conflict markers
+      - id: check-yaml
+        name: Check YAML syntax
+
+      # --- Code Formatting & Style ---
+      - id: end-of-file-fixer
+        name: Ensure files end with a newline
+      - id: trailing-whitespace
+        name: Trim trailing whitespace
+
+  - repo: https://github.com/ansible/ansible-lint
+    rev: v25.6.1
+    hooks:
+      - id: ansible-lint
+        name: Lint Ansible playbooks
+        files: \.(yml|yaml|j2)$
+        args:
+          - "--profile=safety"
+          - "-p"

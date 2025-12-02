@@ -1,0 +1,21 @@
+- name: Installing nodejs and npm packages
+  tags:
+    - node
+  block:
+    - name: Install n
+      community.general.homebrew:
+        name: n
+        state: latest
+
+    - name: Install LTS version of Node.js using n
+      ansible.builtin.command:
+        cmd: n lts
+      register: n_lts_result
+      changed_when: true
+
+    - name: Install npm packages globally
+      community.general.npm:
+        name: "{{ item.name }}"
+        global: true
+        state: present
+      loop: "{{ node_npm_packages }}"
