@@ -31,44 +31,24 @@ Follow these steps to set up a new machine using this playbook.
 
 - A fresh installation of macOS.
 - You are logged in with your Apple ID (required for App Store installations).
-- [Xcode Command Line Tools](https://developer.apple.com/xcode/resources/) are installed. You can install them by
-  running:
 
 ### Installation
 
-This entire script can be run to bootstrap the machine. It will install Homebrew, clone this repository, and then run
-the main Ansible playbook.
+You can set up the entire environment by running the `bootstrap.sh` script. This script automatically handles the installation of Xcode Command Line Tools, Homebrew, Ansible, and executes the playbook.
 
-```commandline
-xcode-select --install
+**Option 1: One-line Installation (Recommended for fresh machines)**
 
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-
-echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile
-
-eval "$(/opt/homebrew/bin/brew shellenv)"
-
-brew install ansible
-
-mkdir Code
-
-cd Code
-
-git clone https://github.com/clytrdr/mac.git
-
-cd mac
-
-echo "your_vault_password" > .vault_pass
-echo "your_mac_password" > .ansible_become_pass
-chmod 600 .ansible_become_pass .vault_pass
+```bash
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/clytrdr/mac/main/bootstrap.sh)"
 ```
 
-```commandline
-ansible-playbook localhost.yml --become-password-file .ansible_become_pass --vault-password-file .vault_pass
-```
+**Option 2: Manual Execution**
 
-```commandline
-conda init --all
+If you have already cloned the repository:
+
+```bash
+chmod +x bootstrap.sh
+./bootstrap.sh
 ```
 
 ## 🔐 Managing Secrets (vars/secrets.yml)
