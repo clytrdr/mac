@@ -1,0 +1,4 @@
+# Ignore project files
+.idea/
+.ansible_become_pass
+.vault_pass
