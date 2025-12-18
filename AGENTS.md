@@ -1,6 +1,6 @@
 # Project Context
 
-This repository contains Ansible playbooks and configurations to manage the local development environment for a MacBook Air.
+This repository contains Ansible playbooks and configurations to manage the local development environment for a macOS machine.
 
 ## Primary Goal
 The user's primary objective is to develop a Python-based system for machine learning-driven cryptocurrency trading.
