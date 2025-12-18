@@ -13,6 +13,7 @@
 3. [🚀 Getting Started](#-getting-started)
     - 3.1 [Prerequisites](#prerequisites)
     - 3.2 [Installation](#installation)
+    - 3.3 [Applying Changes](#applying-changes)
 4. [🔐 Managing Secrets (vars/secrets.yml)](#-managing-secrets-varssecrets.yml)
     - 4.1 [Setting up secrets for the first time](#setting-up-secrets-for-the-first-time)
     - 4.2 [Managing existing secrets](#managing-existing-secrets)
@@ -49,6 +50,14 @@ If you have already cloned the repository:
 ```bash
 chmod +x bootstrap.sh
 ./bootstrap.sh
+```
+
+### Applying Changes
+
+After the initial setup, you should run the playbook whenever you modify the configuration (e.g., adding new packages or changing dotfiles):
+
+```bash
+ansible-playbook localhost.yml --become-password-file .ansible_become_pass --vault-password-file .vault_pass
 ```
 
 ## 🔐 Managing Secrets (vars/secrets.yml)
