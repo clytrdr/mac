@@ -13,3 +13,9 @@
         src: templates/setting_json.j2
         dest: "{{ ansible_facts.env.HOME }}/.gemini/settings.json"
         mode: '0644'
+
+    - name: Deploy Global AGENTS.md
+      ansible.builtin.copy:
+        src: files/AGENTS.md
+        dest: "{{ ansible_facts.env.HOME }}/.gemini/AGENTS.md"
+        mode: '0644'
