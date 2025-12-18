@@ -15,7 +15,7 @@
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v5.0.0
+    rev: v6.0.0
     hooks:
       # --- Git & Sanity Checks ---
       - id: check-added-large-files
@@ -33,7 +33,7 @@ repos:
         name: Trim trailing whitespace
 
   - repo: https://github.com/ansible/ansible-lint
-    rev: v25.6.1
+    rev: v25.12.1
     hooks:
       - id: ansible-lint
         name: Lint Ansible playbooks
