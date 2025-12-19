@@ -8,7 +8,6 @@ homebrew_packages:
   - name: terraform
   - name: tflint
   - name: gh
-  - name: git-flow
   - name: git-lfs
   - name: pre-commit
   - name: ruff

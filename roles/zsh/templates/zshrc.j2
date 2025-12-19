@@ -97,12 +97,35 @@ alias ...='cd ../..'
 # User-specific aliases (from your original config)
 alias gemi="gemini --yolo"
 
-# Git Flow aliases
-alias gfrf='git_flow_release_finish'
+# --- GitHub Flow Helpers ---
 
-git_flow_release_finish() {
-    local version=$1
-    git flow release finish -m "Release_$version" "$version"
+# Create Pull Request using GitHub CLI
+alias gpr='gh pr create'
+
+# Start a new feature branch from latest main
+# Usage: gstart <branch_name>
+gstart() {
+    git checkout main
+    git pull origin main
+    git checkout -b "$1"
+}
+
+# Sync main and delete merged branches
+gclean() {
+    git checkout main
+    git pull origin main
+    git fetch -p
+    # Delete local branches that have been merged into main
+    # Excludes current branch (*) and main itself
+    git branch --merged main | grep -v "\*\|main" | xargs -n 1 git branch -d
+}
+
+# Show GitHub Flow helper usage
+gf() {
+    echo "GitHub Flow Helpers:"
+    echo "  gstart <branch> : Start a new branch from main (e.g. gstart feature/new-feature)"
+    echo "  gpr             : Create a Pull Request (gh pr create)"
+    echo "  gclean          : Switch to main, pull, and delete merged branches"
 }
 
 # --- Custom Functions ---
