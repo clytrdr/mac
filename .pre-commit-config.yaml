@@ -37,6 +37,7 @@ repos:
     hooks:
       - id: ansible-lint
         name: Lint Ansible playbooks
+        language_version: python3.13
         files: \.(yml|yaml|j2)$
         args:
           - "--profile=safety"
