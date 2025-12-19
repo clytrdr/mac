@@ -1,2 +1,3 @@
 node_npm_packages:
   - name: "@google/jules"
+  - name: "@angular/cli"
