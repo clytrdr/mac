@@ -1,0 +1,8 @@
+- name: Configure Claude Code
+  tags:
+    - claude
+  block:
+    - name: Install Claude Code CLI via Homebrew
+      community.general.homebrew_cask:
+        name: claude-code
+        state: present
