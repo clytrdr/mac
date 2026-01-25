@@ -18,6 +18,12 @@
       "env": {
         "GITHUB_PERSONAL_ACCESS_TOKEN": "{{ gh_mcp_token }}"
       }
+    },
+    "claude-code": {
+      "type": "stdio",
+      "command": "/opt/homebrew/bin/claude",
+      "args": ["mcp", "serve"],
+      "env": {}
     }
   },
   "general": {
@@ -31,5 +37,8 @@
   },
   "ui": {
     "theme": "ANSI"
+  },
+  "experimental": {
+    "skills": true
   }
 }
