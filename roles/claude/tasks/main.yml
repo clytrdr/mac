@@ -6,3 +6,33 @@
       community.general.homebrew_cask:
         name: claude-code
         state: present
+
+    - name: Ensure Claude Code config directory exists
+      ansible.builtin.file:
+        path: "{{ ansible_facts.env.HOME }}/.claude"
+        state: directory
+        mode: '0700'
+
+    - name: Configure Claude Code settings
+      ansible.builtin.template:
+        src: templates/settings_json.j2
+        dest: "{{ ansible_facts.env.HOME }}/.claude/settings.json"
+        mode: '0600'
+
+    - name: Deploy Global CLAUDE.md
+      ansible.builtin.copy:
+        src: files/CLAUDE.md
+        dest: "{{ ansible_facts.env.HOME }}/.claude/CLAUDE.md"
+        mode: '0644'
+
+    - name: List configured MCP servers
+      ansible.builtin.command:
+        cmd: claude mcp list
+      register: claude_mcp_list
+      changed_when: false
+      check_mode: false
+
+    - name: Add Context7 MCP server
+      ansible.builtin.command:
+        cmd: claude mcp add --scope user context7 -- npx -y @upstash/context7-mcp@latest
+      when: "'context7' not in claude_mcp_list.stdout"
