@@ -25,14 +25,26 @@
         dest: "{{ ansible_facts.env.HOME }}/.claude/CLAUDE.md"
         mode: '0644'
 
+    - name: Check if Claude Code CLI is available
+      ansible.builtin.command:
+        cmd: which claude
+      register: claude_cli_check
+      changed_when: false
+      failed_when: false
+      check_mode: false
+
     - name: List configured MCP servers
       ansible.builtin.command:
         cmd: claude mcp list
       register: claude_mcp_list
       changed_when: false
       check_mode: false
+      when: claude_cli_check.rc == 0
 
     - name: Add Context7 MCP server
       ansible.builtin.command:
         cmd: claude mcp add --scope user context7 -- npx -y @upstash/context7-mcp@latest
-      when: "'context7' not in claude_mcp_list.stdout"
+      changed_when: true
+      when:
+        - claude_cli_check.rc == 0
+        - "'context7' not in claude_mcp_list.stdout"
