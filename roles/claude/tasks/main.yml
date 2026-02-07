@@ -48,3 +48,19 @@
       when:
         - claude_cli_check.rc == 0
         - "'context7' not in claude_mcp_list.stdout"
+
+    - name: Add JetBrains MCP server
+      ansible.builtin.command:
+        cmd: claude mcp add --scope user --transport sse jetbrains http://localhost:64342/sse
+      changed_when: true
+      when:
+        - claude_cli_check.rc == 0
+        - "'jetbrains' not in claude_mcp_list.stdout"
+
+    - name: Add Terraform MCP server
+      ansible.builtin.command:
+        cmd: claude mcp add --scope user --transport stdio terraform -- docker run -i --rm hashicorp/terraform-mcp-server
+      changed_when: true
+      when:
+        - claude_cli_check.rc == 0
+        - "'terraform' not in claude_mcp_list.stdout"
