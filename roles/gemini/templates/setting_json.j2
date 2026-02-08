@@ -9,6 +9,18 @@
         "-y",
         "@upstash/context7-mcp@latest"
       ]
+    },
+    "jetbrains": {
+      "url": "http://localhost:64342/sse"
+    },
+    "terraform": {
+      "command": "docker",
+      "args": [
+        "run",
+        "-i",
+        "--rm",
+        "hashicorp/terraform-mcp-server"
+      ]
     }
   },
   "general": {
