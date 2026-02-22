@@ -8,6 +8,11 @@
 # To run all hooks on all files manually: pre-commit run --all-files
 # ==============================================================================
 
+ci:
+  autoupdate_schedule: monthly
+  autoupdate_commit_msg: "chore: pre-commit autoupdate"
+  skip: [ansible-lint]
+
 # Exclude files from all hooks using a regex.
 # Useful for binary files, data files, or auto-generated files.
 # Example for multiple patterns: '(\.pkl|\.csv|\.ipynb)$'
