@@ -15,42 +15,36 @@ export PATH=$N_PREFIX/bin:$PATH
 
 # --- Plugin Manager (zinit) ---
 ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
-source "${ZINIT_HOME}/zinit.zsh"
+if [[ -f "${ZINIT_HOME}/zinit.zsh" ]]; then
+  source "${ZINIT_HOME}/zinit.zsh"
+fi
 
 # --- Load Recommended Plugins ---
 # Syntax highlighting for commands
 zinit light zsh-users/zsh-syntax-highlighting
 # Suggests commands as you type based on history
 zinit light zsh-users/zsh-autosuggestions
-# fzf (fuzzy finder) integration - makes history search (Ctrl+R) powerful
-# (It's recommended to install fzf itself via `brew install fzf`)
-zinit light-mode for \
-    junegunn/fzf-bin \
-    junegunn/fzf
+# fzf (fuzzy finder) integration - installed via Homebrew
+if [[ -f "${HOMEBREW_PREFIX:-/opt/homebrew}/opt/fzf/shell/completion.zsh" ]]; then
+  source "${HOMEBREW_PREFIX:-/opt/homebrew}/opt/fzf/shell/completion.zsh"
+fi
+if [[ -f "${HOMEBREW_PREFIX:-/opt/homebrew}/opt/fzf/shell/key-bindings.zsh" ]]; then
+  source "${HOMEBREW_PREFIX:-/opt/homebrew}/opt/fzf/shell/key-bindings.zsh"
+fi
 
 # --- Completion System Setup ---
 # Initialize the completion system
 autoload -Uz compinit
 # Speed up compinit by using a cache file
-if [ -n ~/.zcompdump(N.mh+24) ]; then
+if [[ -n ${ZDOTDIR:-$HOME}/.zcompdump(#qN.mh+24) ]]; then
   compinit;
 else
   compinit -C;
 fi;
 
 # --- Git Prompt Setup ---
-# Ensure .zsh directory exists
-if [ ! -d ~/.zsh ]; then
-  mkdir -p ~/.zsh
-fi
-
-# Download git-prompt.sh if it doesn't exist
-if [ ! -f ~/.zsh/git-prompt.sh ]; then
-  curl -s -o ~/.zsh/git-prompt.sh https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh
-fi
-
-# Source the git-prompt script
-if [ -f ~/.zsh/git-prompt.sh ]; then
+# git-prompt.sh is managed by Ansible
+if [[ -f ~/.zsh/git-prompt.sh ]]; then
   source ~/.zsh/git-prompt.sh
 fi
 
@@ -94,78 +88,44 @@ alias gst='git status'
 alias ..='cd ..'
 alias ...='cd ../..'
 
-# User-specific aliases (from your original config)
-alias gemi="gemini --yolo"
-
-# --- GitHub Flow Helpers ---
-
-# Create Pull Request using GitHub CLI
-alias gpr='gh pr create'
-
-# Start a new feature branch from latest main
-# Usage: gstart <branch_name>
-gstart() {
-    git checkout main
-    git pull origin main
-    git checkout -b "$1"
-}
-
-# Sync main and delete merged branches
-gclean() {
-    git checkout main
-    git pull origin main
-    git fetch -p
-    # Delete local branches that have been merged into main
-    # Excludes current branch (*) and main itself
-    git branch --merged main | grep -v "\*\|main" | xargs -n 1 git branch -d
-}
-
-# Show GitHub Flow helper usage
-gf() {
-    echo "GitHub Flow Helpers:"
-    echo "  gstart <branch> : Start a new branch from main (e.g. gstart feature/new-feature)"
-    echo "  gpr             : Create a Pull Request (gh pr create)"
-    echo "  gclean          : Switch to main, pull, and delete merged branches"
-}
-
 # --- Custom Functions ---
 # A function to update all package managers at once.
 # It checks if each command (brew, conda, npm) exists before running the update.
 updateall() {
   # Update Homebrew
   if command -v brew &> /dev/null; then
-    echo "==> Updating Homebrew..."
+    print "==> Updating Homebrew..."
     brew update
-    echo "==> Updating Homebrew packages..."
+    print "==> Updating Homebrew packages..."
     brew upgrade
   else
-    echo "INFO: Homebrew not found. Skipping."
+    print "INFO: Homebrew not found. Skipping."
   fi
 
   # Update Conda
   if command -v conda &> /dev/null; then
-    echo "\n==> Updating all Conda packages..."
+    print "\n==> Updating all Conda packages..."
     # The '-y' flag automatically confirms the update.
     conda update --all -y
   else
-    echo "\nINFO: Conda not found. Skipping."
+    print "\nINFO: Conda not found. Skipping."
   fi
 
   # Update global NPM packages
   if command -v npm &> /dev/null; then
-    echo "\n==> Updating global npm packages..."
+    print "\n==> Updating global npm packages..."
     npm update -g --no-fund
   else
-    echo "\nINFO: npm not found. Skipping."
+    print "\nINFO: npm not found. Skipping."
   fi
 
   # Update Google Cloud components
   if command -v gcloud &> /dev/null; then
-    echo "\n==> Updating Google Cloud components..."
+    print "\n==> Updating Google Cloud components..."
     gcloud components update --quiet
   else
-    echo "\nINFO: gcloud not found. Skipping."
+    print "\nINFO: gcloud not found. Skipping."
   fi
 
-  echo "\n✅ All updates finished."
+  print "\n✅ All updates finished."
 }

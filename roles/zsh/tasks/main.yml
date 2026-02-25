@@ -16,6 +16,12 @@
         state: directory
         mode: '0755'
 
+    - name: Download git-prompt.sh
+      ansible.builtin.get_url:
+        url: https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh
+        dest: "{{ ansible_facts.env.HOME }}/.zsh/git-prompt.sh"
+        mode: '0644'
+
     - name: Deploy .zshrc configuration from template
       ansible.builtin.template:
         src: templates/zshrc.j2
