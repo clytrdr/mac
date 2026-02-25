@@ -1,0 +1,7 @@
+ghostty_font_family: JetBrains Mono
+ghostty_font_size: 15
+ghostty_theme: JetBrains Darcula
+ghostty_shell: /bin/zsh
+ghostty_copy_on_select: false
+ghostty_shell_integration: detect
+ghostty_link_url: true
