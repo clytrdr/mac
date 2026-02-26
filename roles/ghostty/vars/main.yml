@@ -5,3 +5,5 @@ ghostty_shell: /bin/zsh
 ghostty_copy_on_select: false
 ghostty_shell_integration: detect
 ghostty_link_url: true
+ghostty_cursor_style: block
+ghostty_shell_integration_features: no-cursor

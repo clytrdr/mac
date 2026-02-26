@@ -13,8 +13,14 @@ command = {{ ghostty_shell }}
 # Auto-detect shell and inject Ghostty integration (prompt marks, cursor tracking, etc.)
 shell-integration = {{ ghostty_shell_integration }}
 
+# Disable shell integration overriding cursor style at prompt
+shell-integration-features = {{ ghostty_shell_integration_features }}
+
 # Disable automatic clipboard copy when text is selected (matching PyCharm: "Copy to clipboard on selection" OFF)
 copy-on-select = {{ ghostty_copy_on_select | lower }}
+
+# Cursor shape: block (full character width), bar (thin line), or underline
+cursor-style = {{ ghostty_cursor_style }}
 
 # Enable clickable URL detection and highlighting in terminal output
 link-url = {{ ghostty_link_url | lower }}
