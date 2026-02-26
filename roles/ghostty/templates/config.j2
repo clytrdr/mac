@@ -10,11 +10,8 @@ theme = {{ ghostty_theme }}
 # Default shell to launch when opening a new terminal window
 command = {{ ghostty_shell }}
 
-# Auto-detect shell and inject Ghostty integration (prompt marks, cursor tracking, etc.)
-shell-integration = {{ ghostty_shell_integration }}
-
-# Disable shell integration overriding cursor style at prompt
-shell-integration-features = {{ ghostty_shell_integration_features }}
+# Disable shell integration (prompt marks, cursor override, etc.)
+shell-integration = none
 
 # Disable automatic clipboard copy when text is selected (matching PyCharm: "Copy to clipboard on selection" OFF)
 copy-on-select = {{ ghostty_copy_on_select | lower }}
