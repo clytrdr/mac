@@ -12,6 +12,7 @@
         path: "{{ ansible_facts.env.HOME }}/.claude"
         state: directory
         mode: '0700'
+      check_mode: false
 
     - name: Configure Claude Code settings
       ansible.builtin.template:

@@ -8,6 +8,13 @@
         state: latest
         global: true
 
+    - name: Ensure Gemini CLI config directory exists
+      ansible.builtin.file:
+        path: "{{ ansible_facts.env.HOME }}/.gemini"
+        state: directory
+        mode: '0755'
+      check_mode: false
+
     - name: Configure Gemini CLI
       ansible.builtin.template:
         src: templates/setting_json.j2
