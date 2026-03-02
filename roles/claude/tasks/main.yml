@@ -26,6 +26,19 @@
         dest: "{{ ansible_facts.env.HOME }}/.claude/CLAUDE.md"
         mode: '0644'
 
+    - name: Ensure Claude Code skills directory exists
+      ansible.builtin.file:
+        path: "{{ ansible_facts.env.HOME }}/.claude/skills"
+        state: directory
+        mode: '0755'
+
+    - name: Deploy custom skills
+      ansible.builtin.copy:
+        src: files/skills/
+        dest: "{{ ansible_facts.env.HOME }}/.claude/skills/"
+        mode: '0644'
+        directory_mode: '0755'
+
     - name: Check if Claude Code CLI is available
       ansible.builtin.command:
         cmd: which claude
