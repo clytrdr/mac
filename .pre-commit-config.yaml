@@ -38,7 +38,7 @@ repos:
         name: Trim trailing whitespace
 
   - repo: https://github.com/ansible/ansible-lint
-    rev: v25.12.1
+    rev: v26.2.0
     hooks:
       - id: ansible-lint
         name: Lint Ansible playbooks
