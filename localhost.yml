@@ -8,6 +8,7 @@
       include_vars: vars/secrets.yml
       ignore_errors: true
       no_log: true
+      tags: always
   roles:
     - git
     - homebrew

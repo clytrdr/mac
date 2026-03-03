@@ -78,3 +78,15 @@
       when:
         - claude_cli_check.rc == 0
         - "'terraform' not in claude_mcp_list.stdout"
+
+    - name: Add Firecrawl MCP server
+      ansible.builtin.command:
+        cmd: >-
+          claude mcp add --scope user
+          firecrawl
+          -e FIRECRAWL_API_KEY={{ firecrawl_api_key }}
+          -- npx -y firecrawl-mcp
+      changed_when: true
+      when:
+        - claude_cli_check.rc == 0
+        - "'firecrawl' not in claude_mcp_list.stdout"
