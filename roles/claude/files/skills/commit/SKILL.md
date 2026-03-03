@@ -24,6 +24,10 @@ Stage all changes (including untracked files) and create a commit.
    - Match the style of recent commits shown above.
 4. Run `git commit -m "<message>"` with the drafted message.
    - Append a blank line and `Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>` to the message.
+   - If the commit fails due to pre-commit hooks:
+     1. If hooks only modified files, run `git add -A` and re-run the same `git commit` command.
+     2. If hooks report errors that persist after re-staging, fix the issues yourself, run `git add -A`, and re-run the same `git commit` command.
+     - Do NOT use `--amend`. Always create a new commit.
 5. Run `git status` to confirm the commit succeeded.
 6. Report the committed changes.
 
