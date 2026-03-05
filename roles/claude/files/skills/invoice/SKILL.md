@@ -23,8 +23,9 @@ Rename invoice PDF files in the current directory based on their content.
       - **Tax**: The consumption tax rate as an integer (e.g., `10` for 10%)
    c. If the currency is NOT Japanese Yen (JPY):
       - Inform the user of the original currency and amount.
-      - Use AskUserQuestion to ask the user for the JPY amount from their credit card statement.
-      - Use the user-provided JPY amount as the price.
+      - Use AskUserQuestion to ask the user for the JPY amount from their credit card statement, or whether to use `xxxx` as a placeholder for later entry.
+      - If the user provides a JPY amount, use it as the price.
+      - If the user chooses to defer, use `xxxx` as the price (resulting in `xxxxYEN` in the filename).
    d. Construct the new filename: `{DATE}_{COMPANY}_{SERVICE}_{PRICE}YEN_{TAX}PCT.pdf`
       - Example: `20260301_AWS_Cloud-Hosting_15000YEN_10PCT.pdf`
    e. Show the user the rename plan: `original_name` -> `new_name`
