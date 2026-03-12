@@ -1,0 +1,32 @@
+- name: Manage Mac App Store apps
+  tags:
+    - mas
+  block:
+    - name: Check installed Mac App Store apps
+      ansible.builtin.command: mas list
+      register: mas_installed_list
+      changed_when: false
+
+    - name: Install Mac App Store apps
+      become: true
+      ansible.builtin.command: mas install {{ item.id }}
+      loop: "{{ mas_packages }}"
+      when: item.id | string not in mas_installed_list.stdout
+      register: mas_install_result
+      changed_when: mas_install_result.rc == 0
+      failed_when: >-
+        mas_install_result.rc != 0
+        and 'already installed' not in (mas_install_result.stderr | default(''))
+        and 'No downloads initiated' not in (mas_install_result.stderr | default(''))
+
+    - name: Display manual install instructions
+      ansible.builtin.debug:
+        msg: >-
+          {{ item.item.name }} (ID: {{ item.item.id }}) requires manual installation
+          from the App Store. Open App Store and search for "{{ item.item.name }}".
+      loop: "{{ mas_install_result.results | default([]) }}"
+      when: >-
+        item.stderr is defined
+        and 'No downloads initiated' in item.stderr
+      loop_control:
+        label: "{{ item.item.name }}"

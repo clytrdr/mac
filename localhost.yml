@@ -12,6 +12,7 @@
   roles:
     - git
     - homebrew
+    - mas
     - zsh
     - gemini
     - claude
