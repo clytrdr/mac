@@ -9,10 +9,11 @@ macOS environment setup (Ansible) for an automated trading system.
 
 ## Development Workflow
 
-- Always dry-run before applying changes:
+- After modifying any Ansible file, always run a dry-run automatically:
   ```bash
   ansible-playbook localhost.yml --tags <role_name> --check --diff --vault-password-file .vault_pass
   ```
+- After a successful dry-run, ask the user whether to apply the changes before running without `--check`.
 
 ## Role Conventions
 
