@@ -2,10 +2,28 @@
   tags:
     - claude
   block:
-    - name: Install Claude Code CLI via Homebrew
-      community.general.homebrew_cask:
-        name: claude-code
-        state: present
+    - name: Check if Claude Code CLI is installed
+      ansible.builtin.stat:
+        path: "{{ ansible_facts.env.HOME }}/.local/bin/claude"
+      register: claude_binary
+
+    - name: Download Claude Code installer
+      ansible.builtin.get_url:
+        url: https://claude.ai/install.sh
+        dest: /tmp/claude_install.sh
+        mode: '0755'
+      when: not claude_binary.stat.exists
+
+    - name: Run Claude Code installer
+      ansible.builtin.command:
+        cmd: bash /tmp/claude_install.sh
+      when: not claude_binary.stat.exists
+
+    - name: Remove Claude Code installer
+      ansible.builtin.file:
+        path: /tmp/claude_install.sh
+        state: absent
+      when: not claude_binary.stat.exists
 
     - name: Ensure Claude Code config directory exists
       ansible.builtin.file:
