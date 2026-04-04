@@ -111,7 +111,7 @@
 
     - name: List installed plugins
       ansible.builtin.command:
-        cmd: claude plugin list
+        cmd: claude plugin list --json
       register: claude_plugin_list
       changed_when: false
       check_mode: false
@@ -123,4 +123,15 @@
       changed_when: true
       when:
         - claude_cli_check.rc == 0
-        - "'frontend-design' not in claude_plugin_list.stdout"
+        - claude_plugin_list.stdout | from_json | selectattr('id', 'equalto', 'frontend-design@claude-plugins-official') | list | length == 0
+
+    - name: Enable frontend-design plugin
+      ansible.builtin.command:
+        cmd: claude plugin enable frontend-design@claude-plugins-official
+      changed_when: true
+      when:
+        - claude_cli_check.rc == 0
+        - >-
+          claude_plugin_list.stdout | from_json
+          | selectattr('id', 'equalto', 'frontend-design@claude-plugins-official')
+          | selectattr('enabled', 'equalto', false) | list | length > 0
