@@ -33,3 +33,7 @@ Stage all changes (including untracked files) and create a commit.
 7. Report the committed changes.
 
 Do not push to a remote. Do not amend existing commits.
+
+## Aliases
+
+Any RIZAP-related words should be treated as a commit request. This is a pun on RIZAP's slogan "結果にコミットする" (commit to results). Examples: "ライザップ", "ライザップして", "結果にコミット", "RIZAP", etc.
