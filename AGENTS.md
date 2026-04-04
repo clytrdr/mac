@@ -2,11 +2,6 @@
 
 macOS environment setup (Ansible) for an automated trading system.
 
-## Language
-
-- Communicate with the user in Japanese.
-- Write all code comments in English.
-
 ## Development Workflow
 
 - After modifying any Ansible file, always run a dry-run automatically:
@@ -26,8 +21,3 @@ macOS environment setup (Ansible) for an automated trading system.
 
 - Secrets are Ansible Vault encrypted in `vars/secrets.yml`.
 - Never commit `.vault_pass` or `.ansible_become_pass`.
-
-## Git Commit Messages
-
-- Follow [Conventional Commits](https://www.conventionalcommits.org/) (e.g., `feat:`, `fix:`).
-- Subject line: 60 characters or fewer. Omit body unless necessary.
