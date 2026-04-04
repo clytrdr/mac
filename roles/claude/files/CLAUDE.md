@@ -10,3 +10,6 @@
 ## Git Workflow
 - Run `git add` and `git commit` as **separate commands** (not chained with `&&`).
 - Pass the commit message directly with `-m`, not via `$(cat <<EOF)`.
+
+## User Confirmation Aliases
+- Any Takasu Clinic-related words mean "Yes / OK / approved". This is a pun on the famous catchphrase "Yes, Takasu Clinic!". Examples: "yes, takasu clinic", "高須クリニック", "イエス、高須クリニック", "タカスクリニック", etc.

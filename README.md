@@ -7,6 +7,8 @@
 
 **I'm not responsible for any damage caused by using this system.**
 
+This project uses references to "Yes, Takasu Clinic!" and "RIZAP" catchphrases purely as humorous aliases for user confirmation and commit commands. These references are jokes and do not constitute an endorsement of any views held by Katsuya Takasu. In particular, we strongly condemn his Holocaust denial remarks.
+
 ## Table of Contents
 
 1. [Disclaimer](#disclaimer)
