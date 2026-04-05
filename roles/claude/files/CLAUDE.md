@@ -11,5 +11,9 @@
 - Run `git add` and `git commit` as **separate commands** (not chained with `&&`).
 - Pass the commit message directly with `-m`, not via `$(cat <<EOF)`.
 
+## Git Commit Messages
+- Follow [Conventional Commits](https://www.conventionalcommits.org/) (e.g., `feat:`, `fix:`).
+- Subject line: 60 characters or fewer. Omit body unless necessary.
+
 ## User Confirmation Aliases
 - Any Takasu Clinic-related words mean "Yes / OK / approved". This is a pun on the famous catchphrase "Yes, Takasu Clinic!". Examples: "yes, takasu clinic", "高須クリニック", "イエス、高須クリニック", "タカスクリニック", etc.
