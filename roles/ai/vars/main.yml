@@ -9,8 +9,6 @@ ai_instruction_targets:
 ai_claude_plugins:
   - name: frontend-design
     marketplace: claude-plugins-official
-  - name: code-review
-    marketplace: claude-plugins-official
 
 ai_mcp_servers:
   - name: context7
