@@ -6,9 +6,15 @@ ai_instruction_targets:
     dir: "{{ ansible_facts.env.HOME }}/.gemini"
     dir_mode: '0755'
 
+ai_claude_plugin_marketplaces:
+  - name: openai-codex
+    source: openai/codex-plugin-cc
+
 ai_claude_plugins:
   - name: frontend-design
     marketplace: claude-plugins-official
+  - name: codex
+    marketplace: openai-codex
 
 ai_mcp_servers:
   - name: context7

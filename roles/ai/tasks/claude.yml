@@ -80,6 +80,28 @@
     - item.name not in ai_claude_mcp_list.stdout
   changed_when: true
 
+- name: List configured plugin marketplaces
+  ansible.builtin.command:
+    cmd: claude plugin marketplace list --json
+  register: ai_claude_marketplace_list
+  changed_when: false
+  check_mode: false
+  when: ai_claude_cli_check.rc == 0
+
+- name: Add Claude Code plugin marketplaces
+  ansible.builtin.command:
+    cmd: claude plugin marketplace add {{ item.source }}
+  loop: "{{ ai_claude_plugin_marketplaces }}"
+  loop_control:
+    label: "{{ item.name }}"
+  changed_when: true
+  when:
+    - ai_claude_cli_check.rc == 0
+    - >-
+      ai_claude_marketplace_list.stdout | from_json
+      | selectattr('name', 'equalto', item.name)
+      | list | length == 0
+
 - name: List installed plugins
   ansible.builtin.command:
     cmd: claude plugin list --json
