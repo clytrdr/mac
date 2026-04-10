@@ -1,0 +1,15 @@
+- name: Install and configure Neovim
+  tags:
+    - neovim
+  block:
+    - name: Install Neovim via Homebrew
+      community.general.homebrew:
+        name: neovim
+        state: latest
+
+    - name: Ensure Neovim config directory exists
+      ansible.builtin.file:
+        path: "{{ ansible_facts.env.HOME }}/.config/nvim"
+        state: directory
+        mode: '0755'
+      check_mode: false

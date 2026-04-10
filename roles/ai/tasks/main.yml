@@ -1,0 +1,18 @@
+- name: Configure AI coding agents
+  tags:
+    - ai
+  block:
+    - name: Include common AI tasks
+      ansible.builtin.include_tasks:
+        file: common.yml
+      tags: [always]
+
+    - name: Include Claude Code tasks
+      ansible.builtin.include_tasks:
+        file: claude.yml
+      tags: [claude]
+
+    - name: Include Gemini CLI tasks
+      ansible.builtin.include_tasks:
+        file: gemini.yml
+      tags: [gemini]

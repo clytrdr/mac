@@ -26,3 +26,4 @@ homebrew_cask_packages:
     become: true
   - name: adguard
   - name: pycharm
+  - name: visual-studio-code

@@ -1,0 +1,14 @@
+- name: Ensure AI config directories exist
+  ansible.builtin.file:
+    path: "{{ item.dir }}"
+    state: directory
+    mode: "{{ item.dir_mode }}"
+  loop: "{{ ai_instruction_targets }}"
+  check_mode: false
+
+- name: Deploy global AI instructions
+  ansible.builtin.copy:
+    src: files/global_instructions.md
+    dest: "{{ item.path }}"
+    mode: '0644'
+  loop: "{{ ai_instruction_targets }}"

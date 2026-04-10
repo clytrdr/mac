@@ -1,0 +1,22 @@
+ai_instruction_targets:
+  - path: "{{ ansible_facts.env.HOME }}/.claude/CLAUDE.md"
+    dir: "{{ ansible_facts.env.HOME }}/.claude"
+    dir_mode: '0700'
+  - path: "{{ ansible_facts.env.HOME }}/.gemini/AGENTS.md"
+    dir: "{{ ansible_facts.env.HOME }}/.gemini"
+    dir_mode: '0755'
+
+ai_mcp_servers:
+  - name: context7
+    command: npx
+    args: ["-y", "@upstash/context7-mcp@latest"]
+  - name: jetbrains
+    url: "http://localhost:64342/sse"
+  - name: terraform
+    command: docker
+    args: ["run", "-i", "--rm", "hashicorp/terraform-mcp-server"]
+  - name: firecrawl
+    command: npx
+    args: ["-y", "firecrawl-mcp"]
+    env:
+      FIRECRAWL_API_KEY: "{{ firecrawl_api_key }}"

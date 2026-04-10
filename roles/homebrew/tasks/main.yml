@@ -25,8 +25,6 @@
         name: "{{ item.name }}"
         state: latest
       loop: '{{ homebrew_cask_packages }}'
-      environment:
-        HOMEBREW_CASK_OPTS: "--appdir=/Applications"
 
     - name: Check if gcloud is authenticated
       # Run 'gcloud auth list' to check for an active account.
