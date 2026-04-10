@@ -6,6 +6,12 @@ ai_instruction_targets:
     dir: "{{ ansible_facts.env.HOME }}/.gemini"
     dir_mode: '0755'
 
+ai_claude_plugins:
+  - name: frontend-design
+    marketplace: claude-plugins-official
+  - name: code-review
+    marketplace: claude-plugins-official
+
 ai_mcp_servers:
   - name: context7
     command: npx

@@ -88,21 +88,30 @@
   check_mode: false
   when: ai_claude_cli_check.rc == 0
 
-- name: Install frontend-design plugin
+- name: Install Claude Code plugins
   ansible.builtin.command:
-    cmd: claude plugin install frontend-design@claude-plugins-official
-  changed_when: true
-  when:
-    - ai_claude_cli_check.rc == 0
-    - ai_claude_plugin_list.stdout | from_json | selectattr('id', 'equalto', 'frontend-design@claude-plugins-official') | list | length == 0
-
-- name: Enable frontend-design plugin
-  ansible.builtin.command:
-    cmd: claude plugin enable frontend-design@claude-plugins-official
+    cmd: claude plugin install {{ item.name }}@{{ item.marketplace }}
+  loop: "{{ ai_claude_plugins }}"
+  loop_control:
+    label: "{{ item.name }}"
   changed_when: true
   when:
     - ai_claude_cli_check.rc == 0
     - >-
       ai_claude_plugin_list.stdout | from_json
-      | selectattr('id', 'equalto', 'frontend-design@claude-plugins-official')
+      | selectattr('id', 'equalto', item.name ~ '@' ~ item.marketplace)
+      | list | length == 0
+
+- name: Enable Claude Code plugins
+  ansible.builtin.command:
+    cmd: claude plugin enable {{ item.name }}@{{ item.marketplace }}
+  loop: "{{ ai_claude_plugins }}"
+  loop_control:
+    label: "{{ item.name }}"
+  changed_when: true
+  when:
+    - ai_claude_cli_check.rc == 0
+    - >-
+      ai_claude_plugin_list.stdout | from_json
+      | selectattr('id', 'equalto', item.name ~ '@' ~ item.marketplace)
       | selectattr('enabled', 'equalto', false) | list | length > 0
