@@ -2,6 +2,9 @@ ai_instruction_targets:
   - path: "{{ ansible_facts.env.HOME }}/.claude/CLAUDE.md"
     dir: "{{ ansible_facts.env.HOME }}/.claude"
     dir_mode: '0700'
+  - path: "{{ ansible_facts.env.HOME }}/.codex/AGENTS.md"
+    dir: "{{ ansible_facts.env.HOME }}/.codex"
+    dir_mode: '0755'
   - path: "{{ ansible_facts.env.HOME }}/.gemini/AGENTS.md"
     dir: "{{ ansible_facts.env.HOME }}/.gemini"
     dir_mode: '0755'
