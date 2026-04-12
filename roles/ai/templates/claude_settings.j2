@@ -44,5 +44,6 @@
 {% for plugin in ai_claude_plugins %}
     "{{ plugin.name }}@{{ plugin.marketplace }}": true{{ "," if not loop.last else "" }}
 {% endfor %}
-  }
+  },
+  "effortLevel": "{{ ai_claude_effort_level }}"
 }

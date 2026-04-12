@@ -9,6 +9,8 @@ ai_instruction_targets:
     dir: "{{ ansible_facts.env.HOME }}/.gemini"
     dir_mode: '0755'
 
+ai_claude_effort_level: high
+
 ai_claude_plugin_marketplaces:
   - name: openai-codex
     source: openai/codex-plugin-cc
