@@ -14,12 +14,16 @@ ai_claude_effort_level: high
 ai_claude_plugin_marketplaces:
   - name: openai-codex
     source: openai/codex-plugin-cc
+  - name: caveman
+    source: JuliusBrussee/caveman
 
 ai_claude_plugins:
   - name: frontend-design
     marketplace: claude-plugins-official
   - name: codex
     marketplace: openai-codex
+  - name: caveman
+    marketplace: caveman
 
 ai_mcp_servers:
   - name: context7
