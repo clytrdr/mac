@@ -9,9 +9,6 @@ if [ -d /opt/homebrew/share/zsh/site-functions ]; then
   fpath=(/opt/homebrew/share/zsh/site-functions $fpath)
 fi
 
-# --- Claude Code ---
-export CLAUDE_CODE_EFFORT_LEVEL=high
-
 # --- Path for n ---
 export N_PREFIX=$HOME/.n
 export PATH=$N_PREFIX/bin:$PATH
