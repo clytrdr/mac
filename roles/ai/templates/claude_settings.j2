@@ -45,5 +45,20 @@
     "{{ plugin.name }}@{{ plugin.marketplace }}": true{{ "," if not loop.last else "" }}
 {% endfor %}
   },
-  "effortLevel": "{{ ai_claude_effort_level }}"
+  "extraKnownMarketplaces": {
+{% for mp in ai_claude_plugin_marketplaces %}
+    "{{ mp.name }}": {
+      "source": {
+        "source": "github",
+        "repo": "{{ mp.source }}"
+      }
+    }{{ "," if not loop.last else "" }}
+{% endfor %}
+  },
+  "effortLevel": "{{ ai_claude_effort_level }}",
+  "env": {
+{% for k, v in ai_claude_env.items() %}
+    "{{ k }}": "{{ v }}"{{ "," if not loop.last else "" }}
+{% endfor %}
+  }
 }

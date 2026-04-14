@@ -11,6 +11,9 @@ ai_instruction_targets:
 
 ai_claude_effort_level: high
 
+ai_claude_env:
+  CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING: "1"
+
 ai_claude_plugin_marketplaces:
   - name: openai-codex
     source: openai/codex-plugin-cc
