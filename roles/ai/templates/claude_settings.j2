@@ -1,4 +1,9 @@
 {
+  "env": {
+{% for k, v in ai_claude_env.items() %}
+    "{{ k }}": "{{ v }}"{{ "," if not loop.last else "" }}
+{% endfor %}
+  },
   "permissions": {
     "allow": [
       "Bash(git:*)",
@@ -55,10 +60,5 @@
     }{{ "," if not loop.last else "" }}
 {% endfor %}
   },
-  "effortLevel": "{{ ai_claude_effort_level }}",
-  "env": {
-{% for k, v in ai_claude_env.items() %}
-    "{{ k }}": "{{ v }}"{{ "," if not loop.last else "" }}
-{% endfor %}
-  }
+  "effortLevel": "{{ ai_claude_effort_level }}"
 }
