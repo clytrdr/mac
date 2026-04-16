@@ -26,4 +26,4 @@ homebrew_cask_packages:
     become: true
   - name: adguard
   - name: pycharm
-  - name: font-hackgen-nerd
+  - name: font-udev-gothic-nf
