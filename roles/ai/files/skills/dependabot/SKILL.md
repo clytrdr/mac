@@ -26,9 +26,25 @@ Review and squash-merge open Dependabot pull requests on the current repository.
 6. Upon confirmation, squash-merge the approved PRs one by one using `gh pr merge <number> --squash`.
    - If a merge fails due to conflict (the PR became CONFLICTING after earlier merges changed the base branch), comment `@dependabot rebase` on the PR using `gh pr comment <number> --body "@dependabot rebase"` and inform the user.
 7. After all merges are attempted, show a results summary table: PR number, title, result (merged / conflict-rebasing / failed).
-8. If all PRs were merged successfully, ask the user if they want to pull the latest changes to the local repository.
-   - If yes, run `git pull`.
-9. Report the final status.
+8. If all PRs were merged successfully, ask the user whether to `git pull` the latest changes. If yes, run it.
+9. After a successful `git pull`, determine which refresh commands are needed based on the ecosystems of the merged PRs (parsed from Dependabot branch names: `dependabot/<ecosystem>/...`):
+
+   - `pip`            → Python (uv)
+   - `npm_and_yarn`   → Node (npm)
+   - `terraform`      → Terraform
+   - `github_actions` → no local refresh needed
+
+   For each ecosystem with at least one merged PR, ask the user (one prompt per ecosystem) whether to run the refresh commands:
+
+   - **Python (uv)**:
+     - `uv pip install -r requirements.txt -r requirements-dev.txt`
+       (omit `-r requirements-dev.txt` if that file does not exist)
+     - If `docker-compose.yml` or `compose.yml` exists, also ask separately whether to run `docker compose build` (slow; user may skip).
+   - **Node (npm)**: `npm ci`
+   - **Terraform**: `terraform init -upgrade`
+     (note: this may modify `.terraform.lock.hcl`)
+
+10. Report the final status, including which refresh commands were executed.
 
 ## Rules
 
