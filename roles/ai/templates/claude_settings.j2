@@ -42,8 +42,10 @@
     ],
     "deny": [],
     "additionalDirectories": [
-      "{{ ansible_facts.env.HOME }}/Code"
-    ]
+      "{{ ansible_facts.env.HOME }}/Code",
+      "{{ ansible_facts.env.HOME }}/Documents"
+    ],
+    "defaultMode": "{{ ai_claude_default_mode }}"
   },
   "enabledPlugins": {
 {% for plugin in ai_claude_plugins %}
@@ -60,5 +62,6 @@
     }{{ "," if not loop.last else "" }}
 {% endfor %}
   },
-  "effortLevel": "{{ ai_claude_effort_level }}"
+  "effortLevel": "{{ ai_claude_effort_level }}",
+  "skipAutoPermissionPrompt": {{ ai_claude_skip_auto_permission_prompt | to_json }}
 }

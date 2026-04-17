@@ -10,6 +10,8 @@ ai_instruction_targets:
     dir_mode: '0755'
 
 ai_claude_effort_level: high
+ai_claude_default_mode: auto
+ai_claude_skip_auto_permission_prompt: true
 
 ai_claude_env:
   CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING: "1"
