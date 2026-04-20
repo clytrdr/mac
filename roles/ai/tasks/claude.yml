@@ -64,10 +64,13 @@
       {% for k, v in (item.env | default({})).items() %}-e {{ k }}={{ v }} {% endfor %}
       -- {{ item.command }} {{ item.args | join(' ') }}
   loop: "{{ ai_mcp_servers | selectattr('command', 'defined') | list }}"
+  loop_control:
+    label: "{{ item.name }}"
   when:
     - ai_claude_cli_check.rc == 0
     - item.name not in ai_claude_mcp_list.stdout
   changed_when: true
+  no_log: true
 
 - name: Add MCP servers (sse)
   ansible.builtin.command:
