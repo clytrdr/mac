@@ -27,3 +27,4 @@ homebrew_cask_packages:
   - name: adguard
   - name: pycharm
   - name: font-udev-gothic-nf
+  - name: zotero
