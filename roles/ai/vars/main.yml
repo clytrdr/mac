@@ -14,7 +14,8 @@ ai_claude_default_mode: auto
 ai_claude_skip_auto_permission_prompt: true
 
 ai_codex_trusted_projects:
-  - "{{ ansible_facts.env.HOME }}"
+  - "{{ ansible_facts.env.HOME }}/Code"
+  - "{{ ansible_facts.env.HOME }}/Documents"
 
 ai_codex_tui_model_nux:
   "gpt-5.5": 3
