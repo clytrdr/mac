@@ -13,6 +13,15 @@ ai_claude_effort_level: xhigh
 ai_claude_default_mode: auto
 ai_claude_skip_auto_permission_prompt: true
 
+ai_codex_trusted_projects:
+  - "{{ ansible_facts.env.HOME }}"
+
+ai_codex_tui_model_nux:
+  "gpt-5.5": 3
+
+ai_codex_skills_excludes:
+  - codex-review
+
 ai_claude_env:
   CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING: "1"
 

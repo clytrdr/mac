@@ -1,0 +1,29 @@
+# ~/.codex/config.toml — Managed by Ansible (roles/ai)
+# Reference: https://developers.openai.com/codex/config-basic
+{% for path in ai_codex_trusted_projects %}
+
+[projects."{{ path }}"]
+trust_level = "trusted"
+{% endfor %}
+
+[tui.model_availability_nux]
+{% for model, count in ai_codex_tui_model_nux.items() %}
+"{{ model }}" = {{ count }}
+{% endfor %}
+{% for server in ai_mcp_servers %}
+
+[mcp_servers.{{ server.name }}]
+{% if server.url is defined %}
+url = "{{ server.url }}"
+{% else %}
+command = "{{ server.command }}"
+args = {{ server.args | to_json }}
+{% endif %}
+{% if server.env is defined %}
+
+[mcp_servers.{{ server.name }}.env]
+{% for k, v in server.env.items() %}
+{{ k }} = "{{ v }}"
+{% endfor %}
+{% endif %}
+{% endfor %}

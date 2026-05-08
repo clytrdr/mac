@@ -3,3 +3,34 @@
     name: '@openai/codex'
     state: latest
     global: true
+
+- name: Configure Codex CLI
+  ansible.builtin.template:
+    src: templates/codex_config.j2
+    dest: "{{ ansible_facts.env.HOME }}/.codex/config.toml"
+    mode: '0600'
+
+- name: Ensure Codex CLI skills directory exists
+  ansible.builtin.file:
+    path: "{{ ansible_facts.env.HOME }}/.codex/skills"
+    state: directory
+    mode: '0755'
+
+- name: List Codex-deployable skill directories
+  ansible.builtin.find:
+    paths: "{{ role_path }}/files/skills"
+    file_type: directory
+    recurse: false
+    excludes: "{{ ai_codex_skills_excludes }}"
+  register: ai_codex_skill_dirs
+  check_mode: false
+
+- name: Deploy custom Codex skills
+  ansible.builtin.copy:
+    src: "{{ item.path }}/"
+    dest: "{{ ansible_facts.env.HOME }}/.codex/skills/{{ item.path | basename }}/"
+    mode: '0644'
+    directory_mode: '0755'
+  loop: "{{ ai_codex_skill_dirs.files }}"
+  loop_control:
+    label: "{{ item.path | basename }}"
