@@ -5,7 +5,7 @@ ai_instruction_targets:
   - path: "{{ ansible_facts.env.HOME }}/.codex/AGENTS.md"
     dir: "{{ ansible_facts.env.HOME }}/.codex"
     dir_mode: '0755'
-  - path: "{{ ansible_facts.env.HOME }}/.gemini/AGENTS.md"
+  - path: "{{ ansible_facts.env.HOME }}/.gemini/GEMINI.md"
     dir: "{{ ansible_facts.env.HOME }}/.gemini"
     dir_mode: '0755'
 
@@ -22,6 +22,14 @@ ai_codex_tui_model_nux:
 
 ai_codex_skills_excludes:
   - codex-review
+
+ai_antigravity_skills_excludes: []
+
+ai_antigravity_model: "Gemini 3.5 Flash (High)"
+
+ai_antigravity_trusted_workspaces:
+  - "{{ ansible_facts.env.HOME }}/Code"
+  - "{{ ansible_facts.env.HOME }}/Code/core"
 
 ai_claude_env:
   CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING: "1"

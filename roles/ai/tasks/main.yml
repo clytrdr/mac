@@ -17,7 +17,7 @@
         file: codex.yml
       tags: [codex]
 
-    - name: Import Gemini CLI tasks
+    - name: Import Antigravity CLI tasks
       ansible.builtin.import_tasks:
-        file: gemini.yml
-      tags: [gemini]
+        file: antigravity.yml
+      tags: [antigravity]

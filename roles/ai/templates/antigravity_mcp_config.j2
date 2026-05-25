@@ -1,0 +1,19 @@
+{
+  "mcpServers": {
+{% for server in ai_mcp_servers %}
+    "{{ server.name }}": {
+{% if server.url is defined %}
+      "serverUrl": "{{ server.url }}"
+{% else %}
+      "command": "{{ server.command }}",
+      "args": {{ server.args | to_json }}
+{%- if server.env is defined %},
+      "env": {{ server.env | to_json }}
+{%- endif %}
+
+{% endif %}
+    }{% if not loop.last %},{% endif %}
+
+{% endfor %}
+  }
+}

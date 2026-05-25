@@ -1,0 +1,71 @@
+- name: Check if Antigravity CLI is installed
+  ansible.builtin.stat:
+    path: "{{ ansible_facts.env.HOME }}/.local/bin/agy"
+  register: ai_antigravity_binary
+
+- name: Download Antigravity CLI installer
+  ansible.builtin.get_url:
+    url: https://antigravity.google/cli/install.sh
+    dest: /tmp/antigravity_install.sh
+    mode: '0755'
+  when: not ai_antigravity_binary.stat.exists
+
+- name: Run Antigravity CLI installer
+  ansible.builtin.command:
+    cmd: bash /tmp/antigravity_install.sh
+  when: not ai_antigravity_binary.stat.exists
+
+- name: Remove Antigravity CLI installer
+  ansible.builtin.file:
+    path: /tmp/antigravity_install.sh
+    state: absent
+  when: not ai_antigravity_binary.stat.exists
+
+- name: Ensure Antigravity CLI shared config directory exists
+  ansible.builtin.file:
+    path: "{{ ansible_facts.env.HOME }}/.gemini/config"
+    state: directory
+    mode: '0755'
+
+- name: Configure Antigravity CLI MCP servers
+  ansible.builtin.template:
+    src: templates/antigravity_mcp_config.j2
+    dest: "{{ ansible_facts.env.HOME }}/.gemini/config/mcp_config.json"
+    mode: '0600'
+
+- name: Ensure Antigravity CLI runtime directory exists
+  ansible.builtin.file:
+    path: "{{ ansible_facts.env.HOME }}/.gemini/antigravity-cli"
+    state: directory
+    mode: '0755'
+
+- name: Configure Antigravity CLI settings
+  ansible.builtin.template:
+    src: templates/antigravity_settings.j2
+    dest: "{{ ansible_facts.env.HOME }}/.gemini/antigravity-cli/settings.json"
+    mode: '0600'
+
+- name: Ensure Antigravity CLI global skills directory exists
+  ansible.builtin.file:
+    path: "{{ ansible_facts.env.HOME }}/.gemini/skills"
+    state: directory
+    mode: '0755'
+
+- name: List Antigravity-deployable skill directories
+  ansible.builtin.find:
+    paths: "{{ role_path }}/files/skills"
+    file_type: directory
+    recurse: false
+    excludes: "{{ ai_antigravity_skills_excludes }}"
+  register: ai_antigravity_skill_dirs
+  check_mode: false
+
+- name: Deploy custom Antigravity skills
+  ansible.builtin.copy:
+    src: "{{ item.path }}/"
+    dest: "{{ ansible_facts.env.HOME }}/.gemini/skills/{{ item.path | basename }}/"
+    mode: '0644'
+    directory_mode: '0755'
+  loop: "{{ ai_antigravity_skill_dirs.files }}"
+  loop_control:
+    label: "{{ item.path | basename }}"
