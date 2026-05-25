@@ -1,12 +1,12 @@
 homebrew_taps:
   - hashicorp/tap
+  - terraform-linters/tap
 homebrew_packages:
   - name: ansible
   - name: ansible-lint
   - name: speedtest-cli
   - name: uv
   - name: terraform
-  - name: tflint
   - name: gh
   - name: git-lfs
   - name: pre-commit
@@ -17,6 +17,7 @@ homebrew_packages:
   - name: mas
   - name: ripgrep
 homebrew_cask_packages:
+  - name: terraform-linters/tap/tflint
   - name: google-cloud-sdk
   - name: google-chrome
   - name: clipy
