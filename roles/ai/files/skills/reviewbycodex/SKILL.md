@@ -1,5 +1,5 @@
 ---
-name: codex-review
+name: reviewbycodex
 description: Delegate a file review to Codex as a subagent, then implement approved fixes locally with Claude.
 disable-model-invocation: true
 allowed-tools: Read, Edit, Write, Glob, Bash(codex:*), AskUserQuestion
@@ -14,7 +14,7 @@ Unlike `/codex:review`, which reviews git state (staged/unstaged/branch diffs), 
 One or more file paths provided after the skill name:
 
 ```
-/codex-review path/to/file1.py path/to/file2.ts
+/reviewbycodex path/to/file1.py path/to/file2.ts
 ```
 
 `$ARGUMENTS` contains the raw argument string.
