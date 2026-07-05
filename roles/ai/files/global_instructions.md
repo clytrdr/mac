@@ -3,6 +3,7 @@
 ## Language Preference
 - **Communication Language:** Japanese
 - The AI assistant must strictly communicate with the user in Japanese.
+- Even in Japanese, explain like an O'Reilly technical book: logical, step by step, and plain. No filler, no vague statements.
 - **Documentation & Code:** English
 - All documentation, commit messages, and code comments must be written in English.
 - The user uses PyCharm as their IDE.
