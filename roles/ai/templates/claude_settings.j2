@@ -41,12 +41,13 @@
       "mcp__firecrawl__*"
     ],
     "deny": [],
+    "defaultMode": "{{ ai_claude_default_mode }}",
     "additionalDirectories": [
       "{{ ansible_facts.env.HOME }}/Code",
       "{{ ansible_facts.env.HOME }}/Documents"
-    ],
-    "defaultMode": "{{ ai_claude_default_mode }}"
+    ]
   },
+  "model": "{{ ai_claude_model }}",
   "enabledPlugins": {
 {% for plugin in ai_claude_plugins %}
     "{{ plugin.name }}@{{ plugin.marketplace }}": true{{ "," if not loop.last else "" }}
