@@ -12,6 +12,17 @@
         state: present
       loop: '{{ homebrew_taps }}'
 
+    - name: Trust third-party Homebrew taps
+      # Homebrew 6 refuses formulae from untrusted taps when
+      # HOMEBREW_REQUIRE_TAP_TRUST is set (e.g., on CI runners).
+      # check_mode is disabled because later brew queries fail in
+      # check mode unless the taps are already trusted.
+      ansible.builtin.command: brew trust --tap {{ item }}
+      loop: '{{ homebrew_taps }}'
+      register: homebrew_trust_result
+      changed_when: "'Already trusted' not in homebrew_trust_result.stdout"
+      check_mode: false
+
     - name: Homebrew packages install/upgrade
       community.general.homebrew:
         name: '{{ item.name }}'
