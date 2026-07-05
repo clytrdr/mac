@@ -7,6 +7,16 @@
 - All documentation, commit messages, and code comments must be written in English.
 - The user uses PyCharm as their IDE.
 
+## English Writing Style
+Applies to code comments, docstrings, commit messages, and generated documents (Markdown, HTML).
+
+- Write like an O'Reilly technical book, not a literary essay.
+- Use plain, common verbs: use, make, get, run, check.
+  Avoid fancy verbs: leverage, orchestrate, employ, utilize.
+- No idioms, metaphors, or figurative language.
+- One idea per sentence. Keep sentences short. No nested clauses.
+- Standard technical terms (ML, programming) are fine. Keep everything else at a simple reading level.
+
 ## Git Workflow
 - Run `git add` and `git commit` as **separate commands** (not chained with `&&`).
 - Pass the commit message directly with `-m`, not via `$(cat <<EOF)`.
