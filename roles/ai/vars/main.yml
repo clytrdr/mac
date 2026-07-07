@@ -9,8 +9,8 @@ ai_instruction_targets:
     dir: "{{ ansible_facts.env.HOME }}/.gemini"
     dir_mode: '0755'
 
-ai_claude_model: claude-fable-5[1m]
-ai_claude_effort_level: high
+ai_claude_model: claude-opus-4-8[1m]
+ai_claude_effort_level: xhigh
 ai_claude_default_mode: auto
 ai_claude_skip_auto_permission_prompt: true
 
