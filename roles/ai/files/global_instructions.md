@@ -19,6 +19,7 @@ Applies to code comments, docstrings, commit messages, and generated documents (
 - Standard technical terms (ML, programming) are fine. Keep everything else at a simple reading level.
 
 ## Git Workflow
+- **Never commit without explicit user permission.** The user always reviews changes before they are committed. After making changes, stop and let the user review; commit only when the user asks for it.
 - Run `git add` and `git commit` as **separate commands** (not chained with `&&`).
 - Pass the commit message directly with `-m`, not via `$(cat <<EOF)`.
 
