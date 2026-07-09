@@ -17,6 +17,8 @@ ai_claude_skip_auto_permission_prompt: true
 ai_codex_trusted_projects:
   - "{{ ansible_facts.env.HOME }}/Code"
   - "{{ ansible_facts.env.HOME }}/Documents"
+  - "{{ ansible_facts.env.HOME }}/Code/back"
+  - "{{ ansible_facts.env.HOME }}/Code/mac"
 
 ai_codex_tui_model_nux:
   "gpt-5.5": 3
@@ -51,6 +53,9 @@ ai_mcp_servers:
     args: ["-y", "@upstash/context7-mcp@latest"]
   - name: jetbrains
     url: "http://localhost:64342/sse"
+    codex:
+      command: npx
+      args: ["-y", "mcp-remote", "http://localhost:64342/sse"]
   - name: terraform
     command: docker
     args: ["run", "-i", "--rm", "hashicorp/terraform-mcp-server"]
