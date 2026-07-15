@@ -1,17 +1,17 @@
-# --- Path for Homebrew ---
-# This ensures that binaries installed by Homebrew are found first.
-export PATH="/opt/homebrew/bin:$PATH"
-
-# --- Add Homebrew's Zsh Completion to fpath ---
-# This must be done before `compinit` is called.
-# It allows Zsh to find completion scripts installed by Homebrew (like for git).
-if [ -d /opt/homebrew/share/zsh/site-functions ]; then
-  fpath=(/opt/homebrew/share/zsh/site-functions $fpath)
+# --- Homebrew Environment ---
+# Sets PATH, HOMEBREW_PREFIX, and adds Homebrew's Zsh completions to fpath.
+# fpath must be set before `compinit` is called.
+if [ -x /opt/homebrew/bin/brew ]; then
+  eval "$(/opt/homebrew/bin/brew shellenv)"
 fi
 
 # --- Path for n ---
 export N_PREFIX=$HOME/.n
 export PATH=$N_PREFIX/bin:$PATH
+
+# --- Path for user-local binaries ---
+# Used by installers such as the Antigravity CLI.
+export PATH="$HOME/.local/bin:$PATH"
 
 # --- Plugin Manager (zinit) ---
 ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
@@ -19,18 +19,10 @@ if [[ -f "${ZINIT_HOME}/zinit.zsh" ]]; then
   source "${ZINIT_HOME}/zinit.zsh"
 fi
 
-# --- Load Recommended Plugins ---
-# Syntax highlighting for commands
-zinit light zsh-users/zsh-syntax-highlighting
-# Suggests commands as you type based on history
-zinit light zsh-users/zsh-autosuggestions
-# fzf (fuzzy finder) integration - installed via Homebrew
-if [[ -f "${HOMEBREW_PREFIX:-/opt/homebrew}/opt/fzf/shell/completion.zsh" ]]; then
-  source "${HOMEBREW_PREFIX:-/opt/homebrew}/opt/fzf/shell/completion.zsh"
-fi
-if [[ -f "${HOMEBREW_PREFIX:-/opt/homebrew}/opt/fzf/shell/key-bindings.zsh" ]]; then
-  source "${HOMEBREW_PREFIX:-/opt/homebrew}/opt/fzf/shell/key-bindings.zsh"
-fi
+# --- Useful Options (setopt) ---
+setopt AUTO_CD              # cd to a directory just by typing its name
+setopt EXTENDED_GLOB        # Enable extended globbing (also required by the compinit cache check below)
+setopt NOTIFY               # Notify on completion of long-running jobs
 
 # --- Completion System Setup ---
 # Initialize the completion system
@@ -41,6 +33,16 @@ if [[ -n ${ZDOTDIR:-$HOME}/.zcompdump(#qN.mh+24) ]]; then
 else
   compinit -C;
 fi;
+
+# --- fzf Integration ---
+# fzf (fuzzy finder) is installed via Homebrew.
+# Its completion script must be sourced after compinit.
+if [[ -f "${HOMEBREW_PREFIX:-/opt/homebrew}/opt/fzf/shell/completion.zsh" ]]; then
+  source "${HOMEBREW_PREFIX:-/opt/homebrew}/opt/fzf/shell/completion.zsh"
+fi
+if [[ -f "${HOMEBREW_PREFIX:-/opt/homebrew}/opt/fzf/shell/key-bindings.zsh" ]]; then
+  source "${HOMEBREW_PREFIX:-/opt/homebrew}/opt/fzf/shell/key-bindings.zsh"
+fi
 
 # --- Git Prompt Setup ---
 # git-prompt.sh is managed by Ansible
@@ -71,11 +73,6 @@ setopt HIST_IGNORE_DUPS         # Don't record an event if it's a duplicate of t
 setopt HIST_FIND_NO_DUPS        # When searching, find the newest entry without duplicates
 setopt HIST_IGNORE_SPACE        # Don't save commands that start with a space
 setopt SHARE_HISTORY            # Share history between all sessions
-
-# --- Useful Options (setopt) ---
-setopt AUTO_CD              # cd to a directory just by typing its name
-setopt EXTENDED_GLOB        # Enable extended globbing (e.g., ls ^*.txt)
-setopt NOTIFY               # Notify on completion of long-running jobs
 
 # --- Aliases ---
 # Common aliases for convenience
@@ -129,3 +126,12 @@ updateall() {
 
   print "\n✅ All updates finished."
 }
+
+# --- Load Recommended Plugins ---
+# Loaded at the end of .zshrc, as zsh-syntax-highlighting requires.
+if (( $+functions[zinit] )); then
+  # Suggests commands as you type based on history
+  zinit light zsh-users/zsh-autosuggestions
+  # Syntax highlighting for commands (must be loaded last)
+  zinit light zsh-users/zsh-syntax-highlighting
+fi

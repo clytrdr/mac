@@ -22,7 +22,7 @@ homebrew_cask_packages:
   - name: google-chrome
   - name: clipy
     become: true
-  - name: docker
+  - name: docker-desktop
   - name: miniconda
     become: true
   - name: adguard

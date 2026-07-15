@@ -2,13 +2,12 @@
   tags:
     - zsh
   block:
-    - name: Install zinit (Zsh plugin manager) if not present
-      ansible.builtin.shell:
-        cmd: |
-          ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
-          [ ! -d $ZINIT_HOME ] && mkdir -p "$(dirname $ZINIT_HOME)"
-          [ ! -d $ZINIT_HOME/.git ] && git clone https://github.com/zdharma-continuum/zinit.git "$ZINIT_HOME"
-        creates: "{{ ansible_facts.env.HOME }}/.local/share/zinit/zinit.git"
+    - name: Install zinit (Zsh plugin manager)
+      ansible.builtin.git:
+        repo: https://github.com/zdharma-continuum/zinit.git
+        dest: "{{ ansible_facts.env.HOME }}/.local/share/zinit/zinit.git"
+        version: v3.15.0
+        update: false
 
     - name: Ensure .zsh directory exists
       ansible.builtin.file:
@@ -19,7 +18,7 @@
 
     - name: Download git-prompt.sh
       ansible.builtin.get_url:
-        url: https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh
+        url: https://raw.githubusercontent.com/git/git/v2.50.0/contrib/completion/git-prompt.sh
         dest: "{{ ansible_facts.env.HOME }}/.zsh/git-prompt.sh"
         mode: '0644'
 
