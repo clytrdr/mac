@@ -16,16 +16,16 @@ trust_level = "trusted"
 
 [mcp_servers.{{ server.name }}]
 {% if codex_server.url is defined %}
-url = "{{ codex_server.url }}"
+url = {{ codex_server.url | to_json }}
 {% else %}
-command = "{{ codex_server.command }}"
+command = {{ codex_server.command | to_json }}
 args = {{ codex_server.args | to_json }}
 {% endif %}
 {% if codex_env %}
 
 [mcp_servers.{{ server.name }}.env]
 {% for k, v in codex_env.items() %}
-{{ k }} = "{{ v }}"
+{{ k }} = {{ v | to_json }}
 {% endfor %}
 {% endif %}
 {% endfor %}

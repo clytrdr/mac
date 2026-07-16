@@ -4,16 +4,15 @@
     "{{ server.name }}": {
 {% if server.url is defined %}
       "serverUrl": "{{ server.url }}"
+{% elif server.env is defined %}
+      "command": "{{ server.command }}",
+      "args": {{ server.args | to_json }},
+      "env": {{ server.env | to_json }}
 {% else %}
       "command": "{{ server.command }}",
       "args": {{ server.args | to_json }}
-{%- if server.env is defined %},
-      "env": {{ server.env | to_json }}
-{%- endif %}
-
 {% endif %}
-    }{% if not loop.last %},{% endif %}
-
+    }{{ "," if not loop.last else "" }}
 {% endfor %}
   }
 }

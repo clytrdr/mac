@@ -4,7 +4,6 @@
     state: directory
     mode: "{{ item.dir_mode }}"
   loop: "{{ ai_instruction_targets }}"
-  check_mode: false
 
 - name: Deploy global AI instructions
   ansible.builtin.copy:

@@ -32,7 +32,7 @@ Stage all changes (including untracked files) and create a commit.
 6. Run `git status` to confirm the commit succeeded.
 7. Report the committed changes.
 
-Do not push to a remote. Do not amend existing commits.
+Do not push to a remote. Do not amend commits that existed before this skill ran; `--amend` is allowed only for the commit created in step 5.
 
 ## Aliases
 

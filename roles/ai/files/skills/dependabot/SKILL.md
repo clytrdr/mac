@@ -10,7 +10,7 @@ Review and squash-merge open Dependabot pull requests on the current repository.
 
 !`git status --porcelain`
 
-!`gh pr list --author "app/dependabot"`
+!`gh pr list --author "app/dependabot" --limit 100`
 
 ## Instructions
 

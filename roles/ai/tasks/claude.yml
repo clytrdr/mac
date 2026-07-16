@@ -3,23 +3,46 @@
     path: "{{ ansible_facts.env.HOME }}/.local/bin/claude"
   register: ai_claude_binary
 
+- name: Create temp directory for Claude Code installer
+  ansible.builtin.tempfile:
+    state: directory
+  register: ai_claude_installer_tmp
+  when: not ai_claude_binary.stat.exists
+  check_mode: false
+
 - name: Download Claude Code installer
   ansible.builtin.get_url:
     url: https://claude.ai/install.sh
-    dest: /tmp/claude_install.sh
-    mode: '0755'
+    dest: "{{ ai_claude_installer_tmp.path }}/install.sh"
+    mode: '0700'
   when: not ai_claude_binary.stat.exists
 
 - name: Run Claude Code installer
   ansible.builtin.command:
-    cmd: bash /tmp/claude_install.sh
+    cmd: bash {{ ai_claude_installer_tmp.path }}/install.sh
   when: not ai_claude_binary.stat.exists
 
-- name: Remove Claude Code installer
+- name: Remove Claude Code installer temp directory
   ansible.builtin.file:
-    path: /tmp/claude_install.sh
+    path: "{{ ai_claude_installer_tmp.path }}"
     state: absent
   when: not ai_claude_binary.stat.exists
+  check_mode: false
+
+# model and effortLevel change per session via /model and /effort.
+# Read the live settings first so the template keeps their current
+# values; the vars only seed a machine without settings.json.
+- name: Read current Claude Code settings
+  ansible.builtin.slurp:
+    src: "{{ ansible_facts.env.HOME }}/.claude/settings.json"
+  register: ai_claude_settings_current_raw
+  failed_when: false
+
+- name: Parse current Claude Code settings
+  ansible.builtin.set_fact:
+    ai_claude_settings_current: >-
+      {{ (ai_claude_settings_current_raw.content | b64decode | from_json)
+         if ai_claude_settings_current_raw.content is defined else {} }}
 
 - name: Configure Claude Code settings
   ansible.builtin.template:
@@ -68,7 +91,7 @@
     label: "{{ item.name }}"
   when:
     - ai_claude_cli_check.rc == 0
-    - item.name not in ai_claude_mcp_list.stdout
+    - ai_claude_mcp_list.stdout_lines | select('match', '^' ~ item.name ~ ':') | list | length == 0
   changed_when: true
   no_log: true
 
@@ -78,9 +101,11 @@
       claude mcp add --scope user --transport sse
       {{ item.name }} {{ item.url }}
   loop: "{{ ai_mcp_servers | selectattr('url', 'defined') | list }}"
+  loop_control:
+    label: "{{ item.name }}"
   when:
     - ai_claude_cli_check.rc == 0
-    - item.name not in ai_claude_mcp_list.stdout
+    - ai_claude_mcp_list.stdout_lines | select('match', '^' ~ item.name ~ ':') | list | length == 0
   changed_when: true
 
 - name: List configured plugin marketplaces

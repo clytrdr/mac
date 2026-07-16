@@ -5,7 +5,7 @@
     - name: Import common AI tasks
       ansible.builtin.import_tasks:
         file: common.yml
-      tags: [always]
+      tags: [claude, codex, antigravity]
 
     - name: Import Claude Code tasks
       ansible.builtin.import_tasks:

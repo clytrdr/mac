@@ -9,6 +9,8 @@ ai_instruction_targets:
     dir: "{{ ansible_facts.env.HOME }}/.gemini"
     dir_mode: '0755'
 
+# Seed values for a machine without settings.json. Once settings.json
+# has model / effortLevel (set via /model and /effort), those win.
 ai_claude_model: claude-opus-4-8[1m]
 ai_claude_effort_level: xhigh
 ai_claude_default_mode: auto
@@ -23,10 +25,14 @@ ai_codex_trusted_projects:
 ai_codex_tui_model_nux:
   "gpt-5.5": 3
 
+# trade-tasks needs the claude.ai Google Drive connector, which only
+# exists in Claude Code. Do not deploy it to Codex or Antigravity.
 ai_codex_skills_excludes:
   - reviewbycodex
+  - trade-tasks
 
-ai_antigravity_skills_excludes: []
+ai_antigravity_skills_excludes:
+  - trade-tasks
 
 ai_antigravity_model: "Gemini 3.5 Flash (High)"
 

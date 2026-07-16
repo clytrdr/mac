@@ -3,23 +3,31 @@
     path: "{{ ansible_facts.env.HOME }}/.local/bin/agy"
   register: ai_antigravity_binary
 
+- name: Create temp directory for Antigravity CLI installer
+  ansible.builtin.tempfile:
+    state: directory
+  register: ai_antigravity_installer_tmp
+  when: not ai_antigravity_binary.stat.exists
+  check_mode: false
+
 - name: Download Antigravity CLI installer
   ansible.builtin.get_url:
     url: https://antigravity.google/cli/install.sh
-    dest: /tmp/antigravity_install.sh
-    mode: '0755'
+    dest: "{{ ai_antigravity_installer_tmp.path }}/install.sh"
+    mode: '0700'
   when: not ai_antigravity_binary.stat.exists
 
 - name: Run Antigravity CLI installer
   ansible.builtin.command:
-    cmd: bash /tmp/antigravity_install.sh
+    cmd: bash {{ ai_antigravity_installer_tmp.path }}/install.sh
   when: not ai_antigravity_binary.stat.exists
 
-- name: Remove Antigravity CLI installer
+- name: Remove Antigravity CLI installer temp directory
   ansible.builtin.file:
-    path: /tmp/antigravity_install.sh
+    path: "{{ ai_antigravity_installer_tmp.path }}"
     state: absent
   when: not ai_antigravity_binary.stat.exists
+  check_mode: false
 
 - name: Ensure Antigravity CLI shared config directory exists
   ansible.builtin.file:
@@ -27,11 +35,13 @@
     state: directory
     mode: '0755'
 
+# diff is disabled because the rendered config contains API keys.
 - name: Configure Antigravity CLI MCP servers
   ansible.builtin.template:
     src: templates/antigravity_mcp_config.j2
     dest: "{{ ansible_facts.env.HOME }}/.gemini/config/mcp_config.json"
     mode: '0600'
+  diff: false
 
 - name: Ensure Antigravity CLI runtime directory exists
   ansible.builtin.file:

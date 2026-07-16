@@ -1,14 +1,16 @@
 - name: Codex CLI install
   community.general.npm:
     name: '@openai/codex'
-    state: latest
+    state: present
     global: true
 
+# diff is disabled because the rendered config contains API keys.
 - name: Configure Codex CLI
   ansible.builtin.template:
     src: templates/codex_config.j2
     dest: "{{ ansible_facts.env.HOME }}/.codex/config.toml"
     mode: '0600'
+  diff: false
 
 - name: Ensure Codex CLI skills directory exists
   ansible.builtin.file:

@@ -1,7 +1,7 @@
 {
   "env": {
 {% for k, v in ai_claude_env.items() %}
-    "{{ k }}": "{{ v }}"{{ "," if not loop.last else "" }}
+    {{ k | to_json }}: {{ v | to_json }}{{ "," if not loop.last else "" }}
 {% endfor %}
   },
   "permissions": {
@@ -47,7 +47,7 @@
       "{{ ansible_facts.env.HOME }}/Documents"
     ]
   },
-  "model": "{{ ai_claude_model }}",
+  "model": {{ ai_claude_settings_current.model | default(ai_claude_model) | to_json }},
   "enabledPlugins": {
 {% for plugin in ai_claude_plugins %}
     "{{ plugin.name }}@{{ plugin.marketplace }}": true{{ "," if not loop.last else "" }}
@@ -63,6 +63,6 @@
     }{{ "," if not loop.last else "" }}
 {% endfor %}
   },
-  "effortLevel": "{{ ai_claude_effort_level }}",
+  "effortLevel": {{ ai_claude_settings_current.effortLevel | default(ai_claude_effort_level) | to_json }},
   "skipAutoPermissionPrompt": {{ ai_claude_skip_auto_permission_prompt | to_json }}
 }
