@@ -25,14 +25,10 @@ ai_codex_trusted_projects:
 ai_codex_tui_model_nux:
   "gpt-5.5": 3
 
-# trade-tasks needs the claude.ai Google Drive connector, which only
-# exists in Claude Code. Do not deploy it to Codex or Antigravity.
 ai_codex_skills_excludes:
   - reviewbycodex
-  - trade-tasks
 
-ai_antigravity_skills_excludes:
-  - trade-tasks
+ai_antigravity_skills_excludes: []
 
 ai_antigravity_model: "Gemini 3.5 Flash (High)"
 

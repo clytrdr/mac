@@ -18,6 +18,12 @@ Applies to code comments, docstrings, commit messages, and generated documents (
 - One idea per sentence. Keep sentences short. No nested clauses.
 - Standard technical terms (ML, programming) are fine. Keep everything else at a simple reading level.
 
+## Memory Policy
+- Do not write to the assistant's persistent memory by default.
+- Durable rules and conventions belong in the project's AGENTS.md, which all AI tools share. Tool-specific memory does not.
+- When something seems worth keeping, propose an AGENTS.md edit instead of saving a memory entry.
+- Write to memory only when the user explicitly asks for it.
+
 ## Git Workflow
 - **Never commit without explicit user permission.** The user always reviews changes before they are committed. After making changes, stop and let the user review; commit only when the user asks for it.
 - Run `git add` and `git commit` as **separate commands** (not chained with `&&`).
