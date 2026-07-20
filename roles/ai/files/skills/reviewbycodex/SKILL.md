@@ -25,6 +25,7 @@ One or more file paths provided after the skill name:
    - If empty, use `AskUserQuestion` to ask the user which file(s) to review. Do not guess.
 2. Resolve each path to an absolute path relative to the current working directory.
    - For any path that does not exist, report the missing path and stop. Do not silently skip.
+   - This skill does not review Jupyter notebooks. Drop any `.ipynb` path, report it as skipped, and suggest `/reviewbyself` for notebooks. If no reviewable file remains, stop.
 3. For **each** resolved file, invoke Codex non-interactively as a subagent:
    ```bash
    codex exec \
@@ -45,6 +46,7 @@ One or more file paths provided after the skill name:
 ## Rules
 
 - **Codex reviews only; Claude implements.** Never ask Codex to write a patch or modify files.
+- **No Jupyter notebooks.** Codex reads the raw file, so a `.ipynb` would be reviewed as raw JSON, not as notebook cells. Skip `.ipynb` inputs and point the user to `/reviewbyself`, which reviews notebooks cell by cell.
 - Never apply a fix the user has not explicitly approved via `AskUserQuestion`.
 - Preserve the original file's style and formatting unless a specific finding explicitly addresses style.
 - If `codex exec` fails for any file, surface the stderr verbatim and stop — do not silently skip or fall back.
