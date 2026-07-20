@@ -1,5 +1,41 @@
 {
   "enableTelemetry": false,
   "model": "{{ ai_antigravity_model }}",
+  "permissions": {
+    "allow": [
+      "command(git)",
+      "command(gh)",
+      "command(gcloud)",
+      "command(terraform)",
+      "command(docker)",
+      "command(ansible)",
+      "command(ansible-playbook)",
+      "command(ansible-lint)",
+      "command(find)",
+      "command(ls)",
+      "command(grep)",
+      "command(npm)",
+      "command(npx)",
+      "command(uv)",
+      "command(python)",
+      "command(pytest)",
+      "command(pre-commit)",
+      "command(mkdir)",
+      "command(brew)",
+      "command(cat)",
+      "command(rg)",
+      "command(playwright-cli)",
+      "command(mv)",
+      "command(open)",
+      "read_url(*)",
+      "mcp(context7/*)",
+      "mcp(jetbrains/*)",
+      "mcp(terraform/*)",
+      "mcp(firecrawl/*)",
+      "write_file({{ ansible_facts.env.HOME }}/Code)",
+      "write_file({{ ansible_facts.env.HOME }}/Documents)"
+    ],
+    "deny": []
+  },
   "trustedWorkspaces": {{ ai_antigravity_trusted_workspaces | to_nice_json(indent=2) | indent(2) }}
 }
