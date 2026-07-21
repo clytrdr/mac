@@ -53,11 +53,11 @@ ai_mcp_servers:
   - name: context7
     command: npx
     args: ["-y", "@upstash/context7-mcp@latest"]
-  - name: jetbrains
-    url: "http://localhost:64342/sse"
-    codex:
-      command: npx
-      args: ["-y", "mcp-remote", "http://localhost:64342/sse"]
+  # PyCharm serves its built-in MCP server on the streamable HTTP endpoint
+  # /stream. The IDE assigns the port, so it can change after an IDE update.
+  # Read the current value from Settings > Tools > MCP Server.
+  - name: pycharm
+    url: "http://127.0.0.1:64462/stream"
   - name: terraform
     command: docker
     args: ["run", "-i", "--rm", "hashicorp/terraform-mcp-server"]

@@ -95,10 +95,10 @@
   changed_when: true
   no_log: true
 
-- name: Add MCP servers (sse)
+- name: Add MCP servers (http)
   ansible.builtin.command:
     cmd: >-
-      claude mcp add --scope user --transport sse
+      claude mcp add --scope user --transport http
       {{ item.name }} {{ item.url }}
   loop: "{{ ai_mcp_servers | selectattr('url', 'defined') | list }}"
   loop_control:
