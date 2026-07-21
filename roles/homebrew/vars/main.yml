@@ -29,3 +29,4 @@ homebrew_cask_packages:
   - name: pycharm
   - name: font-udev-gothic-nf
   - name: zotero
+  - name: tradingview
