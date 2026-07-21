@@ -64,5 +64,9 @@
 {% endfor %}
   },
   "effortLevel": {{ ai_claude_settings_current.effortLevel | default(ai_claude_effort_level) | to_json }},
+  "statusLine": {
+    "type": "command",
+    "command": {{ ai_claude_status_line_command | to_json }}
+  },
   "skipAutoPermissionPrompt": {{ ai_claude_skip_auto_permission_prompt | to_json }}
 }
