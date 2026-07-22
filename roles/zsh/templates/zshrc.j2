@@ -85,6 +85,11 @@ alias gst='git status'
 alias ..='cd ..'
 alias ...='cd ../..'
 
+# Claude Code launchers with a fixed model and reasoning effort
+alias fable='claude --model fable --effort high'
+alias opus='claude --model opus --effort xhigh'
+alias sonnet='claude --model sonnet --effort xhigh'
+
 # --- Custom Functions ---
 # A function to update all package managers at once.
 # It checks if each command (brew, conda, npm) exists before running the update.
