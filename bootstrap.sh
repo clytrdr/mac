@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e # Stop immediately if an error occurs
+set -euo pipefail # Stop on error, undefined variable, or pipe failure
 
 # Color definitions
 GREEN='\033[0;32m'
@@ -12,7 +12,7 @@ if ! xcode-select -p &>/dev/null; then
     echo "Installing Xcode Command Line Tools..."
     xcode-select --install
     echo "Please complete the Xcode installation dialog, then press Enter to continue."
-    read -r
+    read -r < /dev/tty
 else
     echo "Xcode Command Line Tools already installed."
 fi
@@ -26,8 +26,15 @@ if ! command -v brew &>/dev/null; then
     if [ -f "/opt/homebrew/bin/brew" ]; then
         eval "$(/opt/homebrew/bin/brew shellenv)"
         # Append to .zprofile if not already present
-        if ! grep -q "/opt/homebrew/bin/brew shellenv" ~/.zprofile; then
+        if ! grep -q "/opt/homebrew/bin/brew shellenv" ~/.zprofile 2>/dev/null; then
              echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile
+        fi
+    # Intel path configuration
+    elif [ -f "/usr/local/bin/brew" ]; then
+        eval "$(/usr/local/bin/brew shellenv)"
+        # Append to .zprofile if not already present
+        if ! grep -q "/usr/local/bin/brew shellenv" ~/.zprofile 2>/dev/null; then
+             echo 'eval "$(/usr/local/bin/brew shellenv)"' >> ~/.zprofile
         fi
     fi
 else
@@ -35,8 +42,12 @@ else
 fi
 
 # 3. Install Ansible
-echo "Installing Ansible..."
-brew install ansible
+if brew list ansible &>/dev/null; then
+    echo "Ansible already installed."
+else
+    echo "Installing Ansible..."
+    brew install ansible
+fi
 
 # 4. Clone Repository
 TARGET_DIR="$HOME/Code/mac"
@@ -52,18 +63,26 @@ cd "$TARGET_DIR"
 
 # 5. Setup Passwords (Interactive)
 if [ ! -f .vault_pass ]; then
-    echo -e "${GREEN}Enter your Ansible Vault Password:${NC}"
-    read -s VAULT_PASS
-    echo "$VAULT_PASS" > .vault_pass
-    chmod 600 .vault_pass
+    while true; do
+        echo -e "${GREEN}Enter your Ansible Vault Password:${NC}"
+        read -rs VAULT_PASS < /dev/tty
+        echo
+        [ -n "$VAULT_PASS" ] && break
+        echo "Password must not be empty. Try again."
+    done
+    (umask 077; echo "$VAULT_PASS" > .vault_pass)
     echo "Vault password saved."
 fi
 
 if [ ! -f .ansible_become_pass ]; then
-    echo -e "${GREEN}Enter your Mac Login Password (for sudo):${NC}"
-    read -s SUDO_PASS
-    echo "$SUDO_PASS" > .ansible_become_pass
-    chmod 600 .ansible_become_pass
+    while true; do
+        echo -e "${GREEN}Enter your Mac Login Password (for sudo):${NC}"
+        read -rs SUDO_PASS < /dev/tty
+        echo
+        [ -n "$SUDO_PASS" ] && break
+        echo "Password must not be empty. Try again."
+    done
+    (umask 077; echo "$SUDO_PASS" > .ansible_become_pass)
     echo "Sudo password saved."
 fi
 
