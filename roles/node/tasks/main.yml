@@ -12,6 +12,7 @@
         cmd: n --lts
       register: node_lts_version
       changed_when: false
+      failed_when: false
       check_mode: false
 
     - name: Get active Node.js version
@@ -25,7 +26,9 @@
     - name: Install LTS version of Node.js using n
       ansible.builtin.command:
         cmd: n lts
-      when: node_active_version.stdout | default('') != 'v' + node_lts_version.stdout
+      when:
+        - node_lts_version.rc == 0
+        - node_active_version.stdout | default('') != 'v' + node_lts_version.stdout
 
     - name: Install npm packages globally
       community.general.npm:
