@@ -7,7 +7,7 @@ allowed-tools: Read, Edit, Write, Glob, Grep, NotebookEdit, AskUserQuestion
 
 Perform a thorough review of one or more files or directories with the current agent itself (no external reviewer). Then implement any approved fixes.
 
-Unlike `/reviewbycodex`, this skill does not delegate to Codex. The same agent reads the code, reviews it, and writes the fixes. Directory arguments are expanded recursively.
+This skill does not delegate to an external reviewer. The same agent reads the code, reviews it, and writes the fixes. Directory arguments are expanded recursively.
 
 ## Arguments
 

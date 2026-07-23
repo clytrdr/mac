@@ -3,126 +3,76 @@
 [![Ansible CI](https://github.com/clytrdr/mac/actions/workflows/ci.yml/badge.svg)](https://github.com/clytrdr/mac/actions/workflows/ci.yml)
 [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/clytrdr/mac/main.svg)](https://results.pre-commit.ci/latest/github/clytrdr/mac/main)
 
-## Disclaimer
+**Disclaimer:** The author is not responsible for any damage caused by using this system.
 
-**I'm not responsible for any damage caused by using this system.**
-
-This project uses references to "Yes, Takasu Clinic!" and "RIZAP" catchphrases purely as humorous aliases for user confirmation and commit commands. These references are jokes and do not constitute an endorsement of any views held by Katsuya Takasu. In particular, we strongly condemn his Holocaust denial remarks.
-
-## Table of Contents
-
-1. [Disclaimer](#disclaimer)
-2. [Overview](#overview)
-3. [🚀 Getting Started](#-getting-started)
-    - 3.1 [Prerequisites](#prerequisites)
-    - 3.2 [Installation](#installation)
-    - 3.3 [Applying Changes](#applying-changes)
-4. [🔐 Managing Secrets (vars/secrets.yml)](#-managing-secrets-varssecrets.yml)
-    - 4.1 [Setting up secrets for the first time](#setting-up-secrets-for-the-first-time)
-    - 4.2 [Managing existing secrets](#managing-existing-secrets)
-5. [What does this playbook do?](#what-does-this-playbook-do)
+This project uses the "Yes, Takasu Clinic!" and "RIZAP" catchphrases as humorous aliases for user confirmation and commit commands. These references are jokes and do not endorse any views held by Katsuya Takasu. In particular, we strongly condemn his Holocaust denial remarks.
 
 ## Overview
 
-This repository contains personal Ansible playbooks to automate the setup and configuration of a new macOS machine. It
-handles the installation of development tools, applications, shell configurations, and AI tools like gemini-cli.
+Personal Ansible playbooks that automate the setup of a new macOS machine. They install development tools, applications, shell configurations, and AI tools.
 
-## 🚀 Getting Started
-
-Follow these steps to set up a new machine using this playbook.
-
-### Prerequisites
+## Prerequisites
 
 - A fresh installation of macOS.
 - You are logged in with your Apple ID (required for App Store installations).
 
-### Installation
+## Development Guidelines
 
-You can set up the entire environment by running the `bootstrap.sh` script. This script automatically handles the installation of Xcode Command Line Tools, Homebrew, Ansible, and executes the playbook.
+See [AGENTS.md](AGENTS.md) for role conventions and the development workflow.
 
-**Option 1: One-line Installation (Recommended for fresh machines)**
+## Installation
 
-```bash
+The `bootstrap.sh` script installs Xcode Command Line Tools, Homebrew, and Ansible, then runs the playbook.
+
+One-line installation (recommended for fresh machines):
+
+```shell
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/clytrdr/mac/main/bootstrap.sh)"
 ```
 
-**Option 2: Manual Execution**
-
 If you have already cloned the repository:
 
-```bash
+```shell
 chmod +x bootstrap.sh
 ./bootstrap.sh
 ```
 
-### Applying Changes
+## Applying Changes
 
-After the initial setup, you should run the playbook whenever you modify the configuration (e.g., adding new packages or changing dotfiles):
+Run the playbook whenever you modify the configuration:
 
-```bash
+```shell
 ansible-playbook localhost.yml --become-password-file .ansible_become_pass --vault-password-file .vault_pass
 ```
 
-## 🔐 Managing Secrets (vars/secrets.yml)
+## Managing Secrets
 
-This project uses `ansible-vault` to securely manage sensitive configuration like Git user information. The encrypted
-file `vars/secrets.yml` contains:
+The encrypted file `vars/secrets.yml` is managed with `ansible-vault`. It contains:
 
-- `git_user`: Your Git username
-- `git_mail`: Your Git email address
-- `gh_mcp_token`: Your GitHub Personal Access Token for the mcp organization
+- `git_user`: Git username
+- `git_mail`: Git email address
+- `firecrawl_api_key`: Firecrawl API key for the MCP server
 
-### Setting up secrets for the first time
+First-time setup:
 
-1. Create the vault password file:
-
-```bash
+```shell
 echo "your_chosen_vault_password" > .vault_pass
 chmod 600 .vault_pass
-```
-
-2. Create the encrypted secrets file:
-
-```bash
 ansible-vault create vars/secrets.yml --vault-password-file .vault_pass
 ```
 
-3. Add your configuration in the editor that opens:
+Manage existing secrets:
 
-```yaml
----
-git_user: "Your Name"
-git_mail: "your.email@example.com"
-```
-
-### Managing existing secrets
-
-**View current secrets:**
-
-```bash
+```shell
 ansible-vault view vars/secrets.yml --vault-password-file .vault_pass
-```
-
-**Edit secrets:**
-
-```bash
 ansible-vault edit vars/secrets.yml --vault-password-file .vault_pass
-```
-
-**Change vault password:**
-
-```bash
 ansible-vault rekey vars/secrets.yml --vault-password-file .vault_pass
 ```
 
-**Important Notes:**
-
-- Keep your `.vault_pass` file secure and never commit it to git
-- The `vars/secrets.yml` file is encrypted and safe to commit
+Never commit `.vault_pass`. The encrypted `vars/secrets.yml` is safe to commit.
 
 ## License
 
-This project is licensed under the GNU General Public License v3.0 (GPLv3)—see the [LICENSE](LICENSE) file for
-details.
+This project is licensed under the GNU General Public License v3.0 (GPLv3). See the [LICENSE](LICENSE) file for details.
 
 Copyright (C) 2025 Ishikura Mikiya

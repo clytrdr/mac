@@ -1,4 +1,4 @@
-- name: Installing nodejs and npm packages
+- name: Install Node.js and npm packages
   tags:
     - node
   block:
@@ -7,15 +7,29 @@
         name: n
         state: latest
 
+    - name: Get latest LTS version number
+      ansible.builtin.command:
+        cmd: n --lts
+      register: node_lts_version
+      changed_when: false
+      check_mode: false
+
+    - name: Get active Node.js version
+      ansible.builtin.command:
+        cmd: node --version
+      register: node_active_version
+      changed_when: false
+      failed_when: false
+      check_mode: false
+
     - name: Install LTS version of Node.js using n
       ansible.builtin.command:
         cmd: n lts
-      register: node_n_lts_result
-      changed_when: true
+      when: node_active_version.stdout | default('') != 'v' + node_lts_version.stdout
 
     - name: Install npm packages globally
       community.general.npm:
         name: "{{ item.name }}"
         global: true
-        state: present
+        state: "{{ item.state | default('latest') }}"
       loop: "{{ node_npm_packages }}"

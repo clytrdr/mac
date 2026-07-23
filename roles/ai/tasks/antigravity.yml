@@ -61,21 +61,18 @@
     state: directory
     mode: '0755'
 
-- name: List Antigravity-deployable skill directories
-  ansible.builtin.find:
-    paths: "{{ role_path }}/files/skills"
-    file_type: directory
-    recurse: false
-    excludes: "{{ ai_antigravity_skills_excludes }}"
-  register: ai_antigravity_skill_dirs
-  check_mode: false
-
+# See the Claude Code skill deploy task for why synchronize is used here.
 - name: Deploy custom Antigravity skills
-  ansible.builtin.copy:
-    src: "{{ item.path }}/"
-    dest: "{{ ansible_facts.env.HOME }}/.gemini/skills/{{ item.path | basename }}/"
-    mode: '0644'
-    directory_mode: '0755'
-  loop: "{{ ai_antigravity_skill_dirs.files }}"
-  loop_control:
-    label: "{{ item.path | basename }}"
+  ansible.posix.synchronize:
+    src: "{{ role_path }}/files/skills/"
+    dest: "{{ ansible_facts.env.HOME }}/.gemini/skills/"
+    delete: true
+    rsync_opts: "{{ ['--exclude=.*']
+                    + (ai_antigravity_skills_excludes
+                       | map('regex_replace', '^', '--exclude=') | list) }}"
+
+- name: Remove excluded Antigravity skills
+  ansible.builtin.file:
+    path: "{{ ansible_facts.env.HOME }}/.gemini/skills/{{ item }}"
+    state: absent
+  loop: "{{ ai_antigravity_skills_excludes }}"

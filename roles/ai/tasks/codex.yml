@@ -18,21 +18,22 @@
     state: directory
     mode: '0755'
 
-- name: List Codex-deployable skill directories
-  ansible.builtin.find:
-    paths: "{{ role_path }}/files/skills"
-    file_type: directory
-    recurse: false
-    excludes: "{{ ai_codex_skills_excludes }}"
-  register: ai_codex_skill_dirs
-  check_mode: false
-
+# See the Claude Code skill deploy task for why synchronize is used here.
+# rsync handles the excludes, so the skill directories no longer need to be
+# listed first.
 - name: Deploy custom Codex skills
-  ansible.builtin.copy:
-    src: "{{ item.path }}/"
-    dest: "{{ ansible_facts.env.HOME }}/.codex/skills/{{ item.path | basename }}/"
-    mode: '0644'
-    directory_mode: '0755'
-  loop: "{{ ai_codex_skill_dirs.files }}"
-  loop_control:
-    label: "{{ item.path | basename }}"
+  ansible.posix.synchronize:
+    src: "{{ role_path }}/files/skills/"
+    dest: "{{ ansible_facts.env.HOME }}/.codex/skills/"
+    delete: true
+    rsync_opts: "{{ ['--exclude=.*']
+                    + (ai_codex_skills_excludes
+                       | map('regex_replace', '^', '--exclude=') | list) }}"
+
+# rsync never deletes an excluded path, so a skill that was deployed before
+# it was added to ai_codex_skills_excludes has to be removed here.
+- name: Remove excluded Codex skills
+  ansible.builtin.file:
+    path: "{{ ansible_facts.env.HOME }}/.codex/skills/{{ item }}"
+    state: absent
+  loop: "{{ ai_codex_skills_excludes }}"

@@ -35,8 +35,7 @@ ai_codex_trusted_projects:
 ai_codex_tui_model_nux:
   "gpt-5.5": 3
 
-ai_codex_skills_excludes:
-  - reviewbycodex
+ai_codex_skills_excludes: []
 
 ai_antigravity_skills_excludes: []
 

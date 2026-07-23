@@ -29,9 +29,9 @@
   when: not ai_claude_binary.stat.exists
   check_mode: false
 
-# model and effortLevel change per session via /model and /effort.
-# Read the live settings first so the template keeps their current
-# values; the vars only seed a machine without settings.json.
+# The model and effortLevel change per session using /model and /effort.
+# Read live settings first to keep their current values in the template.
+# The variables only seed a machine without settings.json.
 - name: Read current Claude Code settings
   ansible.builtin.slurp:
     src: "{{ ansible_facts.env.HOME }}/.claude/settings.json"
@@ -56,12 +56,19 @@
     state: directory
     mode: '0755'
 
+# synchronize runs rsync with --delete.
+# It deletes a skill from the deployed directory after the skill is removed
+# from the repository.
+# Names that start with a dot are excluded. Some CLIs keep their own skills
+# in such a directory, for example ~/.codex/skills/.system. rsync does not
+# delete an excluded path, so those skills stay.
 - name: Deploy custom skills
-  ansible.builtin.copy:
-    src: files/skills/
+  ansible.posix.synchronize:
+    src: "{{ role_path }}/files/skills/"
     dest: "{{ ansible_facts.env.HOME }}/.claude/skills/"
-    mode: '0644'
-    directory_mode: '0755'
+    delete: true
+    rsync_opts:
+      - "--exclude=.*"
 
 - name: Check if Claude Code CLI is available
   ansible.builtin.command:

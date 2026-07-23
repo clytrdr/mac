@@ -1,6 +1,6 @@
 # Project Guidelines
 
-macOS environment setup (Ansible) for an automated trading system.
+macOS environment setup (Ansible)
 
 ## Development Workflow
 

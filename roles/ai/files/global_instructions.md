@@ -4,13 +4,12 @@
 - **Communication Language:** Japanese
 - The AI assistant must strictly communicate with the user in Japanese.
 - Even in Japanese, explain like an O'Reilly technical book: logical, step by step, and plain. No filler, no vague statements.
-- **Documentation & Code:** English
-- All documentation, commit messages, and code comments must be written in English.
 - The user uses PyCharm as their IDE.
 
 ## English Writing Style
-Applies to code comments, docstrings, commit messages, and generated documents (Markdown, HTML).
+This style applies to documentation, code comments, docstrings, commit messages, and generated documents (Markdown, HTML).
 
+- All of the above must be written in English.
 - Write like an O'Reilly technical book, not a literary essay.
 - Use plain, common verbs: use, make, get, run, check.
   Avoid fancy verbs: leverage, orchestrate, employ, utilize.
@@ -20,18 +19,18 @@ Applies to code comments, docstrings, commit messages, and generated documents (
 
 ## Memory Policy
 - Do not write to the assistant's persistent memory by default.
-- Durable rules and conventions belong in the project's AGENTS.md, which all AI tools share. Tool-specific memory does not.
-- When something seems worth keeping, propose an AGENTS.md edit instead of saving a memory entry.
+- Put persistent rules and conventions in the project's AGENTS.md file. All AI tools share this file. Do not use tool-specific memory.
+- If information is worth keeping, propose an edit to AGENTS.md instead of saving a memory entry.
 - Write to memory only when the user explicitly asks for it.
 
 ## Git Workflow
-- **Never commit without explicit user permission.** The user always reviews changes before they are committed. After making changes, stop and let the user review; commit only when the user asks for it.
+- **Never commit without explicit user permission.** The user always reviews changes before commit. After making changes, stop and let the user review. Commit only when the user asks for it.
 - Run `git add` and `git commit` as **separate commands** (not chained with `&&`).
 - Pass the commit message directly with `-m`, not via `$(cat <<EOF)`.
 
 ## Git Commit Messages
-- Follow [Conventional Commits](https://www.conventionalcommits.org/) (e.g., `feat:`, `fix:`).
+- Follow Conventional Commits (e.g., `feat:`, `fix:`).
 - Subject line: 60 characters or fewer. Omit body unless necessary.
 
 ## User Confirmation Aliases
-- Any Takasu Clinic-related words mean "Yes / OK / approved". This is a pun on the famous catchphrase "Yes, Takasu Clinic!". Examples: "yes, takasu clinic", "高須クリニック", "イエス、高須クリニック", "タカスクリニック", etc.
+- Any word related to Takasu Clinic means "Yes / OK / approved". This comes from the phrase "Yes, Takasu Clinic!". Examples: "yes, takasu clinic", "高須クリニック", "イエス、高須クリニック", "タカスクリニック", etc.
