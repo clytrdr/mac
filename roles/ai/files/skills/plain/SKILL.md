@@ -7,11 +7,12 @@ allowed-tools: Read, Edit, Write, Glob, NotebookEdit, AskUserQuestion
 
 Rewrite the English text in one or more files into plain, simple English. Keep the meaning. Do not lose any content. For code files, change only comments and docstrings, never the code.
 
-This skill covers four kinds of target text:
+This skill covers five kinds of target text:
 
 - **Markdown** (`.md`, `.markdown`): the body text.
 - **HTML** (`.html`, `.htm`): the visible text and HTML comments.
 - **Code** (any source file): the comments and docstrings only.
+- **Config, data, and template files** (`.yml`, `.yaml`, `.json`, `.toml`, `.ini`, `.cfg`, `.conf`, `.j2`, dotfiles such as `.gitignore`, and similar): the comments only. Treat these files as code.
 - **Jupyter Notebook** (`.ipynb`): the body text of Markdown cells, and the comments and docstrings in code cells.
 
 ## Arguments
@@ -45,6 +46,7 @@ Rewrite the text to follow these rules. They come from the user's global guideli
    - **Markdown**: rewrite the body text.
    - **HTML**: rewrite the visible text and HTML comments.
    - **Code**: rewrite the comments and docstrings only.
+   - **Config, data, and template files**: rewrite the comments only. A file format with no comment syntax, such as JSON, has no target text. Leave it unchanged and report it.
    - **Jupyter Notebook** (`.ipynb`): parse the file as a notebook. Rewrite the body text of Markdown cells. In code cells, rewrite the comments and docstrings only.
    - For any other or unknown file type, use `AskUserQuestion` to ask whether to treat it as Markdown, HTML, or code. Do not guess.
 4. `Read` the full file. For a notebook, `Read` returns the cells with their outputs.
@@ -57,8 +59,8 @@ Rewrite the text to follow these rules. They come from the user's global guideli
 
 ## Rules
 
-- **Never change code.** In code files, edit only the text inside comments and docstrings. Do not touch identifiers, logic, strings used by the program, imports, or formatting of the code.
-- **Never break structure.** In Markdown, do not change code blocks, inline code, link URLs, image paths, tables layout, or frontmatter keys. In HTML, do not change tags, attributes, URLs, `<script>`, `<style>`, or `<pre>`/`<code>` blocks. In Jupyter notebooks, edit cell source only. Do not change cell types, execution counts, cell outputs, or notebook metadata. In a code cell, keep the code itself unchanged and rewrite only the comments and docstrings.
+- **Never change code.** In code files, edit only the text inside comments and docstrings. Do not touch identifiers, logic, strings used by the program, imports, or formatting of the code. In config, data, and template files, every key and every value is code. This includes text that reads like prose, such as an Ansible task `name`, a `description` field, or a log message. Edit only the comments.
+- **Never break structure.** In Markdown, do not change code blocks, inline code, link URLs, image paths, tables layout, or frontmatter keys. In HTML, do not change tags, attributes, URLs, `<script>`, `<style>`, or `<pre>`/`<code>` blocks. In config, data, and template files, keep the comment marker and the indentation of each comment line as is. YAML indentation is part of the syntax. Do not change template expressions such as `{{ ... }}` or `{% ... %}`, even inside a comment. In Jupyter notebooks, edit cell source only. Do not change cell types, execution counts, cell outputs, or notebook metadata. In a code cell, keep the code itself unchanged and rewrite only the comments and docstrings.
 - **No content loss.** The rewrite must keep every fact and detail from the original. Simplify the wording, not the information.
 - **Meaning first.** If a sentence cannot be simplified without changing its meaning, keep it as is and report it.
 - **Do not commit.** Leave the changes in the working tree for the user to review.
