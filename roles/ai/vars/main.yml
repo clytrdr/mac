@@ -46,6 +46,7 @@ ai_antigravity_trusted_workspaces:
   - "{{ ansible_facts.env.HOME }}/Code/core"
   - "{{ ansible_facts.env.HOME }}/Code/back"
   - "{{ ansible_facts.env.HOME }}/Code/mac"
+  - "{{ ansible_facts.env.HOME }}/Code/infra"
 
 ai_claude_env:
   CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING: "1"
