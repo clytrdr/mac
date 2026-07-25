@@ -52,7 +52,7 @@
 
 - name: Ensure Claude Code skills directory exists
   ansible.builtin.file:
-    path: "{{ ansible_facts.env.HOME }}/.claude/skills"
+    path: "{{ ai_claude_skills_dir }}"
     state: directory
     mode: '0755'
 
@@ -65,7 +65,7 @@
 - name: Deploy custom skills
   ansible.posix.synchronize:
     src: "{{ role_path }}/files/skills/"
-    dest: "{{ ansible_facts.env.HOME }}/.claude/skills/"
+    dest: "{{ ai_claude_skills_dir }}/"
     delete: true
     rsync_opts:
       - "--exclude=.*"

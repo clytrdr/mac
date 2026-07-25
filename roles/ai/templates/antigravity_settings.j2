@@ -32,8 +32,9 @@
       "mcp(pycharm/*)",
       "mcp(terraform/*)",
       "mcp(firecrawl/*)",
-      "write_file({{ ansible_facts.env.HOME }}/Code)",
-      "write_file({{ ansible_facts.env.HOME }}/Documents)"
+{% for dir in ai_workspace_dirs %}
+      "write_file({{ dir }})"{{ "," if not loop.last else "" }}
+{% endfor %}
     ],
     "deny": []
   },

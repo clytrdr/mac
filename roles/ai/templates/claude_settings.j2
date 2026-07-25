@@ -43,8 +43,9 @@
     "deny": [],
     "defaultMode": "{{ ai_claude_default_mode }}",
     "additionalDirectories": [
-      "{{ ansible_facts.env.HOME }}/Code",
-      "{{ ansible_facts.env.HOME }}/Documents"
+{% for dir in ai_workspace_dirs %}
+      "{{ dir }}"{{ "," if not loop.last else "" }}
+{% endfor %}
     ]
   },
   "model": {{ ai_claude_settings_current.model | default(ai_claude_model) | to_json }},

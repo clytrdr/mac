@@ -1,3 +1,27 @@
+# Directory trees every CLI can read and write outside the current project.
+# Each entry covers all paths under it. A project directory under these
+# paths does not need its own entry.
+ai_workspace_dirs:
+  - "{{ ansible_facts.env.HOME }}/Code"
+  - "{{ ansible_facts.env.HOME }}/Documents"
+
+# Project directories that are trusted by default. No trust prompt appears
+# for these paths. Each entry matches an exact path, not a directory tree.
+# The parent path ~/Code is left out intentionally. A directory under ~/Code
+# is trusted only when listed here.
+# This setting does not apply to Claude Code. Claude Code stores project
+# trust in ~/.claude.json. The Claude Code CLI rewrites that file while
+# running. Ansible leaves that file alone, and you answer the trust prompt
+# once per directory.
+ai_trusted_projects:
+  - "{{ ansible_facts.env.HOME }}/Code/apps-script"
+  - "{{ ansible_facts.env.HOME }}/Code/back"
+  - "{{ ansible_facts.env.HOME }}/Code/core"
+  - "{{ ansible_facts.env.HOME }}/Code/front"
+  - "{{ ansible_facts.env.HOME }}/Code/infra"
+  - "{{ ansible_facts.env.HOME }}/Code/mac"
+  - "{{ ansible_facts.env.HOME }}/Documents"
+
 ai_instruction_targets:
   - path: "{{ ansible_facts.env.HOME }}/.claude/CLAUDE.md"
     dir: "{{ ansible_facts.env.HOME }}/.claude"
@@ -9,16 +33,18 @@ ai_instruction_targets:
     dir: "{{ ansible_facts.env.HOME }}/.gemini"
     dir_mode: '0755'
 
-# Seed values for a machine without settings.json. Once settings.json
-# has model / effortLevel (set via /model and /effort), those win.
+# Default values for a machine without settings.json. Values set in
+# settings.json using /model and /effort override these values.
 ai_claude_model: claude-opus-4-8[1m]
 ai_claude_effort_level: xhigh
 ai_claude_default_mode: auto
 ai_claude_skip_auto_permission_prompt: true
 
-# Status line: show the active model, plus the effort level when set.
-# Folded so no source line exceeds the yaml[line-length] limit; the folding
-# joins these lines back into a single shell command with spaces.
+ai_claude_skills_dir: "{{ ansible_facts.env.HOME }}/.claude/skills"
+
+# Status line configuration. Show the active model and the effort level if set.
+# Folded to keep source lines under the yaml[line-length] limit. YAML
+# folding joins these lines into a single shell command with spaces.
 ai_claude_status_line_command: >-
   input=$(cat);
   model=$(echo "$input" | jq -r '.model.display_name');
@@ -26,27 +52,24 @@ ai_claude_status_line_command: >-
   if [ -n "$effort" ]; then printf '%s (%s)' "$model" "$effort";
   else printf '%s' "$model"; fi
 
-ai_codex_trusted_projects:
-  - "{{ ansible_facts.env.HOME }}/Code"
-  - "{{ ansible_facts.env.HOME }}/Documents"
-  - "{{ ansible_facts.env.HOME }}/Code/back"
-  - "{{ ansible_facts.env.HOME }}/Code/mac"
+ai_codex_trusted_projects: "{{ ai_trusted_projects }}"
 
 ai_codex_tui_model_nux:
   "gpt-5.5": 3
 
+ai_codex_skills_dir: "{{ ansible_facts.env.HOME }}/.codex/skills"
+
 ai_codex_skills_excludes: []
+
+# Antigravity reads global skills from ~/.gemini/skills. This directory is
+# separate from the antigravity-cli directory that stores settings.json.
+ai_antigravity_skills_dir: "{{ ansible_facts.env.HOME }}/.gemini/skills"
 
 ai_antigravity_skills_excludes: []
 
 ai_antigravity_model: "Gemini 3.6 Flash (High)"
 
-ai_antigravity_trusted_workspaces:
-  - "{{ ansible_facts.env.HOME }}/Code"
-  - "{{ ansible_facts.env.HOME }}/Code/core"
-  - "{{ ansible_facts.env.HOME }}/Code/back"
-  - "{{ ansible_facts.env.HOME }}/Code/mac"
-  - "{{ ansible_facts.env.HOME }}/Code/infra"
+ai_antigravity_trusted_workspaces: "{{ ai_trusted_projects }}"
 
 ai_claude_env:
   CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING: "1"
@@ -65,9 +88,9 @@ ai_mcp_servers:
   - name: context7
     command: npx
     args: ["-y", "@upstash/context7-mcp@latest"]
-  # PyCharm serves its built-in MCP server on the streamable HTTP endpoint
-  # /stream. The IDE assigns the port, so it can change after an IDE update.
-  # Read the current value from Settings > Tools > MCP Server.
+  # PyCharm runs its built-in MCP server on the HTTP endpoint /stream.
+  # The IDE assigns the port automatically, so it can change after an update.
+  # Check the current port in Settings > Tools > MCP Server.
   - name: pycharm
     url: "http://127.0.0.1:64462/stream"
   - name: terraform
