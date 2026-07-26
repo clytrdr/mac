@@ -1,5 +1,5 @@
 ---
-name: reviewbyself
+name: reviewpython
 description: Review one or more files or directories with the current agent itself, then implement approved fixes.
 disable-model-invocation: true
 allowed-tools: Read, Edit, Write, Glob, Grep, NotebookEdit, AskUserQuestion, mcp__pycharm__lint_files, mcp__pycharm__get_file_problems
@@ -14,7 +14,7 @@ This skill does not delegate to an external reviewer. The same agent reads the c
 One or more file paths or directory paths provided after the skill name:
 
 ```
-/reviewbyself path/to/file1.py path/to/dir path/to/file2.ts
+/reviewpython path/to/file1.py path/to/dir path/to/file2.ts
 ```
 
 `$ARGUMENTS` contains the raw argument string.
