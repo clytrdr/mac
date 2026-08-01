@@ -1,7 +1,7 @@
 ---
 name: dependabot
 description: Review and squash-merge open Dependabot pull requests interactively.
-allowed-tools: Bash, AskUserQuestion
+allowed-tools: Bash, AskUserQuestion, Read
 ---
 
 Review and squash-merge open Dependabot pull requests on the current repository.
@@ -14,41 +14,41 @@ Review and squash-merge open Dependabot pull requests on the current repository.
 
 ## Instructions
 
-1. If the working directory is not clean (uncommitted changes exist), warn the user and stop. A clean working directory is required because `git pull` at the end may cause conflicts.
-2. If no Dependabot PRs are found, report that and stop.
-3. For each open Dependabot PR, check merge status:
+1. Check the working directory. If it is not clean (there are uncommitted changes), warn the user and stop. The working directory must be clean because `git pull` and the post-merge steps both change tracked files.
+2. If there are no Dependabot PRs, report that and stop.
+3. Check the merge status of each open Dependabot PR:
    - Run `gh pr view <number> --json number,title,mergeable,mergeStateStatus` for all PRs.
-4. Present a summary table to the user with columns: PR number, title, mergeable, status.
-5. Use AskUserQuestion to ask the user which PRs to squash-merge:
+4. Show the user a summary table with these columns: PR number, title, mergeable, status.
+   - Point out major version bumps. Dependabot puts the ecosystem in the branch name, but not the bump type. Read the title (`from X to Y`) to find them.
+5. Use AskUserQuestion to ask which PRs to squash-merge:
    - Suggest merging all PRs that are MERGEABLE.
-   - If some PRs have UNSTABLE status, explain it may be due to non-critical CI checks (e.g., pre-commit.ci on private repos) and ask if they should be included.
-   - If any PRs are CONFLICTING, note them and suggest running `@dependabot rebase` via a PR comment.
-6. Upon confirmation, squash-merge the approved PRs one by one using `gh pr merge <number> --squash`.
-   - If a merge fails due to conflict (the PR became CONFLICTING after earlier merges changed the base branch), comment `@dependabot rebase` on the PR using `gh pr comment <number> --body "@dependabot rebase"` and inform the user.
-7. After all merges are attempted, show a results summary table: PR number, title, result (merged / conflict-rebasing / failed).
-8. If all PRs were merged successfully, ask the user whether to `git pull` the latest changes. If yes, run it.
-9. After a successful `git pull`, determine which refresh commands are needed based on the ecosystems of the merged PRs (parsed from Dependabot branch names: `dependabot/<ecosystem>/...`):
+   - Some PRs may have UNSTABLE status. Explain that this can come from CI checks that are not critical. One example is pre-commit.ci on private repos. Ask the user whether to include them.
+   - Some PRs may be CONFLICTING. List them and suggest running `@dependabot rebase` in a PR comment.
+6. After the user confirms, squash-merge the approved PRs one by one with `gh pr merge <number> --squash`.
+   - `gh pr merge` prints nothing on success. Do not assume it worked. After the merges, check every PR with `gh pr view <number> --json number,state`. Use that output as the source of truth.
+   - A merge can fail because of a conflict. This happens when an earlier merge changes the base branch and the PR becomes CONFLICTING. In that case, run `gh pr comment <number> --body "@dependabot rebase"` to comment on the PR, and tell the user.
+7. Show a results table: PR number, title, result (merged / conflict-rebasing / failed).
+8. If at least one PR was merged, ask the user whether to run `git pull` to get the latest changes. If yes, run it. Do not wait for every PR to succeed. The merged ones still need pulling.
+9. After `git pull` succeeds, find out which ecosystems were merged. Read them from the Dependabot branch names: `dependabot/<ecosystem>/...`. Then read the matching reference file and follow it.
 
-   - `pip`            → Python (uv)
-   - `npm_and_yarn`   → Node (npm)
-   - `terraform`      → Terraform
-   - `github_actions` → no local refresh needed
+   | Ecosystem        | Reference file            |
+   | ---------------- | ------------------------- |
+   | `pip`            | `references/python.md`    |
+   | `npm_and_yarn`   | `references/npm.md`       |
+   | `terraform`      | `references/terraform.md` |
+   | `github_actions` | none; no local refresh    |
 
-   For each ecosystem with at least one merged PR, ask the user (one prompt per ecosystem) whether to run the refresh commands:
+   Read only the files you need. Handle one ecosystem at a time. Ask the user before you run each command. Some commands are slow.
 
-   - **Python (uv)**:
-     - `uv pip install -r requirements.txt -r requirements-dev.txt`
-       (omit `-r requirements-dev.txt` if that file does not exist)
-     - If `docker-compose.yml` or `compose.yml` exists, also ask separately whether to run `docker compose build` (slow; user may skip).
-   - **Node (npm)**: `npm ci`
-   - **Terraform**: `terraform init -upgrade`
-     (note: this may modify `.terraform.lock.hcl`)
-
-10. Report the final status, including which refresh commands were executed.
+10. Each reference file lists the files it may change. If any of them changed, show `git status --porcelain` and `git diff --stat`. Then ask the user whether to commit. Do not commit without an explicit yes.
+11. Report the final status: PRs merged, commands run, check results, and any problem that is still open.
 
 ## Rules
 
 - Only process PRs authored by `app/dependabot`.
 - Always use `--squash` for merging.
 - Never force-merge or bypass branch protection.
-- If `gh` CLI is not authenticated, instruct the user to run `gh auth login` and stop.
+- Never run a command that changes remote infrastructure or deploys. The refresh and check steps are local only.
+- Do not push unless the user asks.
+- If the `gh` CLI is not authenticated, tell the user to run `gh auth login` and stop.
+- The job is not done when the PRs are merged. A lockfile can still hold known vulnerabilities after every PR is merged. Follow the reference file to the end.
