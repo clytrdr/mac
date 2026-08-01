@@ -34,6 +34,8 @@ mismatches, unused imports, and wrong types. Use the PyCharm MCP server.
 - Verify meaningful behavior, not coverage numbers.
 - Skip a test if it requires many stacked mocks. Such a test targets implementation details.
 - Focus on tests that catch real bugs and document intended behavior.
+- Do not write tests that expect `AssertionError`. Asserts document invariants for
+  readability and type narrowing. They do not validate values, so they are not behavior to test.
 
 ## Test Organization
 
