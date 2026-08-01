@@ -99,7 +99,8 @@ updateall() {
     print "==> Updating Homebrew..."
     brew update
     print "==> Updating Homebrew packages..."
-    brew upgrade
+    # The '--yes' flag skips the upgrade confirmation prompt.
+    brew upgrade --yes
   else
     print "INFO: Homebrew not found. Skipping."
   fi
