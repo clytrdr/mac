@@ -40,7 +40,9 @@
       "mcp__terraform__*",
       "mcp__firecrawl__*"
     ],
-    "deny": [],
+    "deny": [
+      "Bash(gh repo delete:*)"
+    ],
     "defaultMode": "{{ ai_claude_default_mode }}",
     "additionalDirectories": [
 {% for dir in ai_workspace_dirs %}
