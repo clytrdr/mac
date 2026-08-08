@@ -54,9 +54,6 @@ ai_claude_status_line_command: >-
 
 ai_codex_trusted_projects: "{{ ai_trusted_projects }}"
 
-ai_codex_tui_model_nux:
-  "gpt-5.5": 3
-
 ai_codex_skills_dir: "{{ ansible_facts.env.HOME }}/.codex/skills"
 
 ai_codex_skills_excludes: []
@@ -74,15 +71,11 @@ ai_antigravity_trusted_workspaces: "{{ ai_trusted_projects }}"
 ai_claude_env:
   CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING: "1"
 
-ai_claude_plugin_marketplaces:
-  - name: openai-codex
-    source: openai/codex-plugin-cc
+ai_claude_plugin_marketplaces: []
 
 ai_claude_plugins:
   - name: frontend-design
     marketplace: claude-plugins-official
-  - name: codex
-    marketplace: openai-codex
 
 ai_mcp_servers:
   - name: context7

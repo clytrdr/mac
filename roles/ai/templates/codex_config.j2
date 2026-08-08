@@ -5,11 +5,6 @@
 [projects."{{ path }}"]
 trust_level = "trusted"
 {% endfor %}
-
-[tui.model_availability_nux]
-{% for model, count in ai_codex_tui_model_nux.items() %}
-"{{ model }}" = {{ count }}
-{% endfor %}
 {% for server in ai_mcp_servers %}
 {% set codex_server = server.codex | default(server) %}
 {% set codex_env = codex_server.env | default(server.env | default({})) %}
