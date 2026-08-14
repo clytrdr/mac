@@ -64,7 +64,7 @@ ai_antigravity_skills_dir: "{{ ansible_facts.env.HOME }}/.gemini/skills"
 
 ai_antigravity_skills_excludes: []
 
-ai_antigravity_model: "Gemini 3.6 Flash (High)"
+ai_antigravity_model: "Gemini 3.7 Flash (High)"
 
 ai_antigravity_trusted_workspaces: "{{ ai_trusted_projects }}"
 

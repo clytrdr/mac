@@ -12,11 +12,14 @@ Always read the source code and existing tests before writing or modifying tests
 
 1. Read the source file under test and the existing test file.
 2. Run the IDE inspections on the test file. Record the baseline problem list.
-3. Write or refactor the tests.
-4. Run the tests: `pytest tests/path/to/test_file.py`. AI agents must not pass `-n auto`
+3. List the behaviors of the source file. Map each existing test to a behavior.
+   Write a test only for a behavior that no test covers. See "Test Count".
+4. Write or refactor the tests.
+5. Run the tests: `pytest tests/path/to/test_file.py`. AI agents must not pass `-n auto`
    (the sandbox blocks xdist workers and the run hangs).
-5. Run the IDE inspections again. The problem count must not increase. Fix new problems in the same pass.
-6. Report the result: test outcome and the problem count before and after.
+6. Run the IDE inspections again. The problem count must not increase. Fix new problems in the same pass.
+7. Report the result: test outcome, test count before and after, and problem count
+   before and after. For each added test, state the covered behavior in one line.
 
 ## IDE Inspections
 
@@ -32,10 +35,23 @@ mismatches, unused imports, and wrong types. Use the PyCharm MCP server.
 ## Philosophy
 
 - Verify meaningful behavior, not coverage numbers.
+- Prefer fewer tests. Keep a test only if it is the only test that fails
+  when its behavior breaks.
 - Skip a test if it requires many stacked mocks. Such a test targets implementation details.
 - Focus on tests that catch real bugs and document intended behavior.
 - Do not write tests that expect `AssertionError`. Asserts document invariants for
   readability and type narrowing. They do not validate values, so they are not behavior to test.
+
+## Test Count
+
+Keep the test count unchanged or reduce it by default. Adding a test is not an improvement by itself.
+
+Before you add a test, ask which change to the source makes this test fail and no other test fail.
+If there is no such change, do not add it. Cases with no such change: another test already runs the
+same path (add an assertion there instead), the conditions are independent and already tested
+separately, and the branch returns the same result as the default path.
+
+When you remove a test, state which remaining test covers its behavior.
 
 ## Test Organization
 
