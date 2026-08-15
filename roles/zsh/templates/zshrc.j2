@@ -5,6 +5,12 @@ if [ -x /opt/homebrew/bin/brew ]; then
   eval "$(/opt/homebrew/bin/brew shellenv)"
 fi
 
+# Leave casks with `auto_updates true` to their own updaters.
+# Homebrew 6 upgrades such casks by default when the app bundle version is
+# older than the tap version. For apps that ship often, this re-downloads
+# hundreds of MB on every `brew upgrade`.
+export HOMEBREW_NO_UPGRADE_AUTO_UPDATES_CASKS=1
+
 # --- Path for n ---
 export N_PREFIX=$HOME/.n
 export PATH=$N_PREFIX/bin:$PATH

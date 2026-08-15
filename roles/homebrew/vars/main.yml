@@ -30,3 +30,4 @@ homebrew_cask_packages:
   - name: font-udev-gothic-nf
   - name: zotero
   - name: tradingview
+  - name: claude # Claude desktop app. The Claude Code CLI is installed by roles/ai.

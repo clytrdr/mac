@@ -1,6 +1,11 @@
 - name: Manage Homebrew setup
   tags:
     - homebrew
+  environment:
+    # Leave casks with `auto_updates true` to their own updaters, so a
+    # playbook run does not re-download apps that already update themselves.
+    # Keep this in sync with the same export in roles/zsh/templates/zshrc.j2.
+    HOMEBREW_NO_UPGRADE_AUTO_UPDATES_CASKS: '1'
   block:
     - name: Update Homebrew itself and all taps
       community.general.homebrew:
