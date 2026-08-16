@@ -1,5 +1,7 @@
 # ~/.codex/config.toml — Managed by Ansible (roles/ai)
 # Reference: https://developers.openai.com/codex/config-basic
+model = {{ ai_codex_model | to_json }}
+model_reasoning_effort = {{ ai_codex_reasoning_effort | to_json }}
 {% for path in ai_codex_trusted_projects %}
 
 [projects."{{ path }}"]

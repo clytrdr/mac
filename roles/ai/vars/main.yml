@@ -52,6 +52,11 @@ ai_claude_status_line_command: >-
   if [ -n "$effort" ]; then printf '%s (%s)' "$model" "$effort";
   else printf '%s' "$model"; fi
 
+# Codex CLI model settings. The Codex CLI rewrites config.toml when you run
+# /model, so these values are restored on the next Ansible run.
+ai_codex_model: gpt-5.6-sol
+ai_codex_reasoning_effort: high
+
 ai_codex_trusted_projects: "{{ ai_trusted_projects }}"
 
 ai_codex_skills_dir: "{{ ansible_facts.env.HOME }}/.codex/skills"
