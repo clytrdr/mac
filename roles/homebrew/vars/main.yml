@@ -4,7 +4,6 @@ homebrew_taps:
 homebrew_packages:
   - name: ansible
   - name: ansible-lint
-  - name: speedtest-cli
   - name: uv
   - name: terraform
   - name: gh
