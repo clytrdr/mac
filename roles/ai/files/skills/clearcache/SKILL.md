@@ -30,12 +30,6 @@ du -sh ~/Library/Containers/* 2>/dev/null | sort -rh | head -5
 du -sh ~/Library/Application\ Support/* 2>/dev/null | sort -rh | head -10
 ```
 
-Check Docker usage (cleanup is limited to the commands in the Docker section):
-
-```bash
-docker system df
-```
-
 Check project-local regenerable directories:
 
 ```bash
@@ -62,18 +56,6 @@ These caches are regenerable. The owning tool rebuilds them on the next run.
 | tox environments | `<project>/.tox` | `rm -rf <project>/.tox` |
 | mypy cache | `<project>/.mypy_cache` | `rm -rf <project>/.mypy_cache` |
 | JetBrains old versions | see below | `rm -rf` on old version dirs only |
-| Docker | images, build cache, stopped containers, anonymous volumes | `docker system prune --all`, then `docker volume prune` (see below) |
-
-### Docker
-
-The user's standard cleanup is these two commands, run as separate commands:
-
-```bash
-docker system prune --all
-docker volume prune
-```
-
-This is safe for database data. `docker volume prune` (Docker 23+) removes only unused **anonymous** volumes. Named volumes and volumes attached to a container are kept. Both commands prompt for confirmation on their own; run them in the foreground so the user sees the prompt, or confirm with AskUserQuestion first and pass `--force`.
 
 ### JetBrains old versions
 
@@ -101,7 +83,7 @@ Run the delete commands for the approved items only. Then run `df -h /` again an
 
 Never do any of these, even if a generic cleanup guide suggests them:
 
-- **Never remove named Docker volumes.** Do not run `docker system prune --volumes`, `docker volume prune --all`, or `docker volume rm`. Named volumes can hold database data. Docker cleanup is limited to the two commands in the Docker section above.
+- **Never run any Docker command.** This skill does not touch Docker at all. Do not survey Docker usage (`docker system df`) and do not clean up images, containers, build cache, or volumes. Docker cleanup is out of scope, even if the user has free space problems.
 - **Never uninstall Claude Desktop or delete its data** (`~/Library/Application Support/Claude`). The Claude in Chrome extension depends on the app's `chrome-native-host` helper.
 - **Never delete active project environments** such as `.venv` or `node_modules` of projects in use, `~/.claude`, or the current JetBrains version directories.
 - **Never delete user files** (Documents, Desktop, Downloads, Photos). This skill covers regenerable caches only.
