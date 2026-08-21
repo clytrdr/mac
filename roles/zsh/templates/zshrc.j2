@@ -98,7 +98,7 @@ alias opuslow='claude --model opus --effort low'
 
 # --- Custom Functions ---
 # A function to update all package managers at once.
-# It checks if each command (brew, conda, npm) exists before running the update.
+# It checks if each command exists before running the update.
 updateall() {
   # Update Homebrew
   if command -v brew &> /dev/null; then
@@ -134,6 +134,30 @@ updateall() {
     gcloud components update --quiet
   else
     print "\nINFO: gcloud not found. Skipping."
+  fi
+
+  # Update Claude Code
+  if command -v claude &> /dev/null; then
+    print "\n==> Updating Claude Code..."
+    claude update
+  else
+    print "\nINFO: claude not found. Skipping."
+  fi
+
+  # Update the Antigravity CLI
+  if command -v agy &> /dev/null; then
+    print "\n==> Updating the Antigravity CLI..."
+    agy update
+  else
+    print "\nINFO: agy not found. Skipping."
+  fi
+
+  # Update Codex CLI
+  if command -v codex &> /dev/null; then
+    print "\n==> Updating Codex CLI..."
+    codex update
+  else
+    print "\nINFO: codex not found. Skipping."
   fi
 
   print "\n✅ All updates finished."
