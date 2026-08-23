@@ -30,6 +30,12 @@ du -sh ~/Library/Containers/* 2>/dev/null | sort -rh | head -5
 du -sh ~/Library/Application\ Support/* 2>/dev/null | sort -rh | head -10
 ```
 
+Break down the two directories that hold more than one cache:
+
+```bash
+du -sh ~/.cache/* ~/.npm/* 2>/dev/null | sort -rh | head -15
+```
+
 Check project-local regenerable directories:
 
 ```bash
@@ -48,14 +54,33 @@ These caches are regenerable. The owning tool rebuilds them on the next run.
 
 | Target | Path | Delete command |
 |---|---|---|
-| npm cache | `~/.npm/_cacache` | `npm cache clean --force` |
+| npm cache | `~/.npm` | `npm cache clean --force`, then `rm -rf ~/.npm/_npx ~/.npm/content-v2 ~/.npm/index-v5` |
 | uv cache | `~/.cache/uv` | `uv cache clean` |
 | pip cache | `~/Library/Caches/pip` | `pip cache purge`, or `rm -rf ~/Library/Caches/pip` if `pip` is not on PATH |
+| pip-tools cache | `~/Library/Caches/pip-tools` | `rm -rf ~/Library/Caches/pip-tools` |
 | pre-commit cache | `~/.cache/pre-commit` | `pre-commit clean` |
 | Homebrew cache | `~/Library/Caches/Homebrew` | `brew cleanup --prune=all` |
+| node-gyp headers | `~/Library/Caches/node-gyp` | `rm -rf ~/Library/Caches/node-gyp` |
+| puccinialin (Rust toolchain) | `~/Library/Caches/puccinialin` | `rm -rf ~/Library/Caches/puccinialin` |
+| Cypress binaries | `~/Library/Caches/Cypress` | `rm -rf ~/Library/Caches/Cypress` |
+| Playwright browsers | `~/Library/Caches/ms-playwright`, `~/Library/Caches/ms-playwright-go` | `rm -rf` on each path |
 | tox environments | `<project>/.tox` | `rm -rf <project>/.tox` |
 | mypy cache | `<project>/.mypy_cache` | `rm -rf <project>/.mypy_cache` |
 | JetBrains old versions | see below | `rm -rf` on old version dirs only |
+
+Cypress, Playwright, node-gyp, and puccinialin hold downloaded binaries and toolchains.
+They are safe to delete, but the next test or build run has to download them again.
+Say so in the report instead of listing them next to the cheap caches.
+
+### npm
+
+`npm cache clean --force` does not empty `~/.npm`. It leaves two directories behind:
+
+- `_npx`: packages run through `npx`. The clean command does not cover it at all.
+- `content-v2` and `index-v5`: the package store. The clean command can leave it in place.
+
+There is no `_cacache` directory on current npm versions. Measure `~/.npm/*` in the survey and
+report the total, not just what `npm cache clean` removes.
 
 ### JetBrains old versions
 
@@ -71,13 +96,34 @@ JetBrains IDEs leave cache and support directories behind after upgrades. Delete
    ```
 3. Delete only directories whose version is lower than the installed version, in both locations. Never delete the directory that matches the installed version.
 
+If the only directory present matches the installed version, there is nothing to delete.
+Report that and move on. Do not offer JetBrains as an option in that case.
+
 ## Step 3: Confirm
 
-Show the report and ask with AskUserQuestion which items to delete. Ask one question per call. Do not delete anything the user did not approve.
+Show the report, then ask with AskUserQuestion which items to delete. Ask one question per call.
+Do not delete anything the user did not approve.
+
+Group the targets instead of listing every path as its own option:
+
+1. **Safe set**: caches the owning tool rebuilds automatically and cheaply
+   (npm, pre-commit, pip, pip-tools, uv, Homebrew, mypy).
+2. **Expensive to re-download**: Cypress, Playwright, node-gyp, puccinialin.
+   Say in the option text that these need a re-download before the next test or build run.
+3. **Delete nothing.**
 
 ## Step 4: Delete and verify
 
-Run the delete commands for the approved items only. Then run `df -h /` again and report the reclaimed space as a table: item, size before, size after.
+Run the delete commands for the approved items only. Then measure the result two ways:
+
+- `df -h /` for the overall figure.
+- `du -sh` on each deleted path for the per-item figure.
+
+The `df` output is in Gi units, so a delete under about 1GB does not move the number.
+The per-item measurement is the one to report in that case. `du -sh` on a deleted path
+exits non-zero; that is the expected result, not a failure.
+
+Report the result as a table: item, size before, size after.
 
 ## Forbidden actions
 
@@ -85,6 +131,7 @@ Never do any of these, even if a generic cleanup guide suggests them:
 
 - **Never run any Docker command.** This skill does not touch Docker at all. Do not survey Docker usage (`docker system df`) and do not clean up images, containers, build cache, or volumes. Docker cleanup is out of scope, even if the user has free space problems.
 - **Never uninstall Claude Desktop or delete its data** (`~/Library/Application Support/Claude`). The Claude in Chrome extension depends on the app's `chrome-native-host` helper.
+- **Never delete browser caches** such as `~/Library/Caches/Google` (Chrome) or Safari data. They are large, but they hold session state, not build output. Report the size and mark them out of scope.
 - **Never delete active project environments** such as `.venv` or `node_modules` of projects in use, `~/.claude`, or the current JetBrains version directories.
 - **Never delete user files** (Documents, Desktop, Downloads, Photos). This skill covers regenerable caches only.
 - Do not chain a delete command with a survey command. Keep `rm -rf` calls separate and pass explicit absolute paths.
