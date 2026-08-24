@@ -12,7 +12,6 @@
   roles:
     - git
     - homebrew
-    - mas
     - zsh
     - ai
     - node

@@ -14,7 +14,6 @@ Personal Ansible playbooks that automate the setup of a new macOS machine. They 
 ## Prerequisites
 
 - A fresh installation of macOS.
-- You are logged in with your Apple ID (required for App Store installations).
 
 ## Development Guidelines
 

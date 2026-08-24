@@ -13,7 +13,6 @@ homebrew_packages:
   - name: libomp # Required by LightGBM (OpenMP runtime)
   - name: docker-buildx
   - name: wget
-  - name: mas
   - name: ripgrep
 homebrew_cask_packages:
   - name: terraform-linters/tap/tflint
