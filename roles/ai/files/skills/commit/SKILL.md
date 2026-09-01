@@ -1,23 +1,16 @@
 ---
 name: commit
 description: Stage and commit all changes including untracked files.
-disable-model-invocation: true
-allowed-tools: Bash
 ---
 
 Stage all changes (including untracked files) and create a commit.
 
-## Current state
-
-!`git status`
-
-!`git diff --stat`
-
-!`git log --oneline -5`
+Run this workflow only when the user explicitly asks to create a commit.
 
 ## Instructions
 
-1. Review the git status and diff output above to understand all changes.
+1. Run `git status`, `git diff --stat`, and `git log --oneline -5`. Review the output to
+   understand all changes.
 2. If `.pre-commit-config.yaml` exists in the repository root, run `pre-commit run --all-files`.
    - If it modified any files, review the changes with `git diff --stat`.
 3. Run `git add -A` to stage everything (including untracked files).
@@ -26,13 +19,16 @@ Stage all changes (including untracked files) and create a commit.
    - Match the style of recent commits shown above.
 5. Run `git commit -m "<message>"` with the drafted message.
    - If the commit fails due to pre-commit hooks:
-     1. If hooks only modified files, run `git add -A` and run `git commit --amend --no-edit`.
-     2. If hooks report errors that persist after re-staging, fix the issues yourself, run `git add -A`, and run `git commit --amend --no-edit`.
-   - Use `--amend` only when the change is clearly part of the previous commit (e.g., pre-commit fixes, typos, minor oversights). Otherwise, create a new commit.
+     1. If hooks modified files, review them, run `git add -A`, and retry the same
+        `git commit -m "<message>"` command.
+     2. If hooks report errors, fix them, run `git add -A`, and retry the same commit command.
+   - Never use `--amend`. A failed hook normally means the new commit does not exist. Amending
+     at that point could change a commit that existed before this skill ran.
 6. Run `git status` to confirm the commit succeeded.
 7. Report the committed changes.
 
-Do not push to a remote. Do not amend commits that existed before this skill ran; `--amend` is allowed only for the commit created in step 5.
+Run `git add` and `git commit` as separate commands. Do not push to a remote. Do not amend any
+commit.
 
 ## Aliases
 

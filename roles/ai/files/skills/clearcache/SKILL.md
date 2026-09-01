@@ -1,7 +1,6 @@
 ---
 name: clearcache
 description: Survey disk usage on macOS, report reclaimable developer caches, and delete only the items the user approves.
-allowed-tools: Bash, Read, AskUserQuestion
 ---
 
 Free up disk space on macOS by removing regenerable developer caches. Always survey first, report the findings, and get user approval before deleting anything.
@@ -10,7 +9,7 @@ Free up disk space on macOS by removing regenerable developer caches. Always sur
 
 1. **Survey**: Measure the current state. Do not delete anything in this step.
 2. **Report**: Show a table of reclaimable items with sizes, sorted largest first.
-3. **Confirm**: Use AskUserQuestion to ask which items to delete.
+3. **Confirm**: Ask the user which groups to delete. Wait for explicit approval.
 4. **Delete**: Remove only the approved items.
 5. **Verify**: Compare free space before and after. Report the reclaimed amount.
 
@@ -52,21 +51,26 @@ tmutil listlocalsnapshots /
 
 These caches are regenerable. The owning tool rebuilds them on the next run.
 
-| Target | Path | Delete command |
+Before running a delete command, resolve its target to a literal absolute path and show that
+path to the user. Never pass `~`, an environment variable, a glob, or command substitution to
+`rm -rf`. Prefer the owning tool's cleanup command when one is available.
+
+| Target | Path | Delete action |
 |---|---|---|
-| npm cache | `~/.npm` | `npm cache clean --force`, then `rm -rf ~/.npm/_npx ~/.npm/content-v2 ~/.npm/index-v5` |
+| npm cache | `~/.npm` | Run `npm cache clean --force`, then remove the resolved `_npx` directory if approved |
 | uv cache | `~/.cache/uv` | `uv cache clean` |
-| pip cache | `~/Library/Caches/pip` | `pip cache purge`, or `rm -rf ~/Library/Caches/pip` if `pip` is not on PATH |
-| pip-tools cache | `~/Library/Caches/pip-tools` | `rm -rf ~/Library/Caches/pip-tools` |
+| pip cache | `~/Library/Caches/pip` | Run `pip cache purge`, or remove the resolved directory if `pip` is not on PATH |
+| pip-tools cache | `~/Library/Caches/pip-tools` | Remove the resolved directory |
 | pre-commit cache | `~/.cache/pre-commit` | `pre-commit clean` |
 | Homebrew cache | `~/Library/Caches/Homebrew` | `brew cleanup --prune=all` |
-| node-gyp headers | `~/Library/Caches/node-gyp` | `rm -rf ~/Library/Caches/node-gyp` |
-| puccinialin (Rust toolchain) | `~/Library/Caches/puccinialin` | `rm -rf ~/Library/Caches/puccinialin` |
-| Cypress binaries | `~/Library/Caches/Cypress` | `rm -rf ~/Library/Caches/Cypress` |
-| Playwright browsers | `~/Library/Caches/ms-playwright`, `~/Library/Caches/ms-playwright-go` | `rm -rf` on each path |
-| tox environments | `<project>/.tox` | `rm -rf <project>/.tox` |
-| mypy cache | `<project>/.mypy_cache` | `rm -rf <project>/.mypy_cache` |
-| JetBrains old versions | see below | `rm -rf` on old version dirs only |
+| node-gyp headers | `~/Library/Caches/node-gyp` | Remove the resolved directory |
+| puccinialin (Rust toolchain) | `~/Library/Caches/puccinialin` | Remove the resolved directory |
+| Cypress binaries | `~/Library/Caches/Cypress` | Remove the resolved directory |
+| Playwright browsers | `~/Library/Caches/ms-playwright`, `~/Library/Caches/ms-playwright-go` | Remove each approved resolved directory separately |
+| tox environments | `<project>/.tox` | Remove each approved absolute project path separately |
+| mypy cache | `<project>/.mypy_cache` | Remove each approved absolute project path separately |
+| pytest cache | `<project>/.pytest_cache` | Remove each approved absolute project path separately |
+| JetBrains old versions | see below | Remove old version directories only, using resolved absolute paths |
 
 Cypress, Playwright, node-gyp, and puccinialin hold downloaded binaries and toolchains.
 They are safe to delete, but the next test or build run has to download them again.
@@ -74,13 +78,15 @@ Say so in the report instead of listing them next to the cheap caches.
 
 ### npm
 
-`npm cache clean --force` does not empty `~/.npm`. It leaves two directories behind:
+`npm cache clean --force` clears npm's `_cacache` package store but does not empty `~/.npm`.
+It can leave these regenerable directories behind:
 
 - `_npx`: packages run through `npx`. The clean command does not cover it at all.
-- `content-v2` and `index-v5`: the package store. The clean command can leave it in place.
+- `_prebuilds`: downloaded prebuilt native binaries. Offer this with the expensive-to-download
+  group when it is present.
 
-There is no `_cacache` directory on current npm versions. Measure `~/.npm/*` in the survey and
-report the total, not just what `npm cache clean` removes.
+Measure `~/.npm/*` in the survey and report each directory separately. Do not try to remove
+`content-v2` or `index-v5` as top-level directories. Current npm stores them inside `_cacache`.
 
 ### JetBrains old versions
 
@@ -101,16 +107,17 @@ Report that and move on. Do not offer JetBrains as an option in that case.
 
 ## Step 3: Confirm
 
-Show the report, then ask with AskUserQuestion which items to delete. Ask one question per call.
-Do not delete anything the user did not approve.
+Show the report, then ask one confirmation question. The user may select any combination of
+groups, including none. Do not delete anything the user did not approve.
 
 Group the targets instead of listing every path as its own option:
 
 1. **Safe set**: caches the owning tool rebuilds automatically and cheaply
-   (npm, pre-commit, pip, pip-tools, uv, Homebrew, mypy).
-2. **Expensive to re-download**: Cypress, Playwright, node-gyp, puccinialin.
+   (npm `_cacache`, pre-commit, pip, pip-tools, uv, Homebrew, mypy, pytest, tox).
+2. **Expensive to re-download**: npm `_prebuilds`, Cypress, Playwright, node-gyp, puccinialin.
    Say in the option text that these need a re-download before the next test or build run.
-3. **Delete nothing.**
+3. **JetBrains old versions**: Offer this only when older versions exist.
+4. **Delete nothing.**
 
 ## Step 4: Delete and verify
 
@@ -132,6 +139,6 @@ Never do any of these, even if a generic cleanup guide suggests them:
 - **Never run any Docker command.** This skill does not touch Docker at all. Do not survey Docker usage (`docker system df`) and do not clean up images, containers, build cache, or volumes. Docker cleanup is out of scope, even if the user has free space problems.
 - **Never uninstall Claude Desktop or delete its data** (`~/Library/Application Support/Claude`). The Claude in Chrome extension depends on the app's `chrome-native-host` helper.
 - **Never delete browser caches** such as `~/Library/Caches/Google` (Chrome) or Safari data. They are large, but they hold session state, not build output. Report the size and mark them out of scope.
-- **Never delete active project environments** such as `.venv` or `node_modules` of projects in use, `~/.claude`, or the current JetBrains version directories.
+- **Never delete active project environments** such as `.venv` or `node_modules` of projects in use, agent configuration such as `~/.claude`, `~/.codex`, or `~/.gemini`, or the current JetBrains version directories.
 - **Never delete user files** (Documents, Desktop, Downloads, Photos). This skill covers regenerable caches only.
 - Do not chain a delete command with a survey command. Keep `rm -rf` calls separate and pass explicit absolute paths.

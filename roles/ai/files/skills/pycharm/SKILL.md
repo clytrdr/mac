@@ -1,25 +1,24 @@
 ---
 name: pycharm
 description: Open all uncommitted files in PyCharm via JetBrains MCP.
-disable-model-invocation: true
-allowed-tools: mcp__pycharm__open_file_in_editor
 ---
 
 Open all uncommitted files in PyCharm via the JetBrains MCP server.
 
-## Uncommitted files
-
-!`git status --porcelain`
+Run this workflow only when the user explicitly asks to open the files.
 
 ## Instructions
 
-1. Parse each line of the git status output above.
-2. Extract the file path from each line (after the two-character status code and space).
-3. Skip lines with status `D` (deleted) or `!!` (ignored).
-4. For renamed files (`R` status), use the destination path (after `-> `).
-5. If no files are listed, report that there are no uncommitted files and stop.
-6. Call `mcp__pycharm__open_file_in_editor` for each file path (relative to project root).
-   Make all calls in parallel.
-7. Report the list of opened files when complete.
+1. Run `git status --porcelain` from the project root.
+2. Parse each line of the output.
+3. Extract the file path from each line after the two-character status code and space.
+4. Skip lines with status `D` (deleted) or `!!` (ignored).
+5. For renamed files (`R` status), use the destination path after `-> `.
+6. If no files are listed, report that there are no uncommitted files and stop.
+7. Use the configured JetBrains or PyCharm integration to open each project-relative path.
+   Tool names may have a different namespace in each AI host. Make independent calls in parallel
+   when the host supports it.
+8. If no JetBrains integration is available, report that no files were opened and list the paths.
+9. Report the list of opened files when complete.
 
 Do not modify any files.

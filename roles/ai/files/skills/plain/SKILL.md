@@ -1,8 +1,6 @@
 ---
 name: plain
 description: Rewrite the English text in a file into plain English without changing its meaning or any code.
-disable-model-invocation: true
-allowed-tools: Read, Edit, Write, Glob, NotebookEdit, AskUserQuestion
 ---
 
 Rewrite the English text in one or more files into plain, simple English. Keep the meaning. Do not lose any content. For code files, change only comments and docstrings, never the code.
@@ -15,15 +13,10 @@ This skill covers five kinds of target text:
 - **Config, data, and template files** (`.yml`, `.yaml`, `.json`, `.toml`, `.ini`, `.cfg`, `.conf`, `.j2`, dotfiles such as `.gitignore`, and similar): the comments only. Treat these files as code.
 - **Jupyter Notebook** (`.ipynb`): the body text of Markdown cells, and the comments and docstrings in code cells.
 
-## Arguments
+## Inputs
 
-One or more file paths provided after the skill name:
-
-```
-/plain path/to/doc.md path/to/page.html path/to/module.py path/to/analysis.ipynb
-```
-
-`$ARGUMENTS` contains the raw argument string.
+Use the file paths from the user's request. If the user did not provide any paths, ask for them.
+Do not guess.
 
 ## English Writing Style
 
@@ -38,8 +31,8 @@ Rewrite the text to follow these rules. They come from the user's global guideli
 
 ## Instructions
 
-1. Parse `$ARGUMENTS` into a list of paths.
-   - If empty, use `AskUserQuestion` to ask which file(s) to rewrite. Do not guess.
+1. Collect the requested paths. If none were provided, ask which files to rewrite and wait for
+   the answer.
 2. Resolve each path to an absolute path relative to the current working directory.
    - For any path that does not exist, report the missing path and stop. Do not silently skip.
 3. For each file, decide the target text by file type:
@@ -48,11 +41,12 @@ Rewrite the text to follow these rules. They come from the user's global guideli
    - **Code**: rewrite the comments and docstrings only.
    - **Config, data, and template files**: rewrite the comments only. A file format with no comment syntax, such as JSON, has no target text. Leave it unchanged and report it.
    - **Jupyter Notebook** (`.ipynb`): parse the file as a notebook. Rewrite the body text of Markdown cells. In code cells, rewrite the comments and docstrings only.
-   - For any other or unknown file type, use `AskUserQuestion` to ask whether to treat it as Markdown, HTML, or code. Do not guess.
-4. `Read` the full file. For a notebook, `Read` returns the cells with their outputs.
+   - For any other or unknown file type, ask whether to treat it as Markdown, HTML, or code. Do not guess.
+4. Read the full file. For a notebook, inspect its cells and outputs without changing the outputs.
 5. Rewrite the target text in place, following the English Writing Style rules above.
-   - Use `Edit` for Markdown, HTML, and code files.
-   - For a Jupyter notebook, edit it one cell at a time and change the cell source only. In Claude Code, use `NotebookEdit`. If the agent has no notebook-aware edit tool, keep the `.ipynb` JSON structure intact and change only the text inside the cell `source` fields.
+   - Use the host's normal file-editing capability for Markdown, HTML, and code files.
+   - For a Jupyter notebook, use a notebook-aware editor when available. Otherwise, keep the
+     `.ipynb` JSON structure intact and change only text inside cell `source` fields.
    - Preserve the meaning. Do not drop or add facts, steps, numbers, warnings, or examples.
    - Keep the original language. Rewrite English text only. Leave non-English text as is.
 6. Report the result per file: which parts were rewritten, and note any file left unchanged.

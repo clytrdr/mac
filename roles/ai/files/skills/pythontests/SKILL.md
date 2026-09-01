@@ -1,12 +1,11 @@
 ---
 name: pythontests
-description: Follow these guidelines when creating, modifying, or refactoring Python test code (pytest). Defines conventions for test structure, mocking patterns, IDE inspection workflow, and verification.
-allowed-tools: Read, Edit, Write, Glob, Grep, Bash, mcp__pycharm__get_file_problems, mcp__pycharm__lint_files
+description: Follow these guidelines when you write, modify, or refactor Python test code (pytest). Defines conventions for test structure, mocking patterns, IDE inspection workflows, and verification.
 ---
 
-# Python Test Code Generation & Refactoring
+# Python Test Code Generation and Refactoring
 
-Always read the source code and existing tests before writing or modifying tests.
+Always read the source code and existing tests before you write or modify tests.
 
 ## Workflow
 
@@ -15,18 +14,19 @@ Always read the source code and existing tests before writing or modifying tests
 3. List the behaviors of the source file. Map each existing test to a behavior.
    Write a test only for a behavior that no test covers. See "Test Count".
 4. Write or refactor the tests.
-5. Run the tests: `pytest tests/path/to/test_file.py`. AI agents must not pass `-n auto`
-   (the sandbox blocks xdist workers and the run hangs).
+5. Run the tests: `pytest tests/path/to/test_file.py`. AI agents must not pass `-n auto`.
+   The sandbox blocks xdist workers and the run hangs.
 6. Run the IDE inspections again. The problem count must not increase. Fix new problems in the same pass.
 7. Report the result: test outcome, test count before and after, and problem count
    before and after. For each added test, state the covered behavior in one line.
 
 ## IDE Inspections
 
-PyCharm catches problems that a manual read misses: unresolved references in mock paths, argument
-mismatches, unused imports, and wrong types. Use the PyCharm MCP server.
+PyCharm catches problems that a manual read misses. These problems include unresolved references in mock paths,
+argument mismatches, unused imports, and wrong types. Use the PyCharm MCP server.
 
-- Use `mcp__pycharm__get_file_problems` for one file and `mcp__pycharm__lint_files` for multiple files.
+- Use the PyCharm MCP tool `get_file_problems` for one file and `lint_files` for multiple
+  files. The host environment may add a namespace to these tool names.
 - Pass `projectPath` (project root) and project-relative paths. Set `errorsOnly` to `false`.
 - Fix the root cause. Do not silence warnings with `# noqa`, `# type: ignore`, or `noinspection`.
 - If the IDE warning is wrong, keep the code and report the warning as a false positive.
@@ -37,19 +37,20 @@ mismatches, unused imports, and wrong types. Use the PyCharm MCP server.
 - Verify meaningful behavior, not coverage numbers.
 - Prefer fewer tests. Keep a test only if it is the only test that fails
   when its behavior breaks.
-- Skip a test if it requires many stacked mocks. Such a test targets implementation details.
+- Skip a test if it needs many stacked mocks. Such a test targets implementation details.
 - Focus on tests that catch real bugs and document intended behavior.
-- Do not write tests that expect `AssertionError`. Asserts document invariants for
-  readability and type narrowing. They do not validate values, so they are not behavior to test.
+- Do not write tests that expect `AssertionError`. Assert statements document invariants for
+  readability and type narrowing. They do not validate runtime values. Therefore, they are not behaviors to test.
 
 ## Test Count
 
 Keep the test count unchanged or reduce it by default. Adding a test is not an improvement by itself.
 
-Before you add a test, ask which change to the source makes this test fail and no other test fail.
-If there is no such change, do not add it. Cases with no such change: another test already runs the
-same path (add an assertion there instead), the conditions are independent and already tested
-separately, and the branch returns the same result as the default path.
+Before you add a test, check which change to the source code makes only this test fail.
+If there is no such change, do not add the test. Common cases with no such change include:
+- Another test already runs the same path (add an assertion to that test instead).
+- The conditions are independent and already tested separately.
+- The branch returns the same result as the default path.
 
 When you remove a test, state which remaining test covers its behavior.
 
@@ -71,7 +72,7 @@ Apply this section only in a project that uses TortoiseORM.
 
 Apply this section only in a project that uses FastAPI.
 
-- Create a minimal `FastAPI` app, include the router, and create `TestClient` at the module level.
+- Create a minimal `FastAPI` app, include the router, and create a `TestClient` instance at the module level.
 - Use synchronous test methods. Assert on `response.status_code` and `response.json()`.
 - Mock external dependencies with `@patch.object`.
 
@@ -79,7 +80,7 @@ Apply this section only in a project that uses FastAPI.
 
 ### `@patch.object` first, string `@patch` second
 
-Prefer `@patch.object` when mocking class methods. For imported module-level names
+Prefer `@patch.object` when you mock class methods. For imported module-level names
 (such as client classes, helpers, or config objects), use `@patch` with a string literal:
 
 ```python
@@ -97,11 +98,11 @@ Apply `@patch` decorators to the test class when a test method takes pytest fixt
 or `parametrize` arguments. PyCharm checks method-level `@patch` counts against method
 parameters and reports extra-parameter errors. PyCharm skips this check for class-level decorators.
 
-A class-level patch applies to every `test_*` method. Add the mock parameter to test methods
-that do not use it and prefix its name with an underscore (`_mock_load`).
+A class-level patch applies to every `test_*` method. If a test method does not use the mock,
+still add the mock parameter and prefix its name with an underscore (`_mock_load`).
 
 If tests in the same class need different return values, do not pass `return_value` to
-the decorator. Set `mock_x.return_value = ...` inside the test function body.
+the decorator. Instead, set `mock_x.return_value = ...` inside the test function body.
 
 ### Assertions on mocks
 
@@ -127,5 +128,3 @@ assert kwargs["json"]["OrderType"] == "Limit"
 ### Async mocking
 
 Use `AsyncMock` to mock async methods: `@patch.object(Cls, "method", new_callable=AsyncMock)`.
-
-$ARGUMENTS
