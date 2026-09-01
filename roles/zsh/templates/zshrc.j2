@@ -12,12 +12,16 @@ fi
 export HOMEBREW_NO_UPGRADE_AUTO_UPDATES_CASKS=1
 
 # --- Path for n ---
-export N_PREFIX=$HOME/.n
-export PATH=$N_PREFIX/bin:$PATH
+export N_PREFIX="$HOME/.n"
+export PATH="$N_PREFIX/bin:$PATH"
 
 # --- Path for user-local binaries ---
 # Used by installers such as the Antigravity CLI.
 export PATH="$HOME/.local/bin:$PATH"
+
+# --- Default Editor ---
+export EDITOR=vim
+export VISUAL=vim
 
 # --- Plugin Manager (zinit) ---
 ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
@@ -27,7 +31,7 @@ fi
 
 # --- Useful Options (setopt) ---
 setopt AUTO_CD              # cd to a directory just by typing its name
-setopt EXTENDED_GLOB        # Enable extended globbing (also required by the compinit cache check below)
+setopt EXTENDED_GLOB        # Extended globbing. Also required by the compinit cache check below.
 setopt NOTIFY               # Notify on completion of long-running jobs
 
 # --- Completion System Setup ---
@@ -35,10 +39,13 @@ setopt NOTIFY               # Notify on completion of long-running jobs
 autoload -Uz compinit
 # Speed up compinit by using a cache file
 if [[ -n ${ZDOTDIR:-$HOME}/.zcompdump(#qN.mh+24) ]]; then
-  compinit;
+  compinit
+  # compinit keeps the old dump when nothing changed. Touch it so the
+  # 24-hour check above does not run the full compinit on every start.
+  touch "${ZDOTDIR:-$HOME}/.zcompdump"
 else
-  compinit -C;
-fi;
+  compinit -C
+fi
 
 # --- fzf Integration ---
 # fzf (fuzzy finder) is installed via Homebrew.
@@ -55,6 +62,9 @@ fi
 if [[ -f ~/.zsh/git-prompt.sh ]]; then
   source ~/.zsh/git-prompt.sh
 fi
+# Define an empty fallback so the prompt does not print an error when
+# git-prompt.sh is missing.
+(( $+functions[__git_ps1] )) || __git_ps1() { :; }
 
 # Configure the information shown in the git prompt
 GIT_PS1_SHOWDIRTYSTATE=true
@@ -83,13 +93,7 @@ setopt SHARE_HISTORY            # Share history between all sessions
 # --- Aliases ---
 # Common aliases for convenience
 alias ls='ls -G'            # Enable colors for ls on macOS
-alias l='ls -CF'
 alias la='ls -A'
-alias ll='ls -alF'
-alias g='git'
-alias gst='git status'
-alias ..='cd ..'
-alias ...='cd ../..'
 
 # Claude Code launchers with a fixed model and reasoning effort
 alias fable='claude --model fable --effort high'

@@ -1,0 +1,14 @@
+- name: Install and configure Vim
+  tags:
+    - vim
+  block:
+    - name: Install Vim via Homebrew
+      community.general.homebrew:
+        name: vim
+        state: latest
+
+    - name: Deploy vimrc
+      ansible.builtin.template:
+        src: vimrc.j2
+        dest: "{{ ansible_facts.env.HOME }}/.vimrc"
+        mode: '0644'
