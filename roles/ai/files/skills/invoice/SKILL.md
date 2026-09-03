@@ -53,7 +53,7 @@ named `20260731_...` and a statement named `202607_amex.pdf` both go to `invoice
 ### Capability check
 
 Before using Drive, inspect the capabilities available in the current AI host. Tool names and
-namespaces differ between Claude, Codex, and Gemini.
+namespaces differ between Claude, Codex, and Antigravity.
 
 - Use a Google Drive connector or MCP server when it can search folders and upload a local file.
 - A browser-based upload requires a browser automation integration, such as a compatible Chrome
