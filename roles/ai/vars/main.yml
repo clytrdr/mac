@@ -17,11 +17,11 @@ ai_trusted_projects:
   - "{{ ansible_facts.env.HOME }}/Code/apps-script"
   - "{{ ansible_facts.env.HOME }}/Code/back"
   - "{{ ansible_facts.env.HOME }}/Code/core"
-  - "{{ ansible_facts.env.HOME }}/Code/discretionary"
   - "{{ ansible_facts.env.HOME }}/Code/front"
   - "{{ ansible_facts.env.HOME }}/Code/infra"
   - "{{ ansible_facts.env.HOME }}/Code/mac"
   - "{{ ansible_facts.env.HOME }}/Documents"
+  - "{{ ansible_facts.env.HOME }}/Downloads"
 
 ai_instruction_targets:
   - path: "{{ ansible_facts.env.HOME }}/.claude/CLAUDE.md"
@@ -71,7 +71,7 @@ ai_antigravity_skills_dir: "{{ ansible_facts.env.HOME }}/.gemini/skills"
 
 ai_antigravity_skills_excludes: []
 
-ai_antigravity_model: "Gemini 3.7 Flash (High)"
+ai_antigravity_model: "Gemini 3.8 Flash (High)"
 
 ai_antigravity_trusted_workspaces: "{{ ai_trusted_projects }}"
 
