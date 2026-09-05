@@ -55,7 +55,7 @@ ai_claude_status_line_command: >-
 
 # Codex CLI model settings. The Codex CLI rewrites config.toml when you run
 # /model, so these values are restored on the next Ansible run.
-ai_codex_model: gpt-5.6-sol
+ai_codex_model: gpt-6-astra
 ai_codex_reasoning_effort: high
 ai_codex_plan_mode_reasoning_effort: high
 

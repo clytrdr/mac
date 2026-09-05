@@ -29,3 +29,4 @@ homebrew_cask_packages:
   - name: zotero
   - name: tradingview
   - name: claude # Claude desktop app. The Claude Code CLI is installed by roles/ai.
+  - name: shottr

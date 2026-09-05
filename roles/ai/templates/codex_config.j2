@@ -27,3 +27,7 @@ args = {{ codex_server.args | to_json }}
 {% endfor %}
 {% endif %}
 {% endfor %}
+
+{# Codex CLI writes this block itself. It is templated so the run stays idempotent. #}
+[tui.model_availability_nux]
+{{ ai_codex_model }} = 1

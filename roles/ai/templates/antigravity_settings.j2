@@ -35,8 +35,7 @@
 {% for dir in ai_workspace_dirs %}
       "write_file({{ dir }})"{{ "," if not loop.last else "" }}
 {% endfor %}
-    ],
-    "deny": []
+    ]
   },
   "trustedWorkspaces": {{ ai_antigravity_trusted_workspaces | to_nice_json(indent=2) | indent(2) }}
 }
