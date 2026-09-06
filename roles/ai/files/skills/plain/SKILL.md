@@ -1,61 +1,32 @@
 ---
 name: plain
-description: Rewrite the English text in a file into plain English without changing its meaning or any code.
+description: Rewrite English or translate Japanese text in files into plain English while preserving meaning, code, and structure.
 ---
 
-Rewrite the English text in one or more files into plain, simple English. Keep the meaning. Do not lose any content. For code files, change only comments and docstrings, never the code.
+Edit the requested files in place. Rewrite English and translate Japanese into plain English. Leave other languages unchanged. Preserve every fact, detail, and example. Do not add information.
 
-This skill covers five kinds of target text:
+Use short sentences with one idea each and common verbs such as use, make, get, run, and check. Keep technical terms. Avoid nested clauses, idioms, metaphors, and fancy wording. Write like an O'Reilly technical book.
 
-- **Markdown** (`.md`, `.markdown`): the body text.
-- **HTML** (`.html`, `.htm`): the visible text and HTML comments.
-- **Code** (any source file): the comments and docstrings only.
-- **Config, data, and template files** (`.yml`, `.yaml`, `.json`, `.toml`, `.ini`, `.cfg`, `.conf`, `.j2`, dotfiles such as `.gitignore`, and similar): the comments only. Treat these files as code.
-- **Jupyter Notebook** (`.ipynb`): the body text of Markdown cells, and the comments and docstrings in code cells.
+## Editable Text
 
-## Inputs
+| File type | Editable text |
+| --- | --- |
+| Markdown | Body prose, including headings, lists, and table text |
+| HTML | Visible text and comments |
+| Code | Comments and docstrings |
+| Config, data, templates, dotfiles | Comments only; all keys and values are code |
+| Jupyter notebooks | Markdown cell prose; code cell comments and docstrings |
 
-Use the file paths from the user's request. If the user did not provide any paths, ask for them.
-Do not guess.
+## Constraints
 
-## English Writing Style
+- Preserve code, program strings, formatting, and template expressions, including expressions inside comments.
+- Preserve Markdown code blocks, inline code, URLs, image paths, table layout, and frontmatter.
+- Preserve HTML tags, attributes, and `script`, `style`, `pre`, and `code` contents.
+- Preserve comment markers and indentation. Formats without comments, such as JSON, have no editable text.
+- In notebooks, edit only cell `source` text. Preserve code, cell types, outputs, execution counts, and metadata.
 
-Rewrite the text to follow these rules. They come from the user's global guidelines.
+## Workflow
 
-- Write like an O'Reilly technical book, not a literary essay.
-- Use plain, common verbs: use, make, get, run, check.
-  Avoid fancy verbs: leverage, orchestrate, employ, utilize.
-- No idioms, metaphors, or figurative language.
-- One idea per sentence. Keep sentences short. No nested clauses.
-- Standard technical terms (ML, programming) are fine. Keep everything else at a simple reading level.
-
-## Instructions
-
-1. Collect the requested paths. If none were provided, ask which files to rewrite and wait for
-   the answer.
-2. Resolve each path to an absolute path relative to the current working directory.
-   - For any path that does not exist, report the missing path and stop. Do not silently skip.
-3. For each file, decide the target text by file type:
-   - **Markdown**: rewrite the body text.
-   - **HTML**: rewrite the visible text and HTML comments.
-   - **Code**: rewrite the comments and docstrings only.
-   - **Config, data, and template files**: rewrite the comments only. A file format with no comment syntax, such as JSON, has no target text. Leave it unchanged and report it.
-   - **Jupyter Notebook** (`.ipynb`): parse the file as a notebook. Rewrite the body text of Markdown cells. In code cells, rewrite the comments and docstrings only.
-   - For any other or unknown file type, ask whether to treat it as Markdown, HTML, or code. Do not guess.
-4. Read the full file. For a notebook, inspect its cells and outputs without changing the outputs.
-5. Rewrite the target text in place, following the English Writing Style rules above.
-   - Use the host's normal file-editing capability for Markdown, HTML, and code files.
-   - For a Jupyter notebook, use a notebook-aware editor when available. Otherwise, keep the
-     `.ipynb` JSON structure intact and change only text inside cell `source` fields.
-   - Preserve the meaning. Do not drop or add facts, steps, numbers, warnings, or examples.
-   - Keep the original language. Rewrite English text only. Leave non-English text as is.
-6. Report the result per file: which parts were rewritten, and note any file left unchanged.
-
-## Rules
-
-- **Never change code.** In code files, edit only the text inside comments and docstrings. Do not touch identifiers, logic, strings used by the program, imports, or formatting of the code. In config, data, and template files, every key and every value is code. This includes text that reads like prose, such as an Ansible task `name`, a `description` field, or a log message. Edit only the comments.
-- **Never break structure.** In Markdown, do not change code blocks, inline code, link URLs, image paths, tables layout, or frontmatter keys. In HTML, do not change tags, attributes, URLs, `<script>`, `<style>`, or `<pre>`/`<code>` blocks. In config, data, and template files, keep the comment marker and the indentation of each comment line as is. YAML indentation is part of the syntax. Do not change template expressions such as `{{ ... }}` or `{% ... %}`, even inside a comment. In Jupyter notebooks, edit cell source only. Do not change cell types, execution counts, cell outputs, or notebook metadata. In a code cell, keep the code itself unchanged and rewrite only the comments and docstrings.
-- **No content loss.** The rewrite must keep every fact and detail from the original. Simplify the wording, not the information.
-- **Meaning first.** If a sentence cannot be simplified without changing its meaning, keep it as is and report it.
-- **Do not commit.** Leave the changes in the working tree for the user to review.
-- Report skipped or unchanged files explicitly. Do not silently drop them.
+1. Use the requested paths. Ask if none are provided. Stop and report missing paths. Ask about unknown file types.
+2. Read each full file and edit only the text allowed above. If meaning is unclear, leave the passage unchanged and flag it.
+3. Check the diff for changes to meaning, code, or structure. Report changes and skipped or unchanged files. Do not commit.
