@@ -56,6 +56,8 @@ ai_claude_status_line_command: >-
 # Codex CLI model settings. The Codex CLI rewrites config.toml when you run
 # /model, so these values are restored on the next Ansible run.
 ai_codex_model: gpt-6-astra
+# Codex CLI increments this counter itself. Keep it in sync to stay idempotent.
+ai_codex_model_nux_count: 4
 ai_codex_reasoning_effort: high
 ai_codex_plan_mode_reasoning_effort: high
 
@@ -93,6 +95,10 @@ ai_mcp_servers:
   # Check the current port in Settings > Tools > MCP Server.
   - name: pycharm
     url: "http://127.0.0.1:64462/stream"
+    # Codex only: per-tool approval settings.
+    codex_tools:
+      open_file_in_editor:
+        approval_mode: approve
   - name: terraform
     command: docker
     args: ["run", "-i", "--rm", "hashicorp/terraform-mcp-server"]

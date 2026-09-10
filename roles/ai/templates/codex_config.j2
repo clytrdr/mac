@@ -26,8 +26,15 @@ args = {{ codex_server.args | to_json }}
 {{ k }} = {{ v | to_json }}
 {% endfor %}
 {% endif %}
+{% for tool, opts in (server.codex_tools | default({})).items() %}
+
+[mcp_servers.{{ server.name }}.tools.{{ tool }}]
+{% for k, v in opts.items() %}
+{{ k }} = {{ v | to_json }}
+{% endfor %}
+{% endfor %}
 {% endfor %}
 
 {# Codex CLI writes this block itself. It is templated so the run stays idempotent. #}
 [tui.model_availability_nux]
-{{ ai_codex_model }} = 1
+{{ ai_codex_model }} = {{ ai_codex_model_nux_count }}
