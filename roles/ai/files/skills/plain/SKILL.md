@@ -19,6 +19,7 @@ Use short sentences with one idea each and common verbs such as use, make, get, 
 
 ## Constraints
 
+- Preserve quotations from books exactly as written, including inline quotations and blockquotes. Do not rewrite or translate them.
 - Preserve code, program strings, formatting, and template expressions, including expressions inside comments.
 - Preserve Markdown code blocks, inline code, URLs, image paths, table layout, and frontmatter.
 - Preserve HTML tags, attributes, and `script`, `style`, `pre`, and `code` contents.
