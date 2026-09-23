@@ -20,6 +20,7 @@
       ansible.builtin.get_url:
         url: https://raw.githubusercontent.com/git/git/v2.50.0/contrib/completion/git-prompt.sh
         dest: "{{ ansible_facts.env.HOME }}/.zsh/git-prompt.sh"
+        checksum: sha256:7ff718f4a06fd0a0be7edfef926abb41b1353c48c1515ad312d226965b74943a
         mode: '0644'
 
     - name: Deploy .zshrc configuration from template

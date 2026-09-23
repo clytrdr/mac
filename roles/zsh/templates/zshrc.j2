@@ -97,8 +97,15 @@ alias la='ls -A'
 
 # Claude Code launchers with a fixed model and reasoning effort
 alias fable='claude --model fable --effort high'
+alias opushigh='claude --model opus --effort high'
 alias opusmedium='claude --model opus --effort medium'
 alias opuslow='claude --model opus --effort low'
+
+# Codex CLI launchers with a fixed model and reasoning effort
+alias astrahigh='codex -m gpt-6-astra -c model_reasoning_effort=high'
+alias astramedium='codex -m gpt-6-astra -c model_reasoning_effort=medium'
+alias solhigh='codex -m gpt-6-sol -c model_reasoning_effort=high'
+alias solmedium='codex -m gpt-6-sol -c model_reasoning_effort=medium'
 
 # --- Custom Functions ---
 # A function to update all package managers at once.

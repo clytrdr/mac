@@ -4,6 +4,14 @@
     state: present
     global: true
 
+- name: Get ChatGPT app version
+  ansible.builtin.command:
+    cmd: defaults read {{ ai_codex_app_path }}/Contents/Info.plist CFBundleShortVersionString
+  register: ai_codex_app_version_result
+  changed_when: false
+  failed_when: false
+  check_mode: false
+
 # diff is disabled because the rendered config contains API keys.
 - name: Configure Codex CLI
   ansible.builtin.template:

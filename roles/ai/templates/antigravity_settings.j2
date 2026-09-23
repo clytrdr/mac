@@ -1,5 +1,4 @@
 {
-  "enableTelemetry": false,
   "model": "{{ ai_antigravity_model }}",
   "permissions": {
     "allow": [
@@ -37,5 +36,6 @@
 {% endfor %}
     ]
   },
+  "showFeedbackSurvey": false,
   "trustedWorkspaces": {{ ai_antigravity_trusted_workspaces | to_nice_json(indent=2) | indent(2) }}
 }

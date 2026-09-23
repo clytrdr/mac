@@ -62,6 +62,7 @@
 # Names that start with a dot are excluded. Some CLIs keep their own skills
 # in such a directory, for example ~/.codex/skills/.system. rsync does not
 # delete an excluded path, so those skills stay.
+# synced is excluded because claude.ai manages that directory.
 - name: Deploy custom skills
   ansible.posix.synchronize:
     src: "{{ role_path }}/files/skills/"
@@ -69,6 +70,7 @@
     delete: true
     rsync_opts:
       - "--exclude=.*"
+      - "--exclude=synced"
 
 - name: Check if Claude Code CLI is available
   ansible.builtin.command:

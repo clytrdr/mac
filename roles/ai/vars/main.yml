@@ -67,6 +67,30 @@ ai_codex_skills_dir: "{{ ansible_facts.env.HOME }}/.codex/skills"
 
 ai_codex_skills_excludes: []
 
+# The ChatGPT desktop app writes its own settings into config.toml.
+# They are templated so the run stays idempotent. The template writes them
+# only when this app exists. The app version comes from its Info.plist.
+ai_codex_app_path: /Applications/ChatGPT.app
+
+ai_codex_app_marketplaces:
+  - name: openai-bundled
+    source: "{{ ansible_facts.env.HOME }}/.codex/.tmp/bundled-marketplaces/openai-bundled"
+  - name: openai-primary-runtime
+    source: "{{ ansible_facts.env.HOME }}/.cache/codex-runtimes/codex-primary-runtime/plugins/openai-primary-runtime"
+
+ai_codex_app_plugins:
+  - codex-app-tools@openai-bundled
+  - browser@openai-bundled
+  - unified-computer-use@openai-bundled
+  - chrome@openai-bundled
+  - computer-use@openai-bundled
+  - visualize@openai-bundled
+  - documents@openai-primary-runtime
+  - pdf@openai-primary-runtime
+  - spreadsheets@openai-primary-runtime
+  - presentations@openai-primary-runtime
+  - template-creator@openai-primary-runtime
+
 # Antigravity reads global skills from ~/.gemini/skills. This directory is
 # separate from the antigravity-cli directory that stores settings.json.
 ai_antigravity_skills_dir: "{{ ansible_facts.env.HOME }}/.gemini/skills"
