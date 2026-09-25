@@ -1,23 +1,192 @@
-- name: Configure AI coding agents
+- name: Configure AI apps and coding agents
   tags:
     - ai
   block:
-    - name: Import common AI tasks
-      ansible.builtin.import_tasks:
-        file: common.yml
-      tags: [claude, codex, antigravity]
+    # An app that was installed without Homebrew makes this task fail.
+    # Run `brew install --cask --adopt <cask>` once in a terminal to take it
+    # over. --adopt needs sudo, so the role does not run it.
+    - name: Install AI desktop apps
+      community.general.homebrew_cask:
+        name: "{{ item }}"
+        state: present
+      loop: "{{ ai_casks }}"
 
-    - name: Import Claude Code tasks
-      ansible.builtin.import_tasks:
-        file: claude.yml
-      tags: [claude]
+    - name: Install AI CLIs with the vendor install script
+      ansible.builtin.command:
+        argv:
+          - bash
+          - -c
+          - set -o pipefail; curl -fsSL {{ item.url }} | bash
+        creates: "{{ ansible_facts.env.HOME }}/.local/bin/{{ item.name }}"
+      loop: "{{ ai_cli_installers }}"
+      loop_control:
+        label: "{{ item.name }}"
 
-    - name: Import Codex CLI tasks
-      ansible.builtin.import_tasks:
-        file: codex.yml
-      tags: [codex]
+    - name: Install Codex CLI
+      community.general.npm:
+        name: '@openai/codex'
+        state: present
+        global: true
 
-    - name: Import Antigravity CLI tasks
-      ansible.builtin.import_tasks:
-        file: antigravity.yml
-      tags: [antigravity]
+    - name: Ensure skills directories exist
+      ansible.builtin.file:
+        path: "{{ item.skills_dir }}"
+        state: directory
+        mode: '0755'
+      loop: "{{ ai_tools }}"
+      loop_control:
+        label: "{{ item.name }}"
+
+    - name: Deploy global AI instructions
+      ansible.builtin.copy:
+        src: files/global_instructions.md
+        dest: "{{ item.instructions }}"
+        mode: '0644'
+      loop: "{{ ai_tools }}"
+      loop_control:
+        label: "{{ item.name }}"
+
+    # synchronize runs rsync with --delete. It deletes a deployed skill after
+    # the skill is removed from the repository.
+    # rsync does not delete an excluded path. Names that start with a dot are
+    # excluded because some CLIs keep their own skills there, for example
+    # ~/.codex/skills/.system. synced is excluded because claude.ai manages
+    # ~/.claude/skills/synced.
+    - name: Deploy custom skills
+      ansible.posix.synchronize:
+        src: "{{ role_path }}/files/skills/"
+        dest: "{{ item.skills_dir }}/"
+        delete: true
+        rsync_opts:
+          - "--exclude=.*"
+          - "--exclude=synced"
+      loop: "{{ ai_tools }}"
+      loop_control:
+        label: "{{ item.name }}"
+
+    - name: Ensure JSON settings directories exist
+      ansible.builtin.file:
+        path: "{{ item.path | dirname }}"
+        state: directory
+        mode: "{{ item.dir_mode | default('0755') }}"
+      loop: "{{ ai_json_settings }}"
+      loop_control:
+        label: "{{ item.path }}"
+
+    - name: Read current JSON settings
+      ansible.builtin.slurp:
+        src: "{{ item.path }}"
+      loop: "{{ ai_json_settings }}"
+      loop_control:
+        label: "{{ item.path }}"
+      register: ai_json_settings_current
+      failed_when: false
+
+    # See ai_json_settings in vars/main.yml for how the merge works.
+    - name: Merge managed keys into JSON settings
+      ansible.builtin.copy:
+        content: "{{ item.item.seed | combine(current) | combine(item.item.managed, recursive=true) | to_nice_json(indent=2) }}\n"
+        dest: "{{ item.item.path }}"
+        mode: '0600'
+      vars:
+        current: "{{ (item.content | b64decode | from_json) if item.content is defined else {} }}"
+      loop: "{{ ai_json_settings_current.results }}"
+      loop_control:
+        label: "{{ item.item.path }}"
+
+    # Each CLI prints one server per line, and the line starts with the server
+    # name. A CLI that is not installed fails here and is skipped below.
+    - name: List MCP servers of each CLI
+      ansible.builtin.command:
+        cmd: "{{ item }} mcp list"
+      loop: [claude, codex, agy]
+      register: ai_mcp_list
+      changed_when: false
+      failed_when: false
+      check_mode: false
+
+    - name: Collect MCP server lists of installed CLIs
+      ansible.builtin.set_fact:
+        ai_mcp_listed: "{{ ai_mcp_listed | default({}) | combine({item.item: item.stdout}) }}"
+      loop: "{{ ai_mcp_list.results }}"
+      loop_control:
+        label: "{{ item.item }}"
+      when: item.rc | default(1) == 0
+
+    # no_log hides API keys in the command line.
+    - name: Add MCP servers to Claude Code
+      ansible.builtin.command:
+        cmd: >-
+          claude mcp add --scope user
+          {% if item.url is defined %}
+          --transport http {{ item.name }} {{ item.url }}
+          {% else %}
+          {{ item.name }}
+          {% for k, v in (item.env | default({})).items() %}-e {{ k }}={{ v }} {% endfor %}
+          -- {{ item.command }} {{ item.args | join(' ') }}
+          {% endif %}
+      loop: "{{ ai_mcp_servers }}"
+      loop_control:
+        label: "{{ item.name }}"
+      when:
+        - "'claude' in ai_mcp_listed | default({})"
+        - "ai_mcp_listed.claude is not search('(?m)^' ~ item.name ~ '[: ]')"
+      changed_when: true
+      no_log: true
+
+    - name: Add MCP servers to Codex CLI
+      ansible.builtin.command:
+        cmd: >-
+          codex mcp add {{ item.name }}
+          {% if item.url is defined %}
+          --url {{ item.url }}
+          {% else %}
+          {% for k, v in (item.env | default({})).items() %}--env {{ k }}={{ v }} {% endfor %}
+          -- {{ item.command }} {{ item.args | join(' ') }}
+          {% endif %}
+      loop: "{{ ai_mcp_servers }}"
+      loop_control:
+        label: "{{ item.name }}"
+      when:
+        - "'codex' in ai_mcp_listed | default({})"
+        - "ai_mcp_listed.codex is not search('(?m)^' ~ item.name ~ '[: ]')"
+      changed_when: true
+      no_log: true
+
+    # agy rejects flags that come after the server name.
+    - name: Add MCP servers to Antigravity CLI
+      ansible.builtin.command:
+        cmd: >-
+          agy mcp add
+          {% if item.url is defined %}
+          {{ item.name }} {{ item.url }}
+          {% else %}
+          {% for k, v in (item.env | default({})).items() %}-e {{ k }}={{ v }} {% endfor %}
+          {{ item.name }} -- {{ item.command }} {{ item.args | join(' ') }}
+          {% endif %}
+      loop: "{{ ai_mcp_servers }}"
+      loop_control:
+        label: "{{ item.name }}"
+      when:
+        - "'agy' in ai_mcp_listed | default({})"
+        - "ai_mcp_listed.agy is not search('(?m)^' ~ item.name ~ '[: ]')"
+      changed_when: true
+      no_log: true
+
+    - name: List installed Claude Code plugins
+      ansible.builtin.command:
+        cmd: claude plugin list --json
+      register: ai_claude_plugin_list
+      changed_when: false
+      failed_when: false
+      check_mode: false
+
+    # enabledPlugins in settings.json enables the plugins after install.
+    - name: Install Claude Code plugins
+      ansible.builtin.command:
+        cmd: claude plugin install {{ item }}
+      loop: "{{ ai_claude_plugins }}"
+      changed_when: true
+      when:
+        - ai_claude_plugin_list.rc | default(1) == 0
+        - item not in (ai_claude_plugin_list.stdout | from_json | map(attribute='id') | list)

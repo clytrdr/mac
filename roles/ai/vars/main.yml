@@ -1,3 +1,28 @@
+# Desktop apps. Both apps update themselves, so the role only installs them.
+ai_casks:
+  - claude
+  - chatgpt
+
+# CLIs installed with the vendor install script into ~/.local/bin.
+# Codex CLI is installed with npm instead.
+ai_cli_installers:
+  - name: claude
+    url: https://claude.ai/install.sh
+  - name: agy
+    url: https://antigravity.google/cli/install.sh
+
+# Each CLI gets the same global instructions and the same skills.
+ai_tools:
+  - name: claude
+    instructions: "{{ ansible_facts.env.HOME }}/.claude/CLAUDE.md"
+    skills_dir: "{{ ansible_facts.env.HOME }}/.claude/skills"
+  - name: codex
+    instructions: "{{ ansible_facts.env.HOME }}/.codex/AGENTS.md"
+    skills_dir: "{{ ansible_facts.env.HOME }}/.codex/skills"
+  - name: antigravity
+    instructions: "{{ ansible_facts.env.HOME }}/.gemini/GEMINI.md"
+    skills_dir: "{{ ansible_facts.env.HOME }}/.gemini/skills"
+
 # Directory trees every CLI can read and write outside the current project.
 # Each entry covers all paths under it. A project directory under these
 # paths does not need its own entry.
@@ -5,14 +30,11 @@ ai_workspace_dirs:
   - "{{ ansible_facts.env.HOME }}/Code"
   - "{{ ansible_facts.env.HOME }}/Documents"
 
-# Project directories that are trusted by default. No trust prompt appears
-# for these paths. Each entry matches an exact path, not a directory tree.
-# The parent path ~/Code is left out intentionally. A directory under ~/Code
-# is trusted only when listed here.
-# This setting does not apply to Claude Code. Claude Code stores project
-# trust in ~/.claude.json. The Claude Code CLI rewrites that file while
-# running. Ansible leaves that file alone, and you answer the trust prompt
-# once per directory.
+# Project directories that Antigravity trusts by default. Each entry matches
+# an exact path, not a directory tree.
+# Claude Code and Codex CLI store trust in files that they rewrite
+# themselves (~/.claude.json and ~/.codex/config.toml). Ansible leaves those
+# files alone, and you answer the trust prompt once per directory.
 ai_trusted_projects:
   - "{{ ansible_facts.env.HOME }}/Code/apps-script"
   - "{{ ansible_facts.env.HOME }}/Code/back"
@@ -23,93 +45,38 @@ ai_trusted_projects:
   - "{{ ansible_facts.env.HOME }}/Documents"
   - "{{ ansible_facts.env.HOME }}/Downloads"
 
-ai_instruction_targets:
-  - path: "{{ ansible_facts.env.HOME }}/.claude/CLAUDE.md"
-    dir: "{{ ansible_facts.env.HOME }}/.claude"
-    dir_mode: '0700'
-  - path: "{{ ansible_facts.env.HOME }}/.codex/AGENTS.md"
-    dir: "{{ ansible_facts.env.HOME }}/.codex"
-    dir_mode: '0755'
-  - path: "{{ ansible_facts.env.HOME }}/.gemini/GEMINI.md"
-    dir: "{{ ansible_facts.env.HOME }}/.gemini"
-    dir_mode: '0755'
+# Shell commands that run without a permission prompt in Claude Code and
+# Antigravity. Each tool gets the list in its own format.
+ai_allowed_commands:
+  - git
+  - gh
+  - gcloud
+  - terraform
+  - docker
+  - ansible
+  - ansible-playbook
+  - ansible-lint
+  - find
+  - ls
+  - grep
+  - npm
+  - npx
+  - uv
+  - python
+  - pytest
+  - pre-commit
+  - mkdir
+  - brew
+  - cat
+  - rg
+  - playwright-cli
+  - mv
+  - open
 
-# Default values for a machine without settings.json. Values set in
-# settings.json using /model and /effort override these values.
-ai_claude_model: claude-opus-4-8[1m]
-ai_claude_effort_level: xhigh
-ai_claude_default_mode: auto
-ai_claude_skip_auto_permission_prompt: true
-
-ai_claude_skills_dir: "{{ ansible_facts.env.HOME }}/.claude/skills"
-
-# Status line configuration. Show the active model and the effort level if set.
-# Folded to keep source lines under the yaml[line-length] limit. YAML
-# folding joins these lines into a single shell command with spaces.
-ai_claude_status_line_command: >-
-  input=$(cat);
-  model=$(echo "$input" | jq -r '.model.display_name');
-  effort=$(echo "$input" | jq -r '.effort.level // empty');
-  if [ -n "$effort" ]; then printf '%s (%s)' "$model" "$effort";
-  else printf '%s' "$model"; fi
-
-# Codex CLI model settings. The Codex CLI rewrites config.toml when you run
-# /model, so these values are restored on the next Ansible run.
-ai_codex_model: gpt-6-astra
-# Codex CLI increments this counter itself. Keep it in sync to stay idempotent.
-ai_codex_model_nux_count: 4
-ai_codex_reasoning_effort: high
-ai_codex_plan_mode_reasoning_effort: high
-
-ai_codex_trusted_projects: "{{ ai_trusted_projects }}"
-
-ai_codex_skills_dir: "{{ ansible_facts.env.HOME }}/.codex/skills"
-
-ai_codex_skills_excludes: []
-
-# The ChatGPT desktop app writes its own settings into config.toml.
-# They are templated so the run stays idempotent. The template writes them
-# only when this app exists. The app version comes from its Info.plist.
-ai_codex_app_path: /Applications/ChatGPT.app
-
-ai_codex_app_marketplaces:
-  - name: openai-bundled
-    source: "{{ ansible_facts.env.HOME }}/.codex/.tmp/bundled-marketplaces/openai-bundled"
-  - name: openai-primary-runtime
-    source: "{{ ansible_facts.env.HOME }}/.cache/codex-runtimes/codex-primary-runtime/plugins/openai-primary-runtime"
-
-ai_codex_app_plugins:
-  - codex-app-tools@openai-bundled
-  - browser@openai-bundled
-  - unified-computer-use@openai-bundled
-  - chrome@openai-bundled
-  - computer-use@openai-bundled
-  - visualize@openai-bundled
-  - documents@openai-primary-runtime
-  - pdf@openai-primary-runtime
-  - spreadsheets@openai-primary-runtime
-  - presentations@openai-primary-runtime
-  - template-creator@openai-primary-runtime
-
-# Antigravity reads global skills from ~/.gemini/skills. This directory is
-# separate from the antigravity-cli directory that stores settings.json.
-ai_antigravity_skills_dir: "{{ ansible_facts.env.HOME }}/.gemini/skills"
-
-ai_antigravity_skills_excludes: []
-
-ai_antigravity_model: "Gemini 3.8 Flash (High)"
-
-ai_antigravity_trusted_workspaces: "{{ ai_trusted_projects }}"
-
-ai_claude_env:
-  CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING: "1"
-
-ai_claude_plugin_marketplaces: []
-
-ai_claude_plugins:
-  - name: frontend-design
-    marketplace: claude-plugins-official
-
+# MCP servers for all three CLIs. The role adds a server only when the CLI
+# does not list it yet. It does not update a server that already exists.
+# After you change an entry, run `<cli> mcp remove <name>` for each CLI and
+# run the playbook again.
 ai_mcp_servers:
   - name: context7
     command: npx
@@ -119,10 +86,6 @@ ai_mcp_servers:
   # Check the current port in Settings > Tools > MCP Server.
   - name: pycharm
     url: "http://127.0.0.1:64462/stream"
-    # Codex only: per-tool approval settings.
-    codex_tools:
-      open_file_in_editor:
-        approval_mode: approve
   - name: terraform
     command: docker
     args: ["run", "-i", "--rm", "hashicorp/terraform-mcp-server"]
@@ -131,3 +94,72 @@ ai_mcp_servers:
     args: ["-y", "firecrawl-mcp"]
     env:
       FIRECRAWL_API_KEY: "{{ firecrawl_api_key }}"
+
+ai_mcp_server_names: "{{ ai_mcp_servers | map(attribute='name') | list }}"
+
+# Folded to keep source lines under the yaml[line-length] limit. YAML
+# folding joins these lines into a single shell command with spaces.
+ai_claude_status_line_command: >-
+  input=$(cat);
+  model=$(echo "$input" | jq -r '.model.display_name');
+  effort=$(echo "$input" | jq -r '.effort.level // empty');
+  if [ -n "$effort" ]; then printf '%s (%s)' "$model" "$effort";
+  else printf '%s' "$model"; fi
+
+# JSON settings files that the CLIs also write. The role reads the live
+# file and merges two dicts into it:
+# - seed: used only when the key is missing, for example on a new machine.
+#   /model and /effort change these keys, and the role keeps those values.
+# - managed: always set. Lists in these keys replace the live lists.
+# All other keys in the live file stay as they are.
+# dir_mode sets the mode of the parent directory (default 0755).
+ai_json_settings:
+  - path: "{{ ansible_facts.env.HOME }}/.claude/settings.json"
+    dir_mode: '0700'
+    seed:
+      model: claude-opus-4-8[1m]
+      effortLevel: xhigh
+    managed:
+      env:
+        CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING: "1"
+      permissions:
+        allow: >-
+          {{ ai_allowed_commands
+             | map('regex_replace', '^', 'Bash(')
+             | map('regex_replace', '$', ':*)') | list
+             + ['Read', 'Glob', 'Grep', 'WebFetch', 'WebSearch']
+             + ai_mcp_server_names
+             | map('regex_replace', '^', 'mcp__')
+             | map('regex_replace', '$', '__*') | list }}
+        deny:
+          - Bash(gh repo delete:*)
+        defaultMode: auto
+        additionalDirectories: "{{ ai_workspace_dirs }}"
+      enabledPlugins: >-
+        {{ dict(ai_claude_plugins | product([true])) }}
+      statusLine:
+        type: command
+        command: "{{ ai_claude_status_line_command }}"
+      skipAutoPermissionPrompt: true
+  - path: "{{ ansible_facts.env.HOME }}/.gemini/antigravity-cli/settings.json"
+    seed:
+      model: Gemini 3.8 Flash (High)
+    managed:
+      permissions:
+        allow: >-
+          {{ ai_allowed_commands
+             | map('regex_replace', '^', 'command(')
+             | map('regex_replace', '$', ')') | list
+             + ['read_url(*)']
+             + ai_mcp_server_names
+             | map('regex_replace', '^', 'mcp(')
+             | map('regex_replace', '$', '/*)') | list
+             + ai_workspace_dirs
+             | map('regex_replace', '^', 'write_file(')
+             | map('regex_replace', '$', ')') | list }}
+      showFeedbackSurvey: false
+      trustedWorkspaces: "{{ ai_trusted_projects }}"
+
+# Claude Code plugins, as <name>@<marketplace>.
+ai_claude_plugins:
+  - frontend-design@claude-plugins-official
