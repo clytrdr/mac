@@ -114,68 +114,44 @@ alias prohigh='agy --model gemini-3.1-pro --effort high'
 
 # --- Custom Functions ---
 # A function to update all package managers at once.
-# It checks if each command exists before running the update.
+# It skips a tool if its command is not found.
+# It prints the failed steps at the end and returns 1 if any step fails.
 updateall() {
-  # Update Homebrew
-  if command -v brew &> /dev/null; then
-    print "==> Updating Homebrew..."
-    brew update
-    print "==> Updating Homebrew packages..."
-    # The '--yes' flag skips the upgrade confirmation prompt.
-    brew upgrade --yes
-  else
-    print "INFO: Homebrew not found. Skipping."
-  fi
+  local -a failed
 
-  # Update Conda
-  if command -v conda &> /dev/null; then
-    print "\n==> Updating all Conda packages..."
-    # The '-y' flag automatically confirms the update.
-    conda update --all -y
-  else
-    print "\nINFO: Conda not found. Skipping."
-  fi
+  # Usage: _updateall_step <label> <command> [args...]
+  # The 'failed' array is visible here because zsh uses dynamic scope.
+  _updateall_step() {
+    local label=$1
+    shift
+    if ! command -v $1 &> /dev/null; then
+      print "\nINFO: $1 not found. Skipping."
+      return
+    fi
+    print "\n==> $label"
+    "$@" || failed+=("$label")
+  }
 
-  # Update global NPM packages
-  if command -v npm &> /dev/null; then
-    print "\n==> Updating global npm packages..."
-    npm update -g --no-fund
-  else
-    print "\nINFO: npm not found. Skipping."
-  fi
+  _updateall_step "Updating Homebrew metadata..." brew update
+  # The '--yes' flag skips the upgrade confirmation prompt.
+  _updateall_step "Upgrading Homebrew packages..." brew upgrade --yes
+  # The '-y' flag automatically confirms the update.
+  _updateall_step "Updating all Conda packages..." conda update --all -y
+  # Update Node.js before npm so that global packages use the new version.
+  _updateall_step "Updating Node.js to the latest LTS..." n lts
+  # This also updates Codex CLI, because it is a global npm package.
+  _updateall_step "Updating global npm packages..." npm update -g --no-fund
+  _updateall_step "Updating pipx packages..." pipx upgrade-all
+  _updateall_step "Updating Google Cloud components..." gcloud components update --quiet
+  _updateall_step "Updating Claude Code..." claude update
+  _updateall_step "Updating the Antigravity CLI..." agy update
 
-  # Update Google Cloud components
-  if command -v gcloud &> /dev/null; then
-    print "\n==> Updating Google Cloud components..."
-    gcloud components update --quiet
-  else
-    print "\nINFO: gcloud not found. Skipping."
-  fi
+  unfunction _updateall_step
 
-  # Update Claude Code
-  if command -v claude &> /dev/null; then
-    print "\n==> Updating Claude Code..."
-    claude update
-  else
-    print "\nINFO: claude not found. Skipping."
+  if (( $#failed )); then
+    print "\n❌ Failed steps: ${(j:, :)failed}"
+    return 1
   fi
-
-  # Update the Antigravity CLI
-  if command -v agy &> /dev/null; then
-    print "\n==> Updating the Antigravity CLI..."
-    agy update
-  else
-    print "\nINFO: agy not found. Skipping."
-  fi
-
-  # Update Codex CLI
-  if command -v codex &> /dev/null; then
-    print "\n==> Updating Codex CLI..."
-    codex update
-  else
-    print "\nINFO: codex not found. Skipping."
-  fi
-
   print "\n✅ All updates finished."
 }
 
