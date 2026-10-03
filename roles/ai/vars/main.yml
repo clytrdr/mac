@@ -1,7 +1,8 @@
-# Desktop apps. Both apps update themselves, so the role only installs them.
+# Desktop apps. All apps update themselves, so the role only installs them.
 ai_casks:
   - claude
   - chatgpt
+  - google-gemini
 
 # CLIs installed with the vendor install script into ~/.local/bin.
 # Codex CLI is installed with npm instead.
@@ -72,6 +73,7 @@ ai_allowed_commands:
   - playwright-cli
   - mv
   - open
+  - echo
 
 # MCP servers for all three CLIs. The role adds a server only when the CLI
 # does not list it yet. It does not update a server that already exists.
