@@ -19,6 +19,7 @@ Always read the source code and existing tests before you write or modify tests.
 6. Run the IDE inspections again. The problem count must not increase. Fix new problems in the same pass.
 7. Report the result: test outcome, test count before and after, and problem count
    before and after. For each added test, state the covered behavior in one line.
+   For each renamed test, list the old and new names.
 
 ## IDE Inspections
 
@@ -58,6 +59,10 @@ When you remove a test, state which remaining test covers its behavior.
 
 - Mirror the source code structure under `tests/`.
 - Create one test class per function (`Test<FunctionName>`) or per class (`Test<ClassName>`).
+- Name each test method after the behavior it verifies:
+  `test_<condition>_<expected_result>` (e.g., `test_empty_input_returns_none`).
+- When you modify or refactor a test file, rename existing tests whose names do not
+  describe the behavior (e.g., `test_1`, `test_success`, `test_basic`).
 
 ## Database Tests (TortoiseORM)
 
