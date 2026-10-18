@@ -63,6 +63,10 @@ When you remove a test, state which remaining test covers its behavior.
   `test_<condition>_<expected_result>` (e.g., `test_empty_input_returns_none`).
 - When you modify or refactor a test file, rename existing tests whose names do not
   describe the behavior (e.g., `test_1`, `test_success`, `test_basic`).
+- Omit the docstring when the test name already states the behavior.
+  Add a docstring only for context that the name cannot hold
+  (e.g., why a setup is needed, or a related bug).
+- When you modify or refactor a test file, remove docstrings that only repeat the test name.
 
 ## Database Tests (TortoiseORM)
 
