@@ -1,5 +1,19 @@
-*.retry
-.vault_pass
-.ansible_become_pass
-!vars/secrets.yml
-.claude/settings.local.json
+# Project-specific ignores only.
+# OS and IDE files (.DS_Store, .idea/) are in the global ignore file (~/.gitignore_global).
+
+# --- Secrets ---
+# Ansible Vault password. Passed with `--vault-password-file .vault_pass`.
+/.vault_pass
+# sudo password for `become` tasks.
+/.ansible_become_pass
+# Vault-encrypted, so it is safe to commit.
+# The global ignore file ignores secrets.yml, so un-ignore it here.
+!/vars/secrets.yml
+
+# --- Ansible ---
+# ansible-lint cache. It installs collections and roles from requirements.yml here.
+/.ansible/
+
+# --- AI tool local files ---
+# Shared agent rules live in AGENTS.md, so all of .claude/ stays local.
+/.claude/

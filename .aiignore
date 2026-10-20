@@ -1,4 +1,12 @@
-# Ignore project files
-.idea/
-.ansible_become_pass
-.vault_pass
+# Files that AI tools must not read.
+# Uses .gitignore syntax.
+
+# --- Secrets ---
+# Ansible Vault password. Passed with `--vault-password-file .vault_pass`.
+/.vault_pass
+# sudo password for `become` tasks.
+/.ansible_become_pass
+
+# --- IDE ---
+# PyCharm project settings. Not useful as AI context.
+/.idea/
