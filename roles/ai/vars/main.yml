@@ -37,7 +37,6 @@ ai_workspace_dirs:
 # themselves (~/.claude.json and ~/.codex/config.toml). Ansible leaves those
 # files alone, and you answer the trust prompt once per directory.
 ai_trusted_projects:
-  - "{{ ansible_facts.env.HOME }}/Code/apps-script"
   - "{{ ansible_facts.env.HOME }}/Code/back"
   - "{{ ansible_facts.env.HOME }}/Code/core"
   - "{{ ansible_facts.env.HOME }}/Code/front"
