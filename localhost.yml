@@ -4,14 +4,22 @@
   gather_facts: true
   become: false
   pre_tasks:
+    - name: Check if vault variables file exists
+      ansible.builtin.stat:
+        path: "{{ playbook_dir }}/vars/secrets.yml"
+      register: secrets_file
+      tags: always
+
+    # Load the file only when it exists. A decryption error still fails the run.
     - name: Load vault variables if available
-      include_vars: vars/secrets.yml
-      ignore_errors: true
+      ansible.builtin.include_vars: "{{ playbook_dir }}/vars/secrets.yml"
+      when: secrets_file.stat.exists
       no_log: true
       tags: always
   roles:
     - git
     - homebrew
+    - macos
     - zsh
     - node
     - ai

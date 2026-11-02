@@ -29,6 +29,8 @@
       when:
         - node_lts_version.rc == 0
         - node_active_version.stdout | default('') != 'v' + node_lts_version.stdout
+      # The when condition runs this task only when the version changes.
+      changed_when: true
 
     - name: Install npm packages globally
       community.general.npm:

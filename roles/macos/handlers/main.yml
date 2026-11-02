@@ -1,0 +1,4 @@
+- name: Activate settings
+  # Apply trackpad preferences without logout.
+  ansible.builtin.command: /System/Library/PrivateFrameworks/SystemAdministration.framework/Resources/activateSettings -u
+  changed_when: true

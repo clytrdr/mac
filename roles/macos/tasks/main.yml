@@ -1,0 +1,53 @@
+- name: Configure macOS trackpad and keyboard settings
+  tags:
+    - macos
+  vars:
+    macos_modifier_key: com.apple.keyboard.modifiermapping.{{ macos_modifier_keyboard_id }}
+  block:
+    - name: Set trackpad settings
+      community.general.osx_defaults:
+        domain: "{{ item.1 }}"
+        key: "{{ item.0.key }}"
+        type: "{{ item.0.type }}"
+        value: "{{ item.0.value }}"
+      loop: "{{ macos_trackpad_settings | subelements('domains') }}"
+      loop_control:
+        label: "{{ item.1 }} {{ item.0.key }}={{ item.0.value }}"
+      notify: Activate settings
+
+    - name: Set trackpad tracking speed
+      community.general.osx_defaults:
+        domain: NSGlobalDomain
+        key: com.apple.trackpad.scaling
+        type: float
+        value: "{{ macos_trackpad_scaling }}"
+      notify: Activate settings
+
+    - name: Read modifier key mappings
+      ansible.builtin.command: defaults -currentHost read -g {{ macos_modifier_key }}
+      register: macos_modifier_read
+      changed_when: false
+      failed_when: false
+      check_mode: false
+
+    - name: Set modifier key mappings
+      # osx_defaults cannot write an array of dicts, so use the defaults command.
+      # The new mapping takes effect after logout and login.
+      ansible.builtin.command: >-
+        defaults -currentHost write -g {{ macos_modifier_key }} -array
+        {% for m in macos_modifier_mappings %}
+        '{{ macos_modifier_dict | format(m.dst, m.src) }}'
+        {% endfor %}
+      vars:
+        macos_modifier_dict: >-
+          <dict><key>HIDKeyboardModifierMappingDst</key><integer>%s</integer><key>HIDKeyboardModifierMappingSrc</key><integer>%s</integer></dict>
+        macos_modifier_current: >-
+          {{ macos_modifier_read.stdout
+             | regex_findall('HIDKeyboardModifierMappingDst = (\d+);\s+HIDKeyboardModifierMappingSrc = (\d+);')
+             | map('list') | list }}
+        macos_modifier_expected: >-
+          {{ macos_modifier_mappings | map(attribute='dst') | map('string')
+             | zip(macos_modifier_mappings | map(attribute='src') | map('string'))
+             | map('list') | list }}
+      when: macos_modifier_current != macos_modifier_expected
+      changed_when: true

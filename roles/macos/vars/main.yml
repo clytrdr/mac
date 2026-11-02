@@ -1,0 +1,34 @@
+# Only settings changed from the macOS defaults are listed here.
+
+macos_trackpad_internal_domain: com.apple.AppleMultitouchTrackpad
+macos_trackpad_bluetooth_domain: com.apple.driver.AppleBluetoothMultitouch.trackpad
+
+macos_trackpad_settings:
+  # Click: Firm (default: Medium = 1)
+  - key: FirstClickThreshold
+    type: int
+    value: 2
+    domains:
+      - "{{ macos_trackpad_internal_domain }}"
+  - key: SecondClickThreshold
+    type: int
+    value: 2
+    domains:
+      - "{{ macos_trackpad_internal_domain }}"
+  # Notification Center gesture: off (default: on = 3)
+  - key: TrackpadTwoFingerFromRightEdgeSwipeGesture
+    type: int
+    value: 0
+    domains:
+      - "{{ macos_trackpad_internal_domain }}"
+      - "{{ macos_trackpad_bluetooth_domain }}"
+
+# Tracking speed (System Settings slider, 0.0 to 3.0)
+macos_trackpad_scaling: 2.5
+
+# Modifier keys for the Apple internal keyboard.
+# Values are HID usage IDs: 0x700000039 = Caps Lock, 0x7000000E4 = Control.
+macos_modifier_keyboard_id: 0-0-0
+macos_modifier_mappings:
+  - src: 30064771129
+    dst: 30064771300
