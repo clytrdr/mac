@@ -55,8 +55,17 @@ Keep each test simple:
 
 Apply this section only in a project that uses TortoiseORM.
 
-- Inherit from `tests.utils.TestCase`. Use `asyncSetUp` and async test methods.
-- If a test class overrides `asyncSetUp`, call `await super().asyncSetUp()` first.
+- Use the `db` fixture in `tests/conftest.py`. Add `@pytest.mark.usefixtures("db")` to the test class.
+  Use async test methods.
+- For per-class setup, use an `autouse` fixture that takes `db` as an argument:
+
+  ```python
+  @pytest.fixture(autouse=True)
+  async def _setup(self, db):
+      await init_test_data()
+  ```
+
+  Autouse fixtures run before `usefixtures`. Without the `db` argument, the database does not exist yet.
 - Never mock database models.
 - Call `tests.utils.init_test_data()` to load standard test data (Company, Market, and OrderStatus).
   Omit it when a minimal setup is clearer.
