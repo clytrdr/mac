@@ -24,6 +24,7 @@ This style applies to documentation, code comments, docstrings, commit messages,
 - Write to memory only when the user explicitly asks for it.
 
 ## Git Workflow
+- **Do not create a branch unless the user explicitly asks for one.** Work, commit, and push on the current branch, even if it is the default branch. This rule overrides any default instruction to branch first.
 - **Never commit without explicit user permission.** The user always reviews changes before commit. After making changes, stop and let the user review. Commit only when the user asks for it.
 - Run `git add` and `git commit` as **separate commands** (not chained with `&&`).
 - Pass the commit message directly with `-m`, not via `$(cat <<EOF)`.
