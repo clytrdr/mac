@@ -27,7 +27,7 @@ Prefer the owning tool's cleanup command. Otherwise, remove only the approved di
 | uv | `~/.cache/uv` | `uv cache clean` |
 | pip | `~/Library/Caches/pip` | `pip cache purge`; remove directory if `pip` is unavailable |
 | pre-commit | `~/.cache/pre-commit` | `pre-commit clean` |
-| Homebrew | `~/Library/Caches/Homebrew` | `brew cleanup --prune=all` |
+| Homebrew | `~/Library/Caches/Homebrew` | `brew cleanup --prune=all`; see below |
 | pip-tools | `~/Library/Caches/pip-tools` | Remove directory |
 | node-gyp, puccinialin, Cypress | `~/Library/Caches/{node-gyp,puccinialin,Cypress}` | Remove each approved directory |
 | Playwright | `~/Library/Caches/{ms-playwright,ms-playwright-go}` | Remove each approved directory |
@@ -37,6 +37,8 @@ Prefer the owning tool's cleanup command. Otherwise, remove only the approved di
 Braces in the table list alternative paths. Resolve each path separately before deletion.
 
 **npm:** Report each `~/.npm/*` directory separately. The cleanup command clears `_cacache` but leaves `_npx` and `_prebuilds`; offer these separately. `_prebuilds` requires another binary download. `content-v2` and `index-v5` are inside `_cacache`, not directly under `~/.npm`.
+
+**Homebrew:** The cleanup command also removes old formula versions and other files outside the cache. Before asking for approval, run `brew cleanup --prune=all --dry-run` and report any paths outside `~/Library/Caches/Homebrew`.
 
 **JetBrains:** Get the installed version and list cache and support directories:
 
