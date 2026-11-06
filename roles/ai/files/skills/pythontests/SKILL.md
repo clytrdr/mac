@@ -55,7 +55,8 @@ Keep each test simple:
 
 Apply this section only in a project that uses TortoiseORM.
 
-- Inherit from `tortoise.contrib.test.TestCase`. Use `asyncSetUp` and async test methods.
+- Inherit from `tests.utils.TestCase`. Use `asyncSetUp` and async test methods.
+- If a test class overrides `asyncSetUp`, call `await super().asyncSetUp()` first.
 - Never mock database models.
 - Call `tests.utils.init_test_data()` to load standard test data (Company, Market, and OrderStatus).
   Omit it when a minimal setup is clearer.
