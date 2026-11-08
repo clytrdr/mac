@@ -11,8 +11,11 @@ Run this workflow only when the user explicitly asks to create a commit.
 
 1. Run `git status`, `git diff --stat`, and `git log --oneline -5`. Review the output to
    understand all changes.
-2. If `.pre-commit-config.yaml` exists in the repository root, run `pre-commit run --all-files`.
-   - If it modified any files, review the changes with `git diff --stat`.
+2. If `.pre-commit-config.yaml` exists in the repository root, check whether the hook is
+   installed with `test -f "$(git rev-parse --git-path hooks/pre-commit)"`.
+   - If the hook is not installed, run `pre-commit run --all-files`.
+     If it modified any files, review the changes with `git diff --stat`.
+   - If the hook is installed, skip this step. `git commit` runs the hooks on the staged files.
 3. Run `git add -A` to stage everything (including untracked files).
 4. Draft a commit message following Conventional Commits (e.g., `feat:`, `fix:`, `refactor:`).
    - Subject line: 60 characters or fewer.
