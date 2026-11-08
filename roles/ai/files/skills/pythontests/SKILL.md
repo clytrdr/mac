@@ -57,25 +57,29 @@ Apply this section only in a project that uses TortoiseORM.
 
 - Use the `db` fixture in `tests/conftest.py`. Add `@pytest.mark.usefixtures("db")` to the test class.
   Use async test methods.
-- For per-class setup, use an `autouse` fixture that takes `db` as an argument:
+- To load standard test data (Company, Market, and OrderStatus), use the `seed_data` fixture
+  instead of `db`: `@pytest.mark.usefixtures("seed_data")`. `seed_data` depends on `db`.
+  Omit it when a minimal setup is clearer.
+- For per-class setup, use an `autouse` fixture that takes `db` or `seed_data` as an argument:
 
   ```python
   @pytest.fixture(autouse=True)
-  async def _setup(self, db):
-      await init_test_data()
+  async def _setup(self, seed_data):
+      self.diary_row = await _create_diary()
   ```
 
-  Autouse fixtures run before `usefixtures`. Without the `db` argument, the database does not exist yet.
+  Autouse fixtures run before `usefixtures`. Without the argument, the database does not exist yet.
 - Never mock database models.
-- Call `tests.utils.init_test_data()` to load standard test data (Company, Market, and OrderStatus).
-  Omit it when a minimal setup is clearer.
 
 ## Router Tests (FastAPI)
 
 Apply this section only in a project that uses FastAPI.
 
-- Create a minimal `FastAPI` app. Include the router and create a `TestClient` instance at the module level.
-- Use synchronous test methods. Assert on `response.status_code` and `response.json()`.
+- Create a minimal `FastAPI` app and include the router at the module level.
+- Without database access, use `TestClient` and synchronous test methods.
+- With database access, use `httpx.AsyncClient(transport=ASGITransport(app=app), base_url="http://testserver")`
+  and async test methods.
+- Assert on `response.status_code` and `response.json()`.
 
 ## Mocking
 
