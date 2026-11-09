@@ -25,7 +25,7 @@ repos:
       # --- Git & Sanity Checks ---
       - id: check-added-large-files
         name: Check for large files
-        args: ["--maxkb=2048"] # Warn on files larger than 2MB
+        args: ["--maxkb=2048"] # Fail on files larger than 2 MB
       - id: check-merge-conflict
         name: Check for merge conflict markers
       - id: check-yaml
@@ -38,12 +38,13 @@ repos:
         name: Trim trailing whitespace
 
   - repo: https://github.com/ansible/ansible-lint
-    rev: v26.8.0
+    rev: v26.11.0
     hooks:
       - id: ansible-lint
         name: Lint Ansible playbooks
         language_version: python3.13
         files: \.(yml|yaml|j2)$
+        always_run: false
         args:
           - "--profile=safety"
-          - "-p"
+          - "--format=pep8"
