@@ -2,7 +2,7 @@
 
 Applies to `.py`, `.pyi`, and the code cells of `.ipynb`.
 
-Run the IDE inspections on every Python file in the list. See the "IDE inspections" section of `SKILL.md`. Beyond them, apply current, widely recommended Python practices. Do not invent project-specific rules.
+Run the IDE inspections on every Python file in the list, unless project instructions turn them off. See the "IDE inspections" section of `SKILL.md`. Beyond them, apply current, widely recommended Python practices. Do not invent project-specific rules.
 
 ## Test files
 

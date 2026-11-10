@@ -30,7 +30,7 @@ Review the files and directories from the user request. Then apply approved fixe
 5. Read and review each file completely.
    Apply common checks: check for bugs, security, performance, readability, maintainability, and deviations from surrounding conventions.
    Apply the reference checks.
-   Run the IDE inspections described below.
+   Run the IDE inspections described below, unless project instructions turn them off for the file.
    Review notebook code cells as code and Markdown cells as prose.
    Ignore outputs.
    Do not fix anything during this pass.
@@ -41,10 +41,11 @@ Review the files and directories from the user request. Then apply approved fixe
 8. Apply only approved fixes.
    For notebooks, use a notebook-aware editor when available and change one cell at a time.
    Otherwise, keep the notebook JSON structure intact and edit cell source only.
-9. Check the modified files again with the same IDE inspections.
+9. Check the modified files again with the same IDE inspections, if they are on for the file.
    The warning count must not increase.
    Fix any warning that a fix introduced in the same pass (no new approval needed).
    Report each modified file, the findings addressed, and the warning count before and after.
+   If the inspections are off for a file, write "skipped" in place of the warning count.
 
 ## IDE inspections
 
@@ -59,6 +60,10 @@ Merge the problems into the findings:
 
 Adjust the severity if the code context requires it, and state the reason.
 If the tools are not available, or if a file is outside the project root, report this once. Review the files by reading them directly. Do not stop the run.
+
+Project instructions (AGENTS.md) may turn off IDE inspections for some files.
+Skip the inspections for those files. Say so once in the report.
+Do not report their IDE problems as findings.
 
 ## Rules
 
