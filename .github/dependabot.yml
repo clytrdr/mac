@@ -22,3 +22,14 @@ updates:
     commit-message:
       prefix: "chore"
       include: "scope"
+
+  # Hook revs in .pre-commit-config.yaml.
+  # No major-version ignore: ansible-lint bumps its major version every year.
+  - package-ecosystem: "pre-commit"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore"
+      include: "scope"

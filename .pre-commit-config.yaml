@@ -4,19 +4,10 @@
 # This file configures pre-commit hooks to automatically check and format code
 # before each commit.
 #
-# To update hooks to their latest versions: pre-commit autoupdate
+# Dependabot updates hook versions (see .github/dependabot.yml).
+# To update hooks manually: pre-commit autoupdate
 # To run all hooks on all files manually: pre-commit run --all-files
 # ==============================================================================
-
-ci:
-  autoupdate_schedule: monthly
-  autoupdate_commit_msg: "chore: pre-commit autoupdate"
-  skip: [ansible-lint]
-
-# Exclude files from all hooks using a regex.
-# Useful for binary files, data files, or auto-generated files.
-# Example for multiple patterns: '(\.pkl|\.csv|\.ipynb)$'
-# exclude: '\.pkl$'
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -30,6 +21,8 @@ repos:
         name: Check for merge conflict markers
       - id: check-yaml
         name: Check YAML syntax
+      - id: detect-private-key
+        name: Detect private keys
 
       # --- Code Formatting & Style ---
       - id: end-of-file-fixer
@@ -42,9 +35,19 @@ repos:
     hooks:
       - id: ansible-lint
         name: Lint Ansible playbooks
+        # Match the Python version in .github/workflows/ci.yml.
         language_version: python3.13
         files: \.(yml|yaml|j2)$
         always_run: false
         args:
           - "--profile=safety"
           - "--format=pep8"
+
+  - repo: local
+    hooks:
+      # Block commits of a decrypted secrets file.
+      - id: check-vault-encrypted
+        name: Ensure secrets.yml is Vault encrypted
+        entry: sh -c 'head -n1 "$1" | grep -q "^\$ANSIBLE_VAULT;"' --
+        language: system
+        files: ^vars/secrets\.yml$

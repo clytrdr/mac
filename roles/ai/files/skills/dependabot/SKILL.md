@@ -34,6 +34,7 @@ Reviewing PRs does not approve them for merge. Merge only the PRs that the user 
    | `npm_and_yarn`   | `references/npm.md`       |
    | `terraform`      | `references/terraform.md` |
    | `github_actions` | none; no local refresh    |
+   | `pre_commit`     | none; run `pre-commit run --all-files` |
 
    Read only the files you need. Handle one ecosystem at a time. Ask the user before you run each command. Some commands are slow.
 
