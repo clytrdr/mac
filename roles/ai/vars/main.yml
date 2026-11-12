@@ -107,6 +107,10 @@ ai_claude_status_line_command: >-
   if [ -n "$effort" ]; then printf '%s (%s)' "$model" "$effort";
   else printf '%s' "$model"; fi
 
+# Claude Code plugins, as <name>@<marketplace>.
+ai_claude_plugins:
+  - frontend-design@claude-plugins-official
+
 # JSON settings files that the CLIs also write. The role reads the live
 # file and merges two dicts into it:
 # - seed: used only when the key is missing, for example on a new machine.
@@ -118,7 +122,6 @@ ai_json_settings:
   - path: "{{ ansible_facts.env.HOME }}/.claude/settings.json"
     dir_mode: '0700'
     seed:
-      model: claude-opus-4-8[1m]
       effortLevel: xhigh
     managed:
       env:
@@ -132,8 +135,13 @@ ai_json_settings:
              + ai_mcp_server_names
              | map('regex_replace', '^', 'mcp__')
              | map('regex_replace', '$', '__*') | list }}
+        # A Read rule that starts with // matches from the filesystem root,
+        # so these rules protect the secret files of every project.
         deny:
           - Bash(gh repo delete:*)
+          - Read(//**/.vault_pass)
+          - Read(//**/.ansible_become_pass)
+          - Read(//**/.env)
         defaultMode: auto
         additionalDirectories: "{{ ai_workspace_dirs }}"
       enabledPlugins: >-
@@ -160,7 +168,3 @@ ai_json_settings:
              | map('regex_replace', '$', ')') | list }}
       showFeedbackSurvey: false
       trustedWorkspaces: "{{ ai_trusted_projects }}"
-
-# Claude Code plugins, as <name>@<marketplace>.
-ai_claude_plugins:
-  - frontend-design@claude-plugins-official

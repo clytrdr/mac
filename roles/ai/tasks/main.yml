@@ -80,7 +80,11 @@
       loop_control:
         label: "{{ item.path }}"
       register: ai_json_settings_current
-      failed_when: false
+      # A missing file is normal on a new machine. Any other read error stops
+      # the run, so the merge below never replaces a file that it did not read.
+      failed_when:
+        - ai_json_settings_current is failed
+        - "'file not found' not in ai_json_settings_current.msg | default('') | lower"
 
     # See ai_json_settings in vars/main.yml for how the merge works.
     - name: Merge managed keys into JSON settings
@@ -113,7 +117,8 @@
         label: "{{ item.item }}"
       when: item.rc | default(1) == 0
 
-    # no_log hides API keys in the command line.
+    # The env values are API keys. no_log hides them in the command line.
+    # A server without env values has no key, so its output stays visible.
     - name: Add MCP servers to Claude Code
       ansible.builtin.command:
         cmd: >-
@@ -122,8 +127,8 @@
           --transport http {{ item.name }} {{ item.url }}
           {% else %}
           {{ item.name }}
-          {% for k, v in (item.env | default({})).items() %}-e {{ k }}={{ v }} {% endfor %}
-          -- {{ item.command }} {{ item.args | join(' ') }}
+          {% for k, v in (item.env | default({})).items() %}-e {{ k }}={{ v | quote }} {% endfor %}
+          -- {{ item.command }} {{ item.args | map('quote') | join(' ') }}
           {% endif %}
       loop: "{{ ai_mcp_servers }}"
       loop_control:
@@ -132,7 +137,7 @@
         - "'claude' in ai_mcp_listed | default({})"
         - "ai_mcp_listed.claude is not search('(?m)^' ~ item.name ~ '[: ]')"
       changed_when: true
-      no_log: true
+      no_log: "{{ item.env is defined }}"
 
     - name: Add MCP servers to Codex CLI
       ansible.builtin.command:
@@ -141,8 +146,8 @@
           {% if item.url is defined %}
           --url {{ item.url }}
           {% else %}
-          {% for k, v in (item.env | default({})).items() %}--env {{ k }}={{ v }} {% endfor %}
-          -- {{ item.command }} {{ item.args | join(' ') }}
+          {% for k, v in (item.env | default({})).items() %}--env {{ k }}={{ v | quote }} {% endfor %}
+          -- {{ item.command }} {{ item.args | map('quote') | join(' ') }}
           {% endif %}
       loop: "{{ ai_mcp_servers }}"
       loop_control:
@@ -151,7 +156,7 @@
         - "'codex' in ai_mcp_listed | default({})"
         - "ai_mcp_listed.codex is not search('(?m)^' ~ item.name ~ '[: ]')"
       changed_when: true
-      no_log: true
+      no_log: "{{ item.env is defined }}"
 
     # agy rejects flags that come after the server name.
     - name: Add MCP servers to Antigravity CLI
@@ -161,8 +166,8 @@
           {% if item.url is defined %}
           {{ item.name }} {{ item.url }}
           {% else %}
-          {% for k, v in (item.env | default({})).items() %}-e {{ k }}={{ v }} {% endfor %}
-          {{ item.name }} -- {{ item.command }} {{ item.args | join(' ') }}
+          {% for k, v in (item.env | default({})).items() %}-e {{ k }}={{ v | quote }} {% endfor %}
+          {{ item.name }} -- {{ item.command }} {{ item.args | map('quote') | join(' ') }}
           {% endif %}
       loop: "{{ ai_mcp_servers }}"
       loop_control:
@@ -171,7 +176,7 @@
         - "'agy' in ai_mcp_listed | default({})"
         - "ai_mcp_listed.agy is not search('(?m)^' ~ item.name ~ '[: ]')"
       changed_when: true
-      no_log: true
+      no_log: "{{ item.env is defined }}"
 
     - name: List installed Claude Code plugins
       ansible.builtin.command:
