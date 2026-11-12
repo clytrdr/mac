@@ -5,7 +5,7 @@ description: Rewrite English or translate Japanese text in files into plain Engl
 
 Edit the requested files in place. Rewrite English and translate Japanese into plain English. Leave other languages unchanged. Preserve every fact, detail, and example. Do not add information.
 
-Use short sentences with one idea each and common verbs such as use, make, get, run, and check. Keep technical terms. Avoid nested clauses, idioms, metaphors, and fancy wording. Write like an O'Reilly technical book.
+Follow ASD-STE100 Simplified Technical English: short sentences, one idea per sentence, active voice. Use common verbs such as use, make, get, run, and check. Use the same word for the same thing. Keep technical terms. Avoid nested clauses, idioms, metaphors, and fancy wording.
 
 ## Editable Text
 

@@ -36,7 +36,7 @@ repos:
       - id: ansible-lint
         name: Lint Ansible playbooks
         # Match the Python version in .github/workflows/ci.yml.
-        language_version: python3.13
+        language_version: python3.14
         files: \.(yml|yaml|j2)$
         always_run: false
         args:

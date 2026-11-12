@@ -32,7 +32,3 @@ Run this workflow only when the user explicitly asks to create a commit.
 
 Run `git add` and `git commit` as separate commands. Do not push to a remote. Do not amend any
 commit.
-
-## Aliases
-
-Any RIZAP-related words should be treated as a commit request. This is a pun on RIZAP's slogan "結果にコミットする" (commit to results). Examples: "ライザップ", "ライザップして", "結果にコミット", "RIZAP", etc.

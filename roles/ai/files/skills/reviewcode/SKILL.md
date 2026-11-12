@@ -30,6 +30,7 @@ Review the files and directories from the user request. Then apply approved fixe
 5. Read and review each file completely.
    Apply common checks: check for bugs, security, performance, readability, maintainability, and deviations from surrounding conventions.
    Apply the reference checks.
+   Check English comments, docstrings, and prose briefly. If a sentence is hard to read, report it as a nit and suggest a plain rewrite.
    Run the IDE inspections described below, unless project instructions turn them off for the file.
    Review notebook code cells as code and Markdown cells as prose.
    Ignore outputs.
