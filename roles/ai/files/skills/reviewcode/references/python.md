@@ -2,11 +2,11 @@
 
 Applies to `.py`, `.pyi`, and the code cells of `.ipynb`.
 
-Run the IDE inspections on every Python file in the list, unless project instructions turn them off. See the "IDE inspections" section of `SKILL.md`. Beyond them, apply current, widely recommended Python practices. Do not invent project-specific rules.
+In addition to the IDE inspections, apply current, widely recommended Python practices. Do not invent project-specific rules.
 
 ## Test files
 
-For a pytest test file, the conventions in the `pythontests` skill win over general practice. Read that skill's `SKILL.md` before you report a finding on a test file. Report a deviation from those conventions as a finding. Do not report a pattern the skill asks for, such as a fixture with no docstring.
+For a pytest test file, the conventions in the `pythontests` skill take priority over general practice. That skill is next to this skill: `../pythontests/SKILL.md` from the `reviewcode` directory. Read it before you report a finding on a test file. Report a deviation from those conventions as a finding. Do not report a pattern the skill asks for, such as a test with no docstring.
 
 ## Notebooks
 
