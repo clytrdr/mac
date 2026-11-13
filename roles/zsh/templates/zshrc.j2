@@ -80,6 +80,14 @@ RPROMPT=''
 # Set the main prompt (PS1): user@host: current_directory $ git_status
 PS1='%F{green}%n@%m%f: %F{cyan}%~%f \$ %F{red}$(__git_ps1 "(%s)")%f '
 
+# --- Conda Integration ---
+# Defines the `conda` shell function, so that `conda activate` works.
+# Ansible manages this file, so do not run `conda init` for zsh.
+# This must come after PS1 is set. Conda adds the environment name to PS1.
+if command -v conda &> /dev/null; then
+  eval "$(conda shell.zsh hook)"
+fi
+
 # --- History Configuration ---
 HISTFILE=~/.zsh_history      # History file path
 HISTSIZE=10000               # Number of lines to keep in memory
@@ -110,9 +118,10 @@ alias astramedium='codex -m gpt-6-astra -c model_reasoning_effort=medium'
 # Antigravity CLI launchers with a fixed model and reasoning effort
 alias carbonhigh='agy --model gemini-4-carbon --effort high'
 alias carbonmedium='agy --model gemini-4-carbon --effort medium'
+alias argonhigh='agy --model gemini-4-argon --effort high'
+alias argonmedium='agy --model gemini-4-argon --effort medium'
 alias hydrogenhigh='agy --model gemini-4-hydrogen --effort high'
 alias hydrogenmedium='agy --model gemini-4-hydrogen --effort medium'
-alias flashhigh='agy --model gemini-3.8-flash --effort high'
 
 # --- Custom Functions ---
 # A function to update all package managers at once.
