@@ -1,6 +1,6 @@
 # Tasks
 
-アイデアは[Ideas](idea.md)に
+macOS環境構築（Ansible）のタスク。アイデアは[Ideas](idea.md)に
 
 ## Routine
 
