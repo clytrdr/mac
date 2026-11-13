@@ -3,49 +3,56 @@ name: pythontests
 description: Follow these guidelines when you write, modify, or refactor Python test code (pytest). Defines conventions for test structure, mocking patterns, IDE inspection workflows, and verification.
 ---
 
-# Python Test Code Generation and Refactoring
-
 ## Workflow
 
-1. Read the source file under test and the existing test file.
+1. Read the source file under test and the existing test file, if one exists.
 2. Run the IDE inspections on the test file. Record the problem count.
+   If the test file does not exist yet, the problem count is 0.
 3. List the behaviors of the source file. Map each existing test to a behavior.
 4. Add, simplify, rename, or remove tests. Apply all rules below to the existing tests in the file too.
 5. Run the tests: `pytest tests/path/to/test_file.py`. Do not pass `-n auto`.
    The sandbox blocks xdist workers. The run hangs.
+   If the project configuration adds `-n`, pass `-n 0`.
 6. Run the IDE inspections again. The problem count must not increase.
 7. Report the test outcome and the problem count before and after.
 
 ## IDE Inspections
 
-- Use the PyCharm MCP tool `get_file_problems` for one file and `lint_files` for multiple files.
-  The host environment may add a namespace to these tool names.
-- Pass `projectPath` (project root) and project-relative paths. Set `errorsOnly` to `false`.
+- Use the PyCharm MCP tool `lint_files`. Use it for a single file too.
+  The host environment may add a namespace to the tool name.
+- Pass `projectPath` (project root) and project-relative paths. Set `min_severity` to `warning`.
 - Fix the root cause. Do not use `# noqa`, `# type: ignore`, or `noinspection`.
+  Exception: use `# type: ignore` when a test passes a value of the wrong type on purpose.
 - If a warning is wrong, keep the code and report the warning as a false positive.
-- If the PyCharm MCP tools are not available, state this once and continue.
+- Project instructions (AGENTS.md) may turn off IDE inspections.
+  In that case, or if the PyCharm MCP tool is not available, state this once and skip steps 2 and 6.
+  Write "skipped" in place of the problem count.
 
 ## Test Selection
 
 Fewer and simpler tests are better. Test behavior, not coverage numbers.
 
-Keep or add a test only if some change to the source code makes only this test fail.
+Keep or add a test only if a change to the source code can make this test fail while all other tests pass.
 Otherwise, remove the test or do not add it. Common cases:
 - Another test already runs the same path. Move the assertion into that test.
 - The conditions are independent and already tested separately.
 - The branch returns the same result as the default path.
+
+Also remove a test, or do not add it, in these cases:
 - The test needs many stacked mocks. It tests implementation details.
 - The test expects `AssertionError`. Assert statements document invariants and narrow types.
   They are not runtime behavior.
 
 Keep each test simple:
 - Use only the setup and mocks that the behavior needs.
-- Do not put loops or conditionals in a test body.
+- Do not put conditionals in a test body.
+- Use a loop in a test body only to prepare test data. Do not assert inside a loop. Use `parametrize`.
 
 ## Test Organization
 
 - Mirror the source code structure under `tests/`.
-- Create one test class per function (`Test<FunctionName>`) or per class (`Test<ClassName>`).
+- Create one test class per function (`Test<FunctionName>`, such as `TestParseOrder` for `parse_order`)
+  or per class (`Test<ClassName>`).
 - Name each test `test_<condition>_<expected_result>` (for example, `test_empty_input_returns_none`).
   Rename tests with names like `test_1`, `test_success`, or `test_basic`.
 - Add a docstring only for context that the name cannot hold, such as why a setup is needed or a related bug.
@@ -53,13 +60,13 @@ Keep each test simple:
 
 ## Database Tests (TortoiseORM)
 
-Apply this section only in a project that uses TortoiseORM.
+Apply this section only in a project that uses TortoiseORM and defines the `db` fixture in `tests/conftest.py`.
 
 - Use the `db` fixture in `tests/conftest.py`. Add `@pytest.mark.usefixtures("db")` to the test class.
   Use async test methods.
 - To load standard test data (Company, Market, and OrderStatus), use the `seed_data` fixture
   instead of `db`: `@pytest.mark.usefixtures("seed_data")`. `seed_data` depends on `db`.
-  Omit it when a minimal setup is clearer.
+  Use `db` alone when a minimal setup is clearer.
 - For per-class setup, use an `autouse` fixture that takes `db` or `seed_data` as an argument:
 
   ```python
@@ -69,7 +76,9 @@ Apply this section only in a project that uses TortoiseORM.
   ```
 
   Autouse fixtures run before `usefixtures`. Without the argument, the database does not exist yet.
+  With the argument, the class does not need `usefixtures`.
 - Never mock database models.
+  Exception: patch a model method to make a database error happen.
 
 ## Router Tests (FastAPI)
 
@@ -85,7 +94,7 @@ Apply this section only in a project that uses FastAPI.
 
 ### Patch targets
 
-- Use `@patch.object` for class methods.
+- Use `@patch.object` for methods of a class.
 - Use `new_callable=AsyncMock` for async methods: `@patch.object(Cls, "method", new_callable=AsyncMock)`.
 - Use `@patch` with a string literal for imported module-level names, such as client classes, helpers, or config objects:
 
@@ -108,6 +117,7 @@ It skips this check for class-level decorators.
   still add the parameter and prefix its name with an underscore (`_mock_load`).
 - If tests need different return values, set `mock_x.return_value = ...` in the test body.
   Do not pass `return_value` to the decorator.
+- A class-level patch does not apply to fixtures. The mock is not active in a fixture such as `_setup`.
 
 ### Assertions on mocks
 
@@ -122,7 +132,8 @@ mock_storage_cls.return_value.upload_file.assert_called_once_with(...)
 handler._storage_client.upload_file.assert_called_once_with(...)
 ```
 
-To check call arguments, unpack `call_args` and assert on single fields. Do not use `assert_called_with()`:
+Use `assert_called_once_with(...)` only when the test checks every argument.
+To check some of the arguments, unpack `call_args` and assert on single fields. Do not use `assert_called_with()`:
 
 ```python
 _, kwargs = mock_request.call_args
