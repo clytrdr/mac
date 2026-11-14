@@ -38,10 +38,10 @@ ai_workspace_dirs:
 # files alone, and you answer the trust prompt once per directory.
 ai_trusted_projects:
   - "{{ ansible_facts.env.HOME }}/Code/back"
-  - "{{ ansible_facts.env.HOME }}/Code/core"
   - "{{ ansible_facts.env.HOME }}/Code/front"
   - "{{ ansible_facts.env.HOME }}/Code/infra"
   - "{{ ansible_facts.env.HOME }}/Code/mac"
+  - "{{ ansible_facts.env.HOME }}/Code/ordnung"
   - "{{ ansible_facts.env.HOME }}/Documents"
   - "{{ ansible_facts.env.HOME }}/Downloads"
 

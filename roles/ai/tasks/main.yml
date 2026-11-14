@@ -87,13 +87,20 @@
         - "'file not found' not in ai_json_settings_current.msg | default('') | lower"
 
     # See ai_json_settings in vars/main.yml for how the merge works.
+    # The CLIs write these files with their own key order and with raw UTF-8.
+    # The task compares the data, not the text, so a format difference alone
+    # does not cause a write. The output does not sort keys and does not
+    # escape non-ASCII characters. This keeps the diff of a real change small,
+    # but some keys can still move.
     - name: Merge managed keys into JSON settings
       ansible.builtin.copy:
-        content: "{{ item.item.seed | combine(current) | combine(item.item.managed, recursive=true) | to_nice_json(indent=2) }}\n"
+        content: "{{ merged | to_nice_json(indent=2, sort_keys=false, ensure_ascii=false) }}\n"
         dest: "{{ item.item.path }}"
         mode: '0600'
       vars:
         current: "{{ (item.content | b64decode | from_json) if item.content is defined else {} }}"
+        merged: "{{ item.item.seed | combine(current) | combine(item.item.managed, recursive=true) }}"
+      when: merged != current
       loop: "{{ ai_json_settings_current.results }}"
       loop_control:
         label: "{{ item.item.path }}"
