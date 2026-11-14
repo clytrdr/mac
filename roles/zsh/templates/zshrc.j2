@@ -155,6 +155,13 @@ updateall() {
   _updateall_step "Updating pipx packages..." pipx upgrade-all
   _updateall_step "Updating Google Cloud components..." gcloud components update --quiet
   _updateall_step "Updating Claude Code..." claude update
+  _updateall_step "Updating Claude Code plugin marketplaces..." claude plugin marketplace update
+  # 'claude plugin update' takes one plugin at a time, so loop over the
+  # user-scope plugins. Project-scope plugins depend on the current directory.
+  local plugin
+  for plugin in ${(f)"$(claude plugin list --json 2>/dev/null | jq -r '.[] | select(.scope == "user") | .id')"}; do
+    _updateall_step "Updating Claude Code plugin ${plugin}..." claude plugin update --scope user "$plugin"
+  done
   _updateall_step "Updating the Antigravity CLI..." agy update
 
   unfunction _updateall_step
