@@ -110,6 +110,7 @@ ai_claude_status_line_command: >-
 # Claude Code plugins, as <name>@<marketplace>.
 ai_claude_plugins:
   - frontend-design@claude-plugins-official
+  - code-simplifier@claude-plugins-official
 
 # JSON settings files that the CLIs also write. The role reads the live
 # file and merges two dicts into it:
