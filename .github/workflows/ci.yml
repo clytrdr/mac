@@ -8,6 +8,12 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+
+env:
+  PYTHON_VERSION: '3.14'
+
 jobs:
   lint:
     name: Run pre-commit hooks
@@ -15,11 +21,13 @@ jobs:
     steps:
       - name: Check out the repository
         uses: actions/checkout@v7
+        with:
+          persist-credentials: false
 
       - name: Set up Python
         uses: actions/setup-python@v7
         with:
-          python-version: '3.14'
+          python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Run pre-commit
         uses: pre-commit/action@v3.0.1
@@ -32,38 +40,31 @@ jobs:
     steps:
       - name: Check out the repository
         uses: actions/checkout@v7
+        with:
+          persist-credentials: false
 
       - name: Set up Python
         uses: actions/setup-python@v7
         with:
-          python-version: '3.14'
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+          cache-dependency-path: requirements.txt
 
-      - name: Cache pip dependencies
-        uses: actions/cache@v6
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
-
-      - name: Install Ansible
+      - name: Install Python dependencies
         run: pip3 install -r requirements.txt
 
       - name: Create vault password file from GitHub Secret
-        run: echo "${{ secrets.ANSIBLE_VAULT_PASSWORD }}" > .vault_pass
+        run: |
+          umask 077
+          printf '%s' "$ANSIBLE_VAULT_PASSWORD" > .vault_pass
         env:
           ANSIBLE_VAULT_PASSWORD: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}
 
-      - name: Set vault password file permissions
-        run: chmod 600 .vault_pass
+      - name: Run syntax check
+        run: ansible-playbook localhost.yml --syntax-check --vault-password-file .vault_pass
 
-      - name: Run Ansible Playbook Checks
-        run: |
-          echo "--- Running syntax-check ---"
-          ansible-playbook localhost.yml --syntax-check --vault-password-file .vault_pass
-
-          echo "--- Running dry-run ---"
-          ansible-playbook localhost.yml --check --vault-password-file .vault_pass
+      - name: Run dry-run
+        run: ansible-playbook localhost.yml --check --vault-password-file .vault_pass
 
       - name: Clean up vault password file
         if: always()

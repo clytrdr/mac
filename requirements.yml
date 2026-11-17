@@ -1,3 +1,6 @@
+# ansible-lint reads this file and installs these collections into .ansible/.
+# The playbook does not use this file. The ansible package from Homebrew or pip
+# already includes these collections.
 collections:
   - name: community.general
   - name: ansible.posix
