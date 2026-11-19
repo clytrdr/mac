@@ -1,32 +1,20 @@
 ---
 name: pythontests
-description: Follow these guidelines when you write, modify, or refactor Python test code (pytest). Defines conventions for test structure, mocking patterns, IDE inspection workflows, and verification.
+description: Follow these guidelines when you write, modify, or refactor Python test code (pytest). Defines conventions for test structure, mocking patterns, and verification.
 ---
 
 ## Workflow
 
 1. Read the source file under test and the existing test file, if one exists.
-2. Run the IDE inspections on the test file. Record the problem count.
-   If the test file does not exist yet, the problem count is 0.
-3. List the behaviors of the source file. Map each existing test to a behavior.
-4. Add, simplify, rename, or remove tests. Apply all rules below to the existing tests in the file too.
-5. Run the tests: `pytest tests/path/to/test_file.py`. Do not pass `-n auto`.
+2. List the behaviors of the source file. Map each existing test to a behavior.
+3. Add, simplify, rename, or remove tests. Apply all rules below to the existing tests in the file too.
+4. Run the tests: `pytest tests/path/to/test_file.py`. Do not pass `-n auto`.
    The sandbox blocks xdist workers. The run hangs.
    If the project configuration adds `-n`, pass `-n 0`.
-6. Run the IDE inspections again. The problem count must not increase.
-7. Report the test outcome and the problem count before and after.
+5. Report the test outcome.
 
-## IDE Inspections
-
-- Use the PyCharm MCP tool `lint_files`. Use it for a single file too.
-  The host environment may add a namespace to the tool name.
-- Pass `projectPath` (project root) and project-relative paths. Set `min_severity` to `warning`.
-- Fix the root cause. Do not use `# noqa`, `# type: ignore`, or `noinspection`.
-  Exception: use `# type: ignore` when a test passes a value of the wrong type on purpose.
-- If a warning is wrong, keep the code and report the warning as a false positive.
-- Project instructions (AGENTS.md) may turn off IDE inspections.
-  In that case, or if the PyCharm MCP tool is not available, state this once and skip steps 2 and 6.
-  Write "skipped" in place of the problem count.
+Do not add suppression comments such as `# noqa` or `# type: ignore`. Fix the root cause.
+Exception: use `# type: ignore` when a test passes a value of the wrong type on purpose.
 
 ## Test Selection
 
@@ -36,7 +24,6 @@ Keep or add a test only if a change to the source code can make this test fail w
 Otherwise, remove the test or do not add it. Common cases:
 - Another test already runs the same path. Move the assertion into that test.
 - The conditions are independent and already tested separately.
-- The branch returns the same result as the default path.
 
 Also remove a test, or do not add it, in these cases:
 - The test needs many stacked mocks. It tests implementation details.
@@ -75,8 +62,9 @@ Apply this section only in a project that uses TortoiseORM and defines the `db` 
       self.diary_row = await _create_diary()
   ```
 
-  Autouse fixtures run before `usefixtures`. Without the argument, the database does not exist yet.
-  With the argument, the class does not need `usefixtures`.
+  Autouse fixtures run before the fixtures in `usefixtures`.
+  If `_setup` does not take `db` or `seed_data`, it runs before the database exists.
+  If `_setup` takes one of them, the class does not need `usefixtures`.
 - Never mock database models.
   Exception: patch a model method to make a database error happen.
 
@@ -103,26 +91,13 @@ Apply this section only in a project that uses FastAPI.
   ```
 
 - Do not build the path with an f-string (`@patch(f"{SlackClient.__module__}.WebClient")`).
-  PyCharm cannot resolve it. It reports `Unresolved reference` errors.
-- Do not use `@patch.object(module_object, "WebClient")`.
-  PyCharm treats plain `from x import Y` imports as private under PEP 484 re-export rules.
-
-### Class-level patches
-
-Put `@patch` on the test class when a test method takes pytest fixtures or `parametrize` arguments.
-PyCharm checks method-level `@patch` counts against method parameters. It reports extra-parameter errors.
-It skips this check for class-level decorators.
-
-- A class-level patch applies to every `test_*` method. If a method does not use the mock,
-  still add the parameter and prefix its name with an underscore (`_mock_load`).
-- If tests need different return values, set `mock_x.return_value = ...` in the test body.
-  Do not pass `return_value` to the decorator.
-- A class-level patch does not apply to fixtures. The mock is not active in a fixture such as `_setup`.
+  Do not use `@patch.object(module_object, "WebClient")`.
+  A string literal shows the full patch target in one place. It is easy to read and to search.
 
 ### Assertions on mocks
 
 Assert on the mock that the test created. Do not assert through attributes annotated with real types.
-PyCharm resolves the annotation and reports `Cannot find reference` errors.
+A type checker sees the real type. It reports that the assert method does not exist on that type.
 
 ```python
 # Good: mock_storage_cls is the patched class.

@@ -83,7 +83,7 @@ Prefer explicit code to compact code.
 ## Rules
 
 - Review first, fix later. Never apply a fix without explicit user approval.
-- Fix the root cause of each problem. Do not add suppression comments (`# noqa`, `# type: ignore`, `// @ts-ignore`, `eslint-disable`, `noinspection`) unless the user asks for them. If the user asks for suppression, state the reason for the suppression in the report.
+- Fix the root cause of each problem. Do not add suppression comments (`# noqa`, `# type: ignore`, `// @ts-ignore`, `eslint-disable`) unless the user asks for them. If the user asks for suppression, state the reason for the suppression in the report.
 - Preserve the file style unless a finding targets style.
 - In notebooks, edit cell source only. Do not change cell types, execution counts, outputs, or metadata.
 - If a reference file asks you to use a tool that is not available, report this once and continue the review.
