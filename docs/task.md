@@ -8,7 +8,4 @@ macOS環境構築（Ansible）のタスク。アイデアは[Ideas](idea.md)に
 
 ## Active
 
-- `/reviewdocument`作成
-  - `/plain`skillも同時に実施するようにする
-
 ## Waiting
