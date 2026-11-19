@@ -2,7 +2,7 @@
 
 Applies to `.py`, `.pyi`, and the code cells of `.ipynb`.
 
-In addition to the IDE inspections, apply current, widely recommended Python practices. Do not invent project-specific rules.
+Apply current, widely recommended Python practices. Do not invent project-specific rules.
 
 ## Test files
 

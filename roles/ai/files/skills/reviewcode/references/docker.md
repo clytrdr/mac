@@ -9,7 +9,7 @@ Apply current, widely recommended best practices. Do not invent project-specific
 - Reproducible builds: pinned image versions.
 - Image size and layer caching.
 - Running as a non-root user.
-- No secrets in the file, the image, or its history. A leaked secret is a blocker.
+- No secrets in the file, the image, or its history. A leaked secret is a major finding.
 - Signal handling and container lifecycle (exec form, health checks).
 
 ## Ignore files
@@ -23,7 +23,7 @@ The two files use different pattern syntax:
 
 Checks:
 
-- A credential file the patterns do not exclude (a service account key, `.env`, `*.pem`) is a blocker.
+- A credential file the patterns do not exclude (a service account key, `.env`, `*.pem`) is a major finding.
 - Cross-check every `COPY` source in the Dockerfile against the patterns. An excluded source breaks the build, or worse, the build succeeds with the file missing.
 - No ignore file means the whole directory is uploaded. Report the large directories that the build uploads (`.git`, `node_modules`, `.venv`, `dist`, `__pycache__`).
 - If `.dockerignore` and `.gcloudignore` both exist and exclude different files, report the difference and ask which one is correct.

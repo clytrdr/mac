@@ -18,9 +18,9 @@ Review the files and directories from the user request. Then apply approved fixe
    Match excluded directory names exactly. For example, exclude `.git/`, but keep `.gitignore`,
    `.gitattributes`, and `.github/`.
    Keep text files only: source code, configuration, scripts, templates, and documentation such as Markdown.
-   These filters apply to expanded directories. Keep a file that the user named directly, unless it is a binary.
+   These filters apply to expanded directories. Keep a file that the user specified directly, unless it is a binary.
    Do not open a file whose name shows that it holds credentials, such as `.env`, `*.pem`, `*.key`, `.vault_pass`, or a service account key.
-   This applies to a file that the user named directly too. Report the file as skipped.
+   This applies to a file that the user specified directly too. Report the file as skipped.
 3. Remove duplicates from the list.
    If the list is empty, report it and stop.
    If the list contains more than 30 files, show the count and ask for confirmation before reviewing.
@@ -35,61 +35,57 @@ Review the files and directories from the user request. Then apply approved fixe
    | anything else (including `.md`, `.sh`, `.tf`, `.yml`, `.yaml`, `.json`, `.toml`, `.ini`, `.cfg`, `.conf`, `.j2`) | none — common checks only |
 5. Read and review each file completely.
    Apply common checks. Check for bugs and for security, performance, readability, and maintainability problems.
+   Apply the simplification checks described below.
    Check that the code follows the conventions of the neighboring code.
    Apply the checks from the references.
    Check English comments, docstrings, and prose. If a sentence is hard to read, report it as a nit and suggest a plain rewrite.
-   Run the IDE inspections described below. Record the problem count for each file.
    Review notebook code cells as code and Markdown cells as prose.
    Ignore outputs.
    Do not fix anything during this pass.
-6. Group findings by file and severity (blocker / major / minor / nit).
+6. Group findings by file and severity:
+   - **major**: a bug, a security problem, data loss, or a behavior that does not match the intent.
+   - **minor**: a readability, maintainability, or performance problem that does not change behavior.
+   - **nit**: a small style or wording point. Fixing it is optional.
+
+   In each severity, list the most serious findings first.
    Provide a concrete suggestion and a location for each finding: a line number, or a cell index and line for notebooks.
    Explicitly report when a file has no findings.
 7. Present all actionable findings together and ask which fixes to apply. Wait for explicit approval.
 8. Apply only approved fixes.
    For notebooks, use a notebook-aware editor when available and change one cell at a time.
    If no notebook-aware editor is available, keep the notebook JSON structure intact and edit cell source only.
-9. Run the IDE inspections again on the modified files.
-   The problem count must not increase.
-   If a fix introduced a new problem, fix that problem in this step. This fix does not need new approval.
-   If the new problem is a false positive, keep the code and report the problem. A false positive does not count as an increase.
-   Report each modified file, the findings addressed, and the problem count before and after.
-   If the inspections are off for a file, write "skipped" in place of the problem count.
+   Report each modified file and the findings addressed.
 
-## IDE inspections
+## Simplification checks
 
-A problem is an item that the IDE reports. A finding is an item in the review report.
+In step 5, look for code that you can make simpler without changing its behavior.
+Report each case as a minor finding. If the gain is small, report it as a nit.
 
-Use the PyCharm MCP tool `lint_files`. Use it for a single file too.
-The host may add its own namespace to the tool name.
-Pass `projectPath` and project-relative paths, and set `min_severity` to `warning`.
-PyCharm inspects Python, TypeScript, JavaScript, HTML, YAML, and JSON.
+Look for these problems:
+- Deep nesting. Suggest early returns or guard clauses.
+- Duplicate or redundant code. Suggest one shared implementation.
+- An abstraction that gives no benefit, such as a wrapper that only passes its arguments through.
+- Related logic that is split across distant places in the file.
+- A name that does not tell what the variable or function does.
+- A comment that only repeats what the code says.
+- A nested conditional (ternary) expression. Suggest an `if`/`else` chain or a `match`/`switch` statement.
+- Dead code: unused imports, unused private functions and variables, and unreachable branches.
 
-Check the response for files that PyCharm did not analyze. Do not count these files as free of problems:
-- A file has `timedOut: true`, or the response has `more: true`: run the tool again for the remaining files in smaller batches.
-  If a file times out again, report it as not analyzed.
-- A file has a `notAnalyzedReason`: report the reason.
+Do not suggest a simplification that:
+- changes behavior, including outputs, errors, side effects, and public interfaces.
+- makes the code shorter but harder to read, such as a dense one-line expression.
+- puts too many responsibilities into one function or component.
+- removes an abstraction that makes the code easier to organize, test, or extend.
+- makes the code harder to debug.
 
-Merge the problems into the findings:
-- `ERROR` → blocker
-- `WARNING` → minor
-- `WEAK WARNING` → nit
-
-Adjust the severity if the code context requires it, and state the reason.
-If the tool is not available, or if a file is outside the project root, report this once. Review the files by reading them directly. Do not stop the run.
-
-Project instructions (AGENTS.md) may turn off IDE inspections for some files.
-Skip the inspections for those files. Say so once in the report.
-Do not report their IDE problems as findings.
+Prefer explicit code to compact code.
 
 ## Rules
 
 - Review first, fix later. Never apply a fix without explicit user approval.
-  The only exception is a problem that an approved fix introduced. See step 9.
 - Fix the root cause of each problem. Do not add suppression comments (`# noqa`, `# type: ignore`, `// @ts-ignore`, `eslint-disable`, `noinspection`) unless the user asks for them. If the user asks for suppression, state the reason for the suppression in the report.
-- If the IDE reports a problem incorrectly, keep the code unchanged. Report the problem as a false positive.
 - Preserve the file style unless a finding targets style.
 - In notebooks, edit cell source only. Do not change cell types, execution counts, outputs, or metadata.
-- If a reference asks for a tool that is not available, report this once and continue the review.
+- If a reference file asks you to use a tool that is not available, report this once and continue the review.
 - Report skipped files (binary, credential, excluded, unreadable) explicitly.
 - Do not commit changes. Leave changes for the user to review.
