@@ -112,20 +112,17 @@ ai_claude_plugins:
   - frontend-design@claude-plugins-official
 
 # JSON settings files that the CLIs also write. The role reads the live
-# file and merges two dicts into it:
-# - seed: used only when the key is missing, for example on a new machine.
-#   /model and /effort change these keys, and the role keeps those values.
-# - managed: always set. Lists in these keys replace the live lists.
-# All other keys in the live file stay as they are.
+# file and merges the managed dict into it. The role always sets the managed
+# keys. Lists in these keys replace the live lists. All other keys in the
+# live file stay as they are. The role does not set the model or the effort.
+# The zsh launcher aliases set them with command-line options.
 # dir_mode sets the mode of the parent directory (default 0755).
 ai_json_settings:
   - path: "{{ ansible_facts.env.HOME }}/.claude/settings.json"
     dir_mode: '0700'
-    seed:
-      effortLevel: xhigh
     managed:
       env:
-        CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING: "1"
+        CLAUDE_CODE_DISABLE_FEEDBACK_SURVEY: "1"
       permissions:
         allow: >-
           {{ ai_allowed_commands
@@ -151,8 +148,6 @@ ai_json_settings:
         command: "{{ ai_claude_status_line_command }}"
       skipAutoPermissionPrompt: true
   - path: "{{ ansible_facts.env.HOME }}/.gemini/antigravity-cli/settings.json"
-    seed:
-      model: Gemini 3.8 Flash (High)
     managed:
       permissions:
         allow: >-
@@ -166,5 +161,6 @@ ai_json_settings:
              + ai_workspace_dirs
              | map('regex_replace', '^', 'write_file(')
              | map('regex_replace', '$', ')') | list }}
+      enableTelemetry: false
       showFeedbackSurvey: false
       trustedWorkspaces: "{{ ai_trusted_projects }}"

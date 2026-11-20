@@ -99,7 +99,7 @@
         mode: '0600'
       vars:
         current: "{{ (item.content | b64decode | from_json) if item.content is defined else {} }}"
-        merged: "{{ item.item.seed | combine(current) | combine(item.item.managed, recursive=true) }}"
+        merged: "{{ current | combine(item.item.managed, recursive=true) }}"
       when: merged != current
       loop: "{{ ai_json_settings_current.results }}"
       loop_control:
