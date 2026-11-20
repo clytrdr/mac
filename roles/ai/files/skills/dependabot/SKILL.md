@@ -1,52 +1,85 @@
 ---
 name: dependabot
-description: Review and squash-merge open Dependabot pull requests interactively.
+description: Review and squash-merge open Dependabot pull requests, then refresh and check the local environment.
 ---
 
-Review and squash-merge open Dependabot pull requests in the current repository.
+Review and squash-merge open Dependabot pull requests (PRs) in the current repository.
+Then refresh the local environment and run the checks.
 
-Reviewing PRs does not approve them for merge. Merge only the PRs that the user explicitly approves in this run.
+Ask the user for approval at two points only:
+
+1. Before the merge: which PRs to squash-merge.
+2. Before a commit: only if the local refresh changed tracked files.
+
+Run all other steps without asking. Those steps are local and safe to repeat.
+Report the results at the end.
 
 ## Instructions
 
 1. Run `git status --porcelain`. If the working directory is not clean, warn the user and stop.
-   The working directory must be clean. `git pull` and the post-merge steps change files.
-2. Run `gh pr list --author "app/dependabot" --limit 100`. If there are no Dependabot PRs,
-   report that and stop.
-3. Check the merge status of each open Dependabot PR:
-   - Run `gh pr view <number> --json number,title,mergeable,mergeStateStatus` for all PRs.
-4. Show the user a summary table with these columns: PR number, title, mergeable, status.
-   - Point out major version bumps. Dependabot puts the ecosystem in the branch name, but not the bump type. Read the title (`from X to Y`) to find them.
-5. Ask which PRs to squash-merge and wait for explicit approval:
-   - Suggest merging all PRs that are MERGEABLE.
-   - Some PRs may have UNSTABLE status. Explain that non-critical CI checks can cause this status. One example is pre-commit.ci on private repositories. Ask the user whether to include them.
-   - Some PRs may have CONFLICTING status. List them and suggest running `@dependabot rebase` in a PR comment.
-6. After the user confirms, squash-merge the approved PRs one by one with `gh pr merge <number> --squash`.
-   - `gh pr merge` prints nothing on success. Do not assume it worked. After the merges, check every PR with `gh pr view <number> --json number,state`. Use that output as the source of truth.
-   - A merge can fail because of a conflict. This happens when an earlier merge changes the base branch and the PR becomes CONFLICTING. In that case, run `gh pr comment <number> --body "@dependabot rebase"` to comment on the PR, and tell the user.
-7. Show a results table with these columns: PR number, title, result (merged / conflict-rebasing / failed).
-8. If at least one PR was merged, ask the user whether to run `git pull` to get the latest changes. If the user agrees, run it. Do not wait for every PR to succeed. Pull changes for the merged PRs.
-9. After `git pull` succeeds, check which ecosystems were merged. Read them from the Dependabot branch names: `dependabot/<ecosystem>/...`. Then read the matching reference file and follow its steps.
+   `git pull` and the refresh steps change files. The working directory must be clean.
+2. Get all open Dependabot PRs with one command:
 
-   | Ecosystem        | Reference file            |
-   | ---------------- | ------------------------- |
-   | `pip`            | `references/python.md`    |
-   | `npm_and_yarn`   | `references/npm.md`       |
-   | `terraform`      | `references/terraform.md` |
-   | `github_actions` | none; no local refresh    |
-   | `pre_commit`     | none; run `pre-commit run --all-files` |
+   ```
+   gh pr list --author "app/dependabot" --limit 100 --json number,title,headRefName,mergeable,mergeStateStatus
+   ```
 
-   Read only the files you need. Handle one ecosystem at a time. Ask the user before you run each command. Some commands are slow.
+   If the list is empty, report this and stop.
+   GitHub calculates `mergeable` in the background. If a PR shows `UNKNOWN`,
+   run `gh pr view <number> --json number,mergeable,mergeStateStatus` for that PR only.
+3. Show a summary table with these columns: PR number, title, ecosystem, mergeable, status.
+   - Get the ecosystem from the branch name: `dependabot/<ecosystem>/...`.
+   - Note major version updates. Check the title (`from X to Y`) to find them.
+     For `0.x` versions, a minor version update can also have breaking changes. Note those updates too.
+4. **Approval 1.** Ask which PRs to squash-merge. Wait for explicit approval.
+   Ask for all decisions in this one question:
+   - Suggest merging all MERGEABLE and CLEAN PRs.
+   - UNSTABLE PRs: non-critical CI checks can cause this status. One example is pre-commit.ci
+     on private repositories. Ask in the same question whether to include these PRs.
+   - CONFLICTING PRs: tell the user that you will comment `@dependabot rebase` on these PRs.
+     This comment does not need separate approval.
+5. Squash-merge the approved PRs one by one with `gh pr merge <number> --squash`.
+   - Merge PRs for `github_actions` and `pre_commit` first. They rarely conflict.
+     Then merge the other PRs.
+   - `gh pr merge` prints no output on success. Do not assume that the merge succeeded.
+     After the merges, check every PR with `gh pr view <number> --json number,state`.
+     Use only that output to confirm whether each merge succeeded.
+   - A merge can fail with a conflict. An earlier merge can change the base branch and make
+     the PR CONFLICTING. If a merge fails with a conflict, run `gh pr comment <number> --body "@dependabot rebase"` on that PR.
+     Also run this command on the PRs that were CONFLICTING in step 2.
+6. If you merged at least one PR, run `git pull` without asking.
+   Do not wait for the rebased PRs. Pull the changes from the merged PRs.
+7. Find the ecosystems of the merged PRs. Read each matching reference file and run its steps
+   without asking for each command.
 
-10. Each reference file lists the files it may change. If any of them changed, show `git status --porcelain` and `git diff --stat`. Then ask the user whether to commit. Do not commit without explicit approval.
-11. Report the final status: merged PRs, commands run, check results, and any open issues.
+   | Ecosystem        | Reference file                          |
+   | ---------------- | --------------------------------------- |
+   | `pip`            | `references/python.md`                  |
+   | `npm_and_yarn`   | `references/npm.md`                     |
+   | `terraform`      | `references/terraform.md`               |
+   | `github_actions` | none; no local refresh                  |
+   | `pre_commit`     | none; run `pre-commit run --all-files`  |
+
+   Read only the files you need. Run the pre-commit check after the other ecosystems.
+   If a command fails, do not stop the other ecosystems. Record the failure and report it.
+8. **Approval 2.** Run `git status --porcelain`. If tracked files changed, show
+   `git diff --stat` and ask whether to commit. Do not commit without explicit approval.
+   If the working directory is clean, report this and do not ask.
+9. Report the final status in one message:
+   - A results table: PR number, title, result (merged / conflict-rebasing / failed).
+   - A table of the commands you ran and their results.
+   - Open issues, such as PRs waiting for a rebase and remaining vulnerabilities.
+   - Steps you skipped on purpose, such as `docker compose build`.
 
 ## Rules
 
-- Process only PRs authored by `app/dependabot`.
-- Always use `--squash` for merging.
-- Never force-merge or bypass branch protection.
-- Never run a command that changes remote infrastructure or deploys. Refresh and check steps are local only.
+- Process only PRs with author `app/dependabot`.
+- Always use `--squash` to merge PRs.
+- Do not force-merge or bypass branch protection.
+- Do not run a command that changes remote infrastructure or deploys. Refresh and check steps are local only.
+- Do not run `docker compose build`. It is slow. If the project has a compose file that installs
+  the changed dependencies, tell the user in the final report that the image is out of date.
+  Run `docker compose build` only when the user asks.
 - Do not push unless the user asks.
 - If the `gh` CLI is not authenticated, tell the user to run `gh auth login` and stop.
-- The job is not done when PRs are merged. A lockfile can still hold known vulnerabilities after every PR is merged. Follow the reference file to the end.
+- The task does not end when you merge the PRs. A lockfile can still have known vulnerabilities after you merge every PR. Follow the reference file to the end.
