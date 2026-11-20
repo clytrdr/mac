@@ -95,6 +95,16 @@ ai_mcp_servers:
     args: ["-y", "firecrawl-mcp"]
     env:
       FIRECRAWL_API_KEY: "{{ firecrawl_api_key }}"
+  # Connects to the running Chrome instance. Enable remote debugging at
+  # chrome://inspect/#remote-debugging.
+  - name: chrome-devtools
+    command: npx
+    args:
+      - "-y"
+      - "chrome-devtools-mcp@latest"
+      - "--autoConnect"
+      - "--no-usage-statistics"
+      - "--no-performance-crux"
 
 ai_mcp_server_names: "{{ ai_mcp_servers | map(attribute='name') | list }}"
 
@@ -161,6 +171,5 @@ ai_json_settings:
              + ai_workspace_dirs
              | map('regex_replace', '^', 'write_file(')
              | map('regex_replace', '$', ')') | list }}
-      enableTelemetry: false
       showFeedbackSurvey: false
       trustedWorkspaces: "{{ ai_trusted_projects }}"
