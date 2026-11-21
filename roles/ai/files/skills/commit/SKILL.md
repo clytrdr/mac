@@ -9,26 +9,28 @@ Run this workflow only when the user explicitly asks to create a commit.
 
 ## Instructions
 
-1. Run `git status`, `git diff --stat`, and `git log --oneline -5`. Review the output to
+1. Run `git status`, `git diff --stat`, `git diff`, and `git log --oneline -5`. Review the output to
    understand all changes.
-2. If `.pre-commit-config.yaml` exists in the repository root, check whether the hook is
-   installed with `test -f "$(git rev-parse --git-path hooks/pre-commit)"`.
+2. If `.pre-commit-config.yaml` exists in the repository root, find the hook path with
+   `git rev-parse --git-path hooks/pre-commit` and check whether that file exists.
    - If the hook is not installed, run `pre-commit run --all-files`.
      If it modified any files, review the changes with `git diff --stat`.
    - If the hook is installed, skip this step. `git commit` runs the hooks on the staged files.
-3. Run `git add -A` to stage everything (including untracked files).
-4. Draft a commit message following Conventional Commits (e.g., `feat:`, `fix:`, `refactor:`).
+3. Check `git status` for secret files or unintended untracked files. If any exist, stop and
+   ask the user before staging.
+4. Run `git add -A` to stage everything (including untracked files).
+5. Draft a commit message following Conventional Commits (e.g., `feat:`, `fix:`, `refactor:`).
    - Subject line: 60 characters or fewer.
    - Match the style of recent commits shown above.
-5. Run `git commit -m "<message>"` with the drafted message.
+6. Run `git commit -m "<message>"` with the drafted message.
    - If the commit fails due to pre-commit hooks:
      1. If hooks modified files, review them, run `git add -A`, and retry the same
         `git commit -m "<message>"` command.
      2. If hooks report errors, fix them, run `git add -A`, and retry the same commit command.
    - Never use `--amend`. A failed hook normally means the new commit does not exist. Amending
      at that point could change a commit that existed before this skill ran.
-6. Run `git status` to confirm the commit succeeded.
-7. Report the committed changes.
+7. Run `git status` to confirm the commit succeeded.
+8. Report the committed changes.
 
 Run `git add` and `git commit` as separate commands. Do not push to a remote. Do not amend any
 commit.
