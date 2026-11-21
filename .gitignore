@@ -2,9 +2,9 @@
 # OS and IDE files (.DS_Store, .idea/) are in the global ignore file (~/.gitignore_global).
 
 # --- Secrets ---
-# Ansible Vault password. Passed with `--vault-password-file .vault_pass`.
+# Ansible Vault password. ansible.cfg sets it as vault_password_file.
 /.vault_pass
-# sudo password for `become` tasks.
+# sudo password for `become` tasks. ansible.cfg sets it as become_password_file.
 /.ansible_become_pass
 # Vault-encrypted, so it is safe to commit.
 # The global ignore file ignores secrets.yml, so un-ignore it here.

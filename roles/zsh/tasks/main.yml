@@ -1,36 +1,32 @@
-- name: Configure Zsh
-  tags:
-    - zsh
-  block:
-    - name: Install zinit (Zsh plugin manager)
-      ansible.builtin.git:
-        repo: https://github.com/zdharma-continuum/zinit.git
-        dest: "{{ ansible_facts.env.HOME }}/.local/share/zinit/zinit.git"
-        version: v3.15.0
-        update: false
+- name: Install zinit (Zsh plugin manager)
+  ansible.builtin.git:
+    repo: https://github.com/zdharma-continuum/zinit.git
+    dest: "{{ ansible_facts.env.HOME }}/.local/share/zinit/zinit.git"
+    version: v3.15.0
+    update: false
 
-    - name: Ensure .zsh directory exists
-      ansible.builtin.file:
-        path: "{{ ansible_facts.env.HOME }}/.zsh"
-        state: directory
-        mode: '0755'
-      check_mode: false
+- name: Ensure .zsh directory exists
+  ansible.builtin.file:
+    path: "{{ ansible_facts.env.HOME }}/.zsh"
+    state: directory
+    mode: '0755'
+  check_mode: false
 
-    - name: Download git-prompt.sh
-      ansible.builtin.get_url:
-        url: https://raw.githubusercontent.com/git/git/v2.50.0/contrib/completion/git-prompt.sh
-        dest: "{{ ansible_facts.env.HOME }}/.zsh/git-prompt.sh"
-        checksum: sha256:7ff718f4a06fd0a0be7edfef926abb41b1353c48c1515ad312d226965b74943a
-        mode: '0644'
+- name: Download git-prompt.sh
+  ansible.builtin.get_url:
+    url: https://raw.githubusercontent.com/git/git/v2.50.0/contrib/completion/git-prompt.sh
+    dest: "{{ ansible_facts.env.HOME }}/.zsh/git-prompt.sh"
+    checksum: sha256:7ff718f4a06fd0a0be7edfef926abb41b1353c48c1515ad312d226965b74943a
+    mode: '0644'
 
-    - name: Deploy .zshrc configuration from template
-      ansible.builtin.template:
-        src: templates/zshrc.j2
-        dest: "{{ ansible_facts.env.HOME }}/.zshrc"
-        mode: '0644'
+- name: Deploy .zshrc configuration from template
+  ansible.builtin.template:
+    src: templates/zshrc.j2
+    dest: "{{ ansible_facts.env.HOME }}/.zshrc"
+    mode: '0644'
 
-    - name: Ensure .zfunc directory exists for custom functions
-      ansible.builtin.file:
-        path: "{{ ansible_facts.env.HOME }}/.zfunc"
-        state: directory
-        mode: '0755'
+- name: Ensure .zfunc directory exists for custom functions
+  ansible.builtin.file:
+    path: "{{ ansible_facts.env.HOME }}/.zfunc"
+    state: directory
+    mode: '0755'

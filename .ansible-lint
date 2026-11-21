@@ -1,0 +1,5 @@
+# ansible-lint reads this file. The pre-commit hook sets the profile.
+# The safety profile does not include fqcn, so turn it on here.
+# AGENTS.md requires FQCNs for all modules.
+enable_list:
+  - fqcn

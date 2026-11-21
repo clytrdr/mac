@@ -2,6 +2,9 @@
   hosts: localhost
   connection: local
   gather_facts: true
+  # The roles use only ansible_facts.env. The minimal subset includes it.
+  gather_subset:
+    - "!all"
   become: false
   pre_tasks:
     - name: Check if vault variables file exists
@@ -16,12 +19,14 @@
       when: secrets_file.stat.exists
       no_log: true
       tags: always
+  # Each role gets one tag that matches its directory name.
+  # The tag applies to all tasks and handlers of the role.
   roles:
-    - git
-    - homebrew
-    - macos
-    - zsh
-    - node
-    - ai
-    - ghostty
-    - vim
+    - { role: git, tags: git }
+    - { role: homebrew, tags: homebrew }
+    - { role: macos, tags: macos }
+    - { role: zsh, tags: zsh }
+    - { role: node, tags: node }
+    - { role: ai, tags: ai }
+    - { role: ghostty, tags: ghostty }
+    - { role: vim, tags: vim }

@@ -1,51 +1,47 @@
-- name: Install Node.js and npm packages
-  tags:
-    - node
-  block:
-    - name: Install n
-      community.general.homebrew:
-        name: n
-        state: latest
+- name: Install n
+  community.general.homebrew:
+    name: n
+    state: latest
 
-    - name: Get latest LTS version number
-      ansible.builtin.command:
-        cmd: n --lts
-      register: node_lts_version
-      changed_when: false
-      failed_when: false
-      check_mode: false
+- name: Get latest LTS version number
+  ansible.builtin.command:
+    cmd: n --lts
+  register: node_lts_version
+  changed_when: false
+  failed_when: false
+  check_mode: false
 
-    - name: Get active Node.js version
-      ansible.builtin.command:
-        cmd: node --version
-      register: node_active_version
-      changed_when: false
-      failed_when: false
-      check_mode: false
+- name: Get active Node.js version
+  ansible.builtin.command:
+    cmd: node --version
+  register: node_active_version
+  changed_when: false
+  failed_when: false
+  check_mode: false
 
-    - name: Install LTS version of Node.js using n
-      ansible.builtin.command:
-        cmd: n lts
-      when:
-        - node_lts_version.rc == 0
-        - node_active_version.stdout | default('') != 'v' + node_lts_version.stdout
-      # The when condition runs this task only when the version changes.
-      changed_when: true
+- name: Install LTS version of Node.js using n
+  ansible.builtin.command:
+    cmd: n lts
+  when:
+    - node_lts_version.rc == 0
+    - node_active_version.stdout | default('') != 'v' + node_lts_version.stdout
+  # The when condition runs this task only when the version changes.
+  changed_when: true
 
-    # pre-commit runs nodeenv when node is under $HOME. The nodeenv in Homebrew's
-    # pre-commit fails on the 27.0.0-alpha "latest" release. Remove this task
-    # after the formula ships nodeenv 1.11.1 or later (ekalinin/nodeenv#453).
-    - name: Make nodeenv install the LTS version of Node.js
-      ansible.builtin.copy:
-        content: |
-          [nodeenv]
-          node = lts
-        dest: "{{ ansible_facts.env.HOME }}/.nodeenvrc"
-        mode: "0644"
+# pre-commit runs nodeenv when node is under $HOME. The nodeenv in Homebrew's
+# pre-commit fails on the 27.0.0-alpha "latest" release. Remove this task
+# after the formula ships nodeenv 1.11.1 or later (ekalinin/nodeenv#453).
+- name: Make nodeenv install the LTS version of Node.js
+  ansible.builtin.copy:
+    content: |
+      [nodeenv]
+      node = lts
+    dest: "{{ ansible_facts.env.HOME }}/.nodeenvrc"
+    mode: "0644"
 
-    - name: Install npm packages globally
-      community.general.npm:
-        name: "{{ item.name }}"
-        global: true
-        state: "{{ item.state | default('latest') }}"
-      loop: "{{ node_npm_packages }}"
+- name: Install npm packages globally
+  community.general.npm:
+    name: "{{ item.name }}"
+    global: true
+    state: "{{ item.state | default('latest') }}"
+  loop: "{{ node_npm_packages }}"

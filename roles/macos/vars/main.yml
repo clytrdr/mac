@@ -29,6 +29,7 @@ macos_trackpad_scaling: 2.5
 # Modifier keys for the Apple internal keyboard.
 # Values are HID usage IDs: 0x700000039 = Caps Lock, 0x7000000E4 = Control.
 macos_modifier_keyboard_id: 0-0-0
+macos_modifier_key: com.apple.keyboard.modifiermapping.{{ macos_modifier_keyboard_id }}
 macos_modifier_mappings:
   - src: 30064771129
     dst: 30064771300

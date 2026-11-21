@@ -11,10 +11,6 @@ This project uses the "Yes, Takasu Clinic!" catchphrase as a humorous alias for 
 
 Personal Ansible playbooks that automate the setup of a new macOS machine. They install development tools, applications, shell configurations, and AI tools.
 
-## Prerequisites
-
-- A fresh installation of macOS.
-
 ## Development Guidelines
 
 See [AGENTS.md](AGENTS.md) for role conventions and the development workflow.
@@ -32,7 +28,6 @@ One-line installation (recommended for fresh machines):
 If you have already cloned the repository:
 
 ```shell
-chmod +x bootstrap.sh
 ./bootstrap.sh
 ```
 
@@ -41,34 +36,36 @@ chmod +x bootstrap.sh
 Run the playbook whenever you modify the configuration:
 
 ```shell
-ansible-playbook localhost.yml --become-password-file .ansible_become_pass --vault-password-file .vault_pass
+ansible-playbook localhost.yml
 ```
+
+To run only one role, add `--tags <role_name>` (e.g., `--tags git`).
+
+`ansible.cfg` sets the paths of two password files, so the commands in this README need no password flags. `bootstrap.sh` asks for both passwords and creates the files:
+
+- `.vault_pass`: the Ansible Vault password
+- `.ansible_become_pass`: the Mac login password, for tasks that use `sudo`
 
 ## Managing Secrets
 
-The encrypted file `vars/secrets.yml` is managed with `ansible-vault`. It contains:
+The encrypted file `vars/secrets.yml` is managed with `ansible-vault`. [`vars/secrets.example.yml`](vars/secrets.example.yml) lists its keys with placeholder values.
 
-- `git_user`: Git username
-- `git_mail`: Git email address
-- `firecrawl_api_key`: Firecrawl API key for the MCP server
-
-First-time setup:
+To start a new vault, copy the example file, set the values, and encrypt the file:
 
 ```shell
-echo "your_chosen_vault_password" > .vault_pass
-chmod 600 .vault_pass
-ansible-vault create vars/secrets.yml --vault-password-file .vault_pass
+cp vars/secrets.example.yml vars/secrets.yml
+ansible-vault encrypt vars/secrets.yml
 ```
 
 Manage existing secrets:
 
 ```shell
-ansible-vault view vars/secrets.yml --vault-password-file .vault_pass
-ansible-vault edit vars/secrets.yml --vault-password-file .vault_pass
-ansible-vault rekey vars/secrets.yml --vault-password-file .vault_pass
+ansible-vault view vars/secrets.yml
+ansible-vault edit vars/secrets.yml
+ansible-vault rekey vars/secrets.yml
 ```
 
-Never commit `.vault_pass`. The encrypted `vars/secrets.yml` is safe to commit.
+`.gitignore` excludes `.vault_pass` and `.ansible_become_pass`, and a pre-commit hook blocks them. Never commit these files. The encrypted `vars/secrets.yml` is safe to commit.
 
 ## License
 

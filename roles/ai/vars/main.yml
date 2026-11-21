@@ -47,32 +47,25 @@ ai_trusted_projects:
 
 # Shell commands that run without a permission prompt in Claude Code and
 # Antigravity. Each tool gets the list in its own format.
+# Both tools run in auto mode. In auto mode, a command that matches an allow
+# rule skips the safety check, and the safety check handles all other
+# commands. So list only narrow, safe commands that run often. Each entry
+# saves the few seconds that one safety check takes.
+# Do not list these kinds of commands:
+#   - Commands that can delete or overwrite data, such as git, gh,
+#     terraform, docker, brew, and mv. An allow rule would skip the check
+#     for `git push --force` or `terraform destroy`, for example.
+#   - Interpreters and package runners, such as python, npx, and uv.
+#     Claude Code ignores these rules in auto mode.
+#   - Read-only commands, such as ls, cat, grep, and rg.
+#     Auto mode allows them without a rule.
+# ansible-playbook is not here, because a real run changes this machine.
+# Claude Code allows only its dry-runs (see ai_claude_allowed_rules).
 ai_allowed_commands:
-  - git
-  - gh
-  - gcloud
-  - terraform
-  - docker
-  - ansible
-  - ansible-playbook
   - ansible-lint
-  - find
-  - ls
-  - grep
-  - npm
-  - npx
-  - uv
-  - python
   - pytest
   - pre-commit
-  - mkdir
-  - brew
-  - cat
-  - rg
   - playwright-cli
-  - mv
-  - open
-  - echo
 
 # MCP servers for all three CLIs. The role adds a server only when the CLI
 # does not list it yet. It does not update a server that already exists.
@@ -108,6 +101,14 @@ ai_mcp_servers:
 
 ai_mcp_server_names: "{{ ai_mcp_servers | map(attribute='name') | list }}"
 
+# Extra Claude Code allow rules. A * can match text in the middle of a
+# command, so these rules allow dry-runs and syntax checks of a playbook.
+# Other ansible-playbook runs go to the auto mode safety check, or ask
+# first in the other modes.
+ai_claude_allowed_rules:
+  - Bash(ansible-playbook * --check*)
+  - Bash(ansible-playbook * --syntax-check*)
+
 # Folded to keep source lines under the yaml[line-length] limit. YAML
 # folding joins these lines into a single shell command with spaces.
 ai_claude_status_line_command: >-
@@ -139,6 +140,7 @@ ai_json_settings:
              | map('regex_replace', '^', 'Bash(')
              | map('regex_replace', '$', ':*)') | list
              + ['Read', 'Glob', 'Grep', 'WebFetch', 'WebSearch']
+             + ai_claude_allowed_rules
              + ai_mcp_server_names
              | map('regex_replace', '^', 'mcp__')
              | map('regex_replace', '$', '__*') | list }}

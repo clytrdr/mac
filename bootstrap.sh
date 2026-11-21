@@ -108,7 +108,7 @@ if [ ! -f .vault_pass ]; then
         # Check the password against the encrypted file before keeping it.
         # Discard stdout, because it holds the decrypted secrets.
         if [ ! -f vars/secrets.yml ] ||
-            ansible-vault view vars/secrets.yml --vault-password-file .vault_pass >/dev/null; then
+            ansible-vault view vars/secrets.yml >/dev/null; then
             break
         fi
         rm -f .vault_pass
@@ -134,6 +134,7 @@ unset PASSWORD
 
 # 6. Run Playbook
 echo "Running Ansible Playbook..."
-ansible-playbook localhost.yml --become-password-file .ansible_become_pass --vault-password-file .vault_pass
+# ansible.cfg names both password files.
+ansible-playbook localhost.yml
 
 echo -e "${GREEN}Setup Complete! Please restart your terminal.${NC}"

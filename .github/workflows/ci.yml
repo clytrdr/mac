@@ -29,6 +29,14 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
+      # ansible.cfg names both password files, and Ansible fails when one is
+      # missing. The syntax check in ansible-lint decrypts nothing, so a dummy
+      # vault password is enough.
+      - name: Create dummy password files
+        run: |
+          printf 'dummy' > .vault_pass
+          : > .ansible_become_pass
+
       - name: Run pre-commit
         uses: pre-commit/action@v3.0.1
 
@@ -53,19 +61,22 @@ jobs:
       - name: Install Python dependencies
         run: pip3 install -r requirements.txt
 
-      - name: Create vault password file from GitHub Secret
+      # ansible.cfg names both password files. The runner has passwordless
+      # sudo, so the become password file can stay empty.
+      - name: Create password files
         run: |
           umask 077
           printf '%s' "$ANSIBLE_VAULT_PASSWORD" > .vault_pass
+          : > .ansible_become_pass
         env:
           ANSIBLE_VAULT_PASSWORD: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}
 
       - name: Run syntax check
-        run: ansible-playbook localhost.yml --syntax-check --vault-password-file .vault_pass
+        run: ansible-playbook localhost.yml --syntax-check
 
       - name: Run dry-run
-        run: ansible-playbook localhost.yml --check --vault-password-file .vault_pass
+        run: ansible-playbook localhost.yml --check
 
-      - name: Clean up vault password file
+      - name: Clean up password files
         if: always()
-        run: rm -f .vault_pass
+        run: rm -f .vault_pass .ansible_become_pass

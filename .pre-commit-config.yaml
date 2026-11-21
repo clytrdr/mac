@@ -51,3 +51,19 @@ repos:
         entry: sh -c 'head -n1 "$1" | grep -q "^\$ANSIBLE_VAULT;"' --
         language: system
         files: ^vars/secrets\.yml$
+
+      # Block commits of the password files, also with `git add -f`.
+      - id: forbid-password-files
+        name: Block commits of password files
+        entry: Password files must not be committed. See .gitignore.
+        language: fail
+        files: (^|/)\.(vault_pass|ansible_become_pass)$
+
+      # AGENTS.md: use {{ ansible_facts.env.HOME }}, not ~ or $HOME.
+      # Comment lines are skipped. Templates are not checked, because they
+      # write shell and config files that use these forms on purpose.
+      - id: check-home-path
+        name: Use ansible_facts.env.HOME for the home directory
+        entry: '^[^#]*(~/|\$HOME|\$\{HOME\}|lookup\([''"]env[''"],\s*[''"]HOME)'
+        language: pygrep
+        files: ^(localhost\.yml|roles/[^/]+/(tasks|handlers|vars|defaults)/.*\.ya?ml)$
