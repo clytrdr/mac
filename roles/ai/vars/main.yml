@@ -117,13 +117,11 @@ ai_json_settings:
       permissions:
         allow: >-
           {{ ai_allowed_commands
-             | map('regex_replace', '^', 'Bash(')
-             | map('regex_replace', '$', ':*)') | list
+             | map('regex_replace', '^(.*)$', 'Bash(\1:*)') | list
              + ['Read', 'Glob', 'Grep', 'WebFetch', 'WebSearch']
              + ai_claude_allowed_rules
              + ai_mcp_server_names
-             | map('regex_replace', '^', 'mcp__')
-             | map('regex_replace', '$', '__*') | list }}
+             | map('regex_replace', '^(.*)$', 'mcp__\1__*') | list }}
         # Leading // matches from the root and blocks secrets in all projects.
         deny:
           - Bash(gh repo delete:*)
@@ -143,14 +141,11 @@ ai_json_settings:
       permissions:
         allow: >-
           {{ ai_allowed_commands
-             | map('regex_replace', '^', 'command(')
-             | map('regex_replace', '$', ')') | list
+             | map('regex_replace', '^(.*)$', 'command(\1)') | list
              + ['read_url(*)']
              + ai_mcp_server_names
-             | map('regex_replace', '^', 'mcp(')
-             | map('regex_replace', '$', '/*)') | list
+             | map('regex_replace', '^(.*)$', 'mcp(\1/*)') | list
              + ai_workspace_dirs
-             | map('regex_replace', '^', 'write_file(')
-             | map('regex_replace', '$', ')') | list }}
+             | map('regex_replace', '^(.*)$', 'write_file(\1)') | list }}
       showFeedbackSurvey: false
       trustedWorkspaces: "{{ ai_trusted_projects }}"

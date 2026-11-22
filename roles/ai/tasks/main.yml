@@ -112,9 +112,15 @@
   failed_when: false
   check_mode: false
 
-- name: Collect MCP server lists of installed CLIs
+# The first word of each line is taken as a server name. The add tasks
+# below loop over the missing servers of each installed CLI only.
+- name: Find missing MCP servers of installed CLIs
   ansible.builtin.set_fact:
-    ai_mcp_listed: "{{ ai_mcp_listed | default({}) | combine({item.item: item.stdout}) }}"
+    ai_mcp_missing: >-
+      {{ ai_mcp_missing | default({}) | combine({item.item: ai_mcp_servers
+         | rejectattr('name', 'in', item.stdout_lines
+           | map('regex_replace', '^([^: ]+).*$', '\1') | list)
+         | list}) }}
   loop: "{{ ai_mcp_list.results }}"
   loop_control:
     label: "{{ item.item }}"
@@ -133,12 +139,9 @@
       {% for k, v in (item.env | default({})).items() %}-e {{ k }}={{ v | quote }} {% endfor %}
       -- {{ item.command }} {{ item.args | map('quote') | join(' ') }}
       {% endif %}
-  loop: "{{ ai_mcp_servers }}"
+  loop: "{{ ai_mcp_missing.claude | default([]) }}"
   loop_control:
     label: "{{ item.name }}"
-  when:
-    - "'claude' in ai_mcp_listed | default({})"
-    - "ai_mcp_listed.claude is not search('(?m)^' ~ item.name ~ '[: ]')"
   changed_when: true
   no_log: "{{ item.env is defined }}"
 
@@ -152,12 +155,9 @@
       {% for k, v in (item.env | default({})).items() %}--env {{ k }}={{ v | quote }} {% endfor %}
       -- {{ item.command }} {{ item.args | map('quote') | join(' ') }}
       {% endif %}
-  loop: "{{ ai_mcp_servers }}"
+  loop: "{{ ai_mcp_missing.codex | default([]) }}"
   loop_control:
     label: "{{ item.name }}"
-  when:
-    - "'codex' in ai_mcp_listed | default({})"
-    - "ai_mcp_listed.codex is not search('(?m)^' ~ item.name ~ '[: ]')"
   changed_when: true
   no_log: "{{ item.env is defined }}"
 
@@ -172,12 +172,9 @@
       {% for k, v in (item.env | default({})).items() %}-e {{ k }}={{ v | quote }} {% endfor %}
       {{ item.name }} -- {{ item.command }} {{ item.args | map('quote') | join(' ') }}
       {% endif %}
-  loop: "{{ ai_mcp_servers }}"
+  loop: "{{ ai_mcp_missing.agy | default([]) }}"
   loop_control:
     label: "{{ item.name }}"
-  when:
-    - "'agy' in ai_mcp_listed | default({})"
-    - "ai_mcp_listed.agy is not search('(?m)^' ~ item.name ~ '[: ]')"
   changed_when: true
   no_log: "{{ item.env is defined }}"
 
