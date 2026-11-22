@@ -15,7 +15,8 @@ Do not include `-r requirements-dev.txt` if that file does not exist.
 `uv pip install -r` keeps an editable install of the project. Do not run `uv pip install -e .` again.
 Run `uv pip install -e .` only if the project is not installed in the virtual environment yet.
 
-Do not run `uv sync` or `uv pip sync`. A `uv.lock` file can exist even when the project does not use that workflow. Follow the README.
+Do not run `uv sync` or `uv pip sync`. A `uv.lock` file can exist even when the project does not use that workflow.
+A README can tell you to run `uv pip sync` after you remove a package from a `*.in` file. That step does not apply here, because Dependabot changes only versions.
 
 ## 2. Container
 
