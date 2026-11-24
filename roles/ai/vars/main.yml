@@ -52,7 +52,6 @@ ai_allowed_commands:
   - ansible-lint
   - pytest
   - pre-commit
-  - playwright-cli
 
 # MCP servers for all three CLIs. The role adds missing servers only.
 # To update an entry, run `<cli> mcp remove <name>` for each CLI. Then run
