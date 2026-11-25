@@ -157,8 +157,9 @@ updateall() {
   _updateall_step "Updating Claude Code plugin marketplaces..." claude plugin marketplace update
   # 'claude plugin update' takes one plugin at a time, so loop over the
   # user-scope plugins. Project-scope plugins depend on the current directory.
+  # Skip built-in plugins. They are part of Claude Code and have no separate update.
   local plugin
-  for plugin in ${(f)"$(claude plugin list --json 2>/dev/null | jq -r '.[] | select(.scope == "user") | .id')"}; do
+  for plugin in ${(f)"$(claude plugin list --json 2>/dev/null | jq -r '.[] | select(.scope == "user" and (.id | endswith("@builtin") | not)) | .id')"}; do
     _updateall_step "Updating Claude Code plugin ${plugin}..." claude plugin update --scope user "$plugin"
   done
   _updateall_step "Updating the Antigravity CLI..." agy update
