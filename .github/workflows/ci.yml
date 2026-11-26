@@ -11,24 +11,24 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 env:
-  PYTHON_VERSION: '3.14'
+  PYTHON_VERSION: "3.14"
 
 jobs:
   lint:
-    name: Run pre-commit hooks
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
-      - name: Check out the repository
-        uses: actions/checkout@v7
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
-
-      - name: Set up Python
-        uses: actions/setup-python@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: ${{ env.PYTHON_VERSION }}
-
       # ansible.cfg names both password files, and Ansible fails when a file
       # is missing or empty. ansible-lint does not decrypt or escalate, so
       # dummy values are enough.
@@ -36,48 +36,44 @@ jobs:
         run: |
           printf 'dummy' > .vault_pass
           printf 'dummy' > .ansible_become_pass
-
       - name: Run pre-commit
         uses: pre-commit/action@v3.0.1
 
   test-playbook:
-    name: Test Ansible Playbook
-    if: github.actor != 'dependabot[bot]'
-    runs-on: macos-latest
     needs: lint
+    if: >-
+      github.event_name != 'pull_request' ||
+      (github.actor != 'dependabot[bot]' &&
+      github.event.pull_request.head.repo.full_name == github.repository)
+    runs-on: macos-latest
+    timeout-minutes: 20
     steps:
-      - name: Check out the repository
-        uses: actions/checkout@v7
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
-
-      - name: Set up Python
-        uses: actions/setup-python@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: ${{ env.PYTHON_VERSION }}
-          cache: 'pip'
-          cache-dependency-path: requirements.txt
-
       - name: Install Python dependencies
-        run: pip3 install -r requirements.txt
-
+        run: python -m pip install -r requirements.txt
       # ansible.cfg names both password files, and Ansible rejects an empty
       # password file. The runner has passwordless sudo, so sudo never asks
       # for the dummy become password.
       - name: Create password files
         run: |
+          if [ -z "$ANSIBLE_VAULT_PASSWORD" ]; then
+            echo "::error::ANSIBLE_VAULT_PASSWORD secret is not set" >&2
+            exit 1
+          fi
           umask 077
           printf '%s' "$ANSIBLE_VAULT_PASSWORD" > .vault_pass
           printf 'dummy' > .ansible_become_pass
         env:
           ANSIBLE_VAULT_PASSWORD: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}
-
       - name: Run syntax check
         run: ansible-playbook localhost.yml --syntax-check
-
       - name: Run dry-run
         run: ansible-playbook localhost.yml --check
-
       - name: Clean up password files
         if: always()
         run: rm -f .vault_pass .ansible_become_pass
