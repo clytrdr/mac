@@ -1,7 +1,6 @@
 # My Ansible Setup for macOS
 
 [![Ansible CI](https://github.com/clytrdr/mac/actions/workflows/ci.yml/badge.svg)](https://github.com/clytrdr/mac/actions/workflows/ci.yml)
-[![pre-commit.ci status](https://results.pre-commit.ci/badge/github/clytrdr/mac/main.svg)](https://results.pre-commit.ci/latest/github/clytrdr/mac/main)
 
 **Disclaimer:** The author is not responsible for any damage caused by using this system.
 
