@@ -9,6 +9,7 @@
     dest: "{{ ansible_facts.env.HOME }}/.gitignore_global"
     mode: '0644'
 
+# no_log hides vault values in task output and CI logs.
 - name: Set Git configurations
   community.general.git_config:
     name: "{{ item.name }}"
@@ -17,7 +18,10 @@
   loop:
     - { name: 'core.excludesFile', value: "{{ ansible_facts.env.HOME }}/.gitignore_global" }
     - { name: 'init.defaultBranch', value: 'main' }
-    - { name: 'user.name', value: "{{ git_user }}" }
-    - { name: 'user.email', value: "{{ git_mail }}" }
+    - { name: 'user.name', value: "{{ git_user }}", secret: true }
+    - { name: 'user.email', value: "{{ git_mail }}", secret: true }
     - { name: 'alias.pushall', value: '!git push --all && git push --tags' }
+  loop_control:
+    label: "{{ item.name }}"
   when: item.value is defined and item.value | string | length > 0
+  no_log: "{{ item.secret | default(false) }}"

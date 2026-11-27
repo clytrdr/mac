@@ -114,6 +114,7 @@
 
 # The first word of each line is taken as a server name. The add tasks
 # below loop over the missing servers of each installed CLI only.
+# no_log hides API keys that ai_mcp_servers includes in this fact.
 - name: Find missing MCP servers of installed CLIs
   ansible.builtin.set_fact:
     ai_mcp_missing: >-
@@ -125,6 +126,7 @@
   loop_control:
     label: "{{ item.item }}"
   when: item.rc | default(1) == 0
+  no_log: true
 
 # The env values are API keys. no_log hides them in the command line.
 # A server without env values has no key, so its output stays visible.
