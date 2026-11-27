@@ -34,8 +34,8 @@ Report the results at the end.
 4. **Approval 1.** Ask which PRs to squash-merge. Wait for explicit approval.
    Ask for all decisions in this one question:
    - Suggest merging all MERGEABLE and CLEAN PRs.
-   - UNSTABLE PRs: non-critical CI checks can cause this status. One example is pre-commit.ci
-     on private repositories. Ask in the same question whether to include these PRs.
+   - UNSTABLE PRs: non-critical or flaky CI checks can cause this status. Ask in the same question
+     whether to include these PRs.
    - CONFLICTING PRs: tell the user that you will comment `@dependabot rebase` on these PRs.
      This comment does not need separate approval.
 5. Squash-merge the approved PRs one by one with `gh pr merge <number> --squash`.

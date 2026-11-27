@@ -18,22 +18,27 @@ npm audit fix
 npm audit
 ```
 
-Record the new counts.
+Record the new counts. If `npm audit` reports no findings, go to step 5.
 
 Do not run `npm audit fix --force`. If the user asks for `--force`, compare the target version with the installed version first. Tell the user clearly if the change is a downgrade.
 
 ## 3. Check for in-range updates
 
+Check `.github/dependabot.yml` for `ignore` rules under the `npm` ecosystem. Do not update packages that match those rules.
+
 ```
 npm outdated
 ```
 
-If `Current` differs from `Wanted` for any package, run:
+Find packages where `Current` differs from `Wanted` and no `ignore` rule matches them.
+If any such packages exist, update only those packages:
 
 ```
-npm update
+npm update <package1> <package2> ...
 npm audit
 ```
+
+If `.github/dependabot.yml` has no `ignore` rules for `npm`, you can run plain `npm update`.
 
 ## 4. Check remaining findings
 
@@ -45,6 +50,7 @@ If the latest version is still vulnerable, report the finding as blocked upstrea
 Run these scripts if `package.json` defines them:
 
 ```
+npm run lint
 npm run build
 npm test
 ```

@@ -34,16 +34,6 @@ pytest
 
 Report failures with the output.
 
-## 4. Ansible repositories
-
-If the repository root has `localhost.yml` or `ansible.cfg`, the Python requirements are the tools themselves, not an application. Step 1 completes the refresh. The repository has no test suite.
-
-Running the playbook again changes the local machine. Do not run the playbook. Show this command in the final report. Let the user decide whether to run it:
-
-```
-ansible-playbook localhost.yml --check --diff --vault-password-file .vault_pass
-```
-
-## 5. Files that may change
+## 4. Files that may change
 
 Usually none. Dependabot already committed the `requirements*.txt` changes in the PR. `uv pip install` writes only to the virtual environment.

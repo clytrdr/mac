@@ -34,6 +34,8 @@ ai_workspace_dirs:
 # Claude Code and Codex CLI store trust in their own files, so the role does
 # not manage it.
 ai_trusted_projects:
+  - "{{ ansible_facts.env.HOME }}"
+  - "{{ ansible_facts.env.HOME }}/Code"
   - "{{ ansible_facts.env.HOME }}/Code/back"
   - "{{ ansible_facts.env.HOME }}/Code/front"
   - "{{ ansible_facts.env.HOME }}/Code/infra"
